@@ -1,5 +1,28 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Local database (Postgres)
+
+- Preferred: run Postgres via Docker so dev matches prod.
+- Copy `.env.example` to `.env.local` and adjust if needed.
+- Start DB: `docker compose up -d db`
+- Stop DB: `docker compose down` (add `--volumes` to reset data)
+- If you prefer native Postgres, skip Docker and point `DATABASE_URL` to your local instance.
+
+## Migrations
+
+- Install deps if you haven’t since pulling changes: `npm install`
+- Make sure `DATABASE_URL` is set (via `.env.local` or env).
+- Apply migrations: `npm run db:migrate` (uses `db/migrations/*.sql`, tracks state in `migrations` table).
+- On DigitalOcean App Platform, run `npm run db:migrate` as a deploy/release command with the managed Postgres `DATABASE_URL` and a strong `LOBBY_TOKEN_SECRET`.
+
+## Deployment (DigitalOcean App Platform)
+
+- Attach a managed Postgres and use its connection string as `DATABASE_URL`.
+- Set `LOBBY_TOKEN_SECRET` to a strong random string.
+- Build command: `npm run build`
+- Run command: `npm run start` (will switch to `node server.js` once the custom WS server is added).
+- App Platform sets `PORT` for you; Next.js reads it automatically.
+
 ## Getting Started
 
 First, run the development server:

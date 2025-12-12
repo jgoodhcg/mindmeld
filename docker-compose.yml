@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mindmeld
+      POSTGRES_PASSWORD: mindmeld
+      POSTGRES_DB: mindmeld
+    ports:
+      - "5432:5432"
+    volumes:
+      - mindmeld_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mindmeld"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mindmeld_pgdata:
