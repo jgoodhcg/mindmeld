@@ -13,25 +13,6 @@ Mindmeld is a platform for multiplayer party games that bring people together th
 
 ---
 
-## Stack
-
-- **Framework**: Next.js 15 (with custom server for WebSocket support)
-- **Runtime**: Node.js
-- **Database**: PostgreSQL
-- **Hosting**: DigitalOcean App Platform
-- **Real-time**: WebSockets via `ws` library on custom server
-
-## Architecture Note
-
-Next.js doesn't natively support WebSocket connections. We use a custom `server.js` that:
-1. Creates a Node HTTP server
-2. Attaches the WebSocket server (`ws`) for real-time game communication
-3. Passes regular HTTP requests to Next.js handler
-
-Single port serves both HTTP and WebSocket traffic.
-
----
-
 ## Game 1: Trivia
 
 ### Core Concepts
@@ -149,37 +130,35 @@ trivia_answers
 
 ## Roadmap
 
-### Platform Identity/Auth
-- [ ] Lobby session token issuance/validation (HTTP + WebSocket handshake)
-- [ ] `players.user_id` nullable column for future auth backfill
-- [ ] Auth provider integration (Auth.js/Clerk/Supabase) for post-v1
-
 ### Phase 1: Foundation
-- [ ] Initialize Next.js project with TypeScript
-- [ ] Set up custom server with WebSocket support
-- [ ] Configure PostgreSQL connection (local + production)
-- [ ] Create database schema/migrations
-- [ ] Verify local dev environment works
-- [ ] Deploy to DO App Platform (hello world)
+- [ ] Database schema and migrations
+- [ ] Basic lobby creation and joining
+- [ ] Local development environment
+- [ ] Deploy to production (hello world)
 
 ### Phase 2: Lobby System
-- [ ] Create lobby API endpoint (generates code)
+- [ ] Create lobby (generates join code)
 - [ ] Join lobby via URL (`/trivia/:code`)
 - [ ] Player name entry
-- [ ] Lobby state synchronization via WebSocket
+- [ ] Real-time lobby state sync
 - [ ] Host configuration UI (questions per person, team mode)
 
-### Phase 3: Teams
+### Phase 3: Identity & Sessions
+- [ ] Lobby session token issuance/validation
+- [ ] Session persistence across reconnects
+- [ ] `players.user_id` nullable column for future auth
+
+### Phase 4: Teams
 - [ ] Solo mode (auto-create team of 1)
 - [ ] Auto-assign teams
 - [ ] Manual team assignment UI
 
-### Phase 4: Question Submission
+### Phase 5: Question Submission
 - [ ] Question submission form (question + 4 answers, mark correct)
 - [ ] Track submission count per player
 - [ ] Show submission progress to lobby
 
-### Phase 5: Game Play
+### Phase 6: Game Play
 - [ ] Randomize question order
 - [ ] Display question to all players
 - [ ] Server-authoritative timer
@@ -187,14 +166,14 @@ trivia_answers
 - [ ] Point calculation (time-based positive, fixed negative)
 - [ ] Round results display
 
-### Phase 6: Stats & End Game
+### Phase 7: Stats & End Game
 - [ ] Calculate all stats (total, avg, median, fastest, slowest)
 - [ ] Team aggregate stats
 - [ ] Final results screen
 - [ ] Option to play again with same lobby
 
-### Phase 7: Polish
-- [ ] Mobile-responsive CSS
+### Phase 8: Polish
+- [ ] Mobile-responsive design
 - [ ] Reconnection handling
 - [ ] Error states and edge cases
 - [ ] Lobby cleanup (old/abandoned lobbies)
@@ -216,5 +195,3 @@ trivia_answers
 - Lobby expiration policy
 - Max players per lobby?
 - Max questions per person limit?
-- PostgreSQL provider for production (Supabase free tier, Neon free tier, or DO Managed)
-- Auth path: Auth.js vs. hosted (Clerk/Supabase) when adding global accounts; token sharing with WS auth helpers

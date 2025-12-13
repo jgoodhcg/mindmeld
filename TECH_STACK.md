@@ -1,49 +1,126 @@
-# Technical Architecture Decision Record: Mindmeld (Next.js Stack)
+# Technical Architecture: Mindmeld (Go Stack)
 
 ## 1. Core Stack
-- **Language:** TypeScript (Node.js runtime)
-  - *Why:* Strong typing with a familiar JS ecosystem; seamless in Next.js.
-- **Framework:** Next.js (App Router)
-  - *Why:* Full-stack pages/routes with built-in bundling, image/font optimizations, and SSR/SSG when needed.
-- **Custom Server:** Node HTTP server + `ws`
-  - *Why:* Single-port HTTP + WebSocket handling for lobby/game real-time updates.
-- **Styling:** Tailwind CSS (v4, CLI)
-  - *Why:* Rapid UI development with utility classes; no extra build tooling beyond the Tailwind CLI.
+
+- **Language:** Go (Golang)
+  - *Why:* Simplicity, stability ("boring" in a good way), exceptional standard library, easy single-binary deployment. Low cognitive load.
+
+- **Templating:** templ (https://templ.guide)
+  - *Why:* Type-safe HTML. Catches errors at compile time, preventing runtime bugs in UI code.
+
+- **Frontend Logic:** HTMX + WebSockets
+  - *Why:* HATEOAS architecture. No frontend build step, no JavaScript framework complexity.
+
+- **Styling:** Tailwind CSS (CLI)
+  - *Why:* Rapid UI development. The standalone CLI means no Node.js/NPM dependency is required for builds.
 
 ## 2. Data & State
-- **Database:** PostgreSQL (managed in production)
-  - *Why:* Reliable, scalable relational store; fits multiplayer/game/session data.
-- **Schema Management:** SQL migrations (`db/migrations/*.sql`) via Node runner
-  - *Why:* Plain SQL, simple tracking table; easy to run locally and in CI/deploy.
-- **Session/Identity:** Signed lobby session token (httpOnly cookie)
-  - *Why:* Bind `player_id` + `lobby_id` for reloads/reconnects without global auth.
-- **Real-time:** `ws` library on the custom server
-  - *Why:* Lightweight WebSocket handling for lobby sync, timers, and game events.
+
+- **Database:** PostgreSQL
+  - *Why:* Robust, scalable, standard relational database. Easily hosted as a managed component on DigitalOcean App Platform.
+
+- **Schema Management:** goose
+  - *Why:* Manages database structure changes (migrations) using plain SQL files. Ensures production and dev DBs stay in sync.
+
+- **Data Access:** sqlc
+  - *Why:* Generates type-safe Go code from raw SQL queries. Replaces complex ORMs and catches SQL errors at compile time.
+
+- **Real-time:** nhooyr.io/websocket + HTMX ws extension
+  - *Why:* Robust, idiomatic Go WebSocket handling to push game state updates to clients instantly.
 
 ## 3. Infrastructure & Deployment
+
 - **Host:** DigitalOcean App Platform
-  - *Why:* Managed runtime, automatic HTTPS, environment variables, zero-ops deploys.
-- **Runtime:** Node.js 20+
-  - *Why:* Supported by App Platform; aligns with Next.js requirements.
-- **Build Command:** `npm run build`
-  - *Why:* Standard Next.js build pipeline.
-- **Run Command:** `npm run start` (or `node server.js` once custom server is in place)
-  - *Why:* Serves both HTTP and WS from one process.
-- **Env Vars:** `DATABASE_URL`, `LOBBY_TOKEN_SECRET`, `PORT` (provided by DO)
-  - *Why:* Separate secrets/config from code; consistent between local and prod.
+  - *Why:* Fully managed PaaS. Handles build, deployment, SSL, and scaling automatically. Zero server maintenance.
+
+- **Containerization:** Dockerfile
+  - *Why:* Standardizes the build environment for the App Platform.
+
+- **Web Server / Proxy:** Managed by Platform
+  - *Why:* Platform handles SSL termination (HTTPS) and routing automatically.
+
+- **Deployment Pipeline:** Git Push -> Auto-Deploy
+  - *Why:* Continuous Delivery. Pushing to the repository triggers a build and update.
 
 ## 4. Authentication (Strategy)
-- **Phase 1 (MVP):** Anonymous lobby sessions
-  - *Implementation:* Signed httpOnly cookie with `player_id` + `lobby_id`; display name per lobby.
-- **Phase 2 (Future):** Accounts via Auth.js or hosted provider
-  - *Why:* Add OAuth/email auth without changing lobby token flow; store `user_id` nullable now.
+
+- **Phase 1 (MVP):** Anonymous Sessions
+  - *Implementation:* Signed HTTP-only cookies using `alexedwards/scs`.
+  - *Identity:* Users are identified by a random Session ID and a display name they pick per lobby.
+
+- **Phase 2 (Future):** OAuth2 / Magic Links
+  - *Implementation:* `markbates/goth` for OAuth.
+  - *Why:* Avoids storing passwords (security liability). Accounts are linked to the existing Session IDs.
 
 ## 5. Development Tooling
-- **Package Manager:** npm (lockfile checked in)
-  - *Why:* Default for Next.js; matches DO build environment.
-- **Migrations:** `npm run db:migrate`
-  - *Why:* Runs SQL migrations with tracking table; works locally and in deploy hooks.
-- **Linting:** ESLint (Next.js config)
-  - *Why:* Catch common React/TS issues early.
-- **Dev Server:** `npm run dev`
-  - *Why:* Hot reload for rapid iteration; custom server will be added later for WS parity with prod.
+
+- **Live Reload:** Air
+  - *Why:* Recompiles and restarts the Go server instantly when files change.
+
+- **Build Tool:** Make (Makefile)
+  - *Why:* Universal standard to coordinate `templ generate`, `tailwind`, and `go build` steps.
+
+## 6. Project Structure
+
+```
+mindmeld/
+├── cmd/
+│   └── server/
+│       └── main.go           # Application entrypoint
+├── internal/
+│   ├── handlers/             # HTTP handlers
+│   ├── middleware/           # Auth, logging, etc.
+│   ├── db/                   # sqlc generated code
+│   └── ws/                   # WebSocket hub
+├── templates/                # templ files (.templ)
+├── static/                   # CSS, JS, images
+│   └── css/
+│       └── input.css         # Tailwind source
+├── migrations/               # goose SQL migrations
+├── queries/                  # sqlc SQL queries
+├── go.mod
+├── go.sum
+├── Makefile
+├── Dockerfile
+├── .air.toml
+├── sqlc.yaml
+└── tailwind.config.js
+```
+
+## 7. Key Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `github.com/go-chi/chi/v5` | HTTP router |
+| `github.com/alexedwards/scs/v2` | Session management |
+| `github.com/a-h/templ` | Type-safe HTML templates |
+| `nhooyr.io/websocket` | WebSocket handling |
+| `github.com/pressly/goose/v3` | Database migrations |
+| `github.com/sqlc-dev/sqlc` | SQL code generation |
+| `github.com/jackc/pgx/v5` | PostgreSQL driver |
+
+## 8. Common Commands
+
+```bash
+# Development
+make dev          # Start with live reload (Air)
+make generate     # Run templ + sqlc code generation
+make build        # Build production binary
+
+# Database
+make migrate      # Apply pending migrations
+make migrate-new  # Create new migration file
+
+# Styling
+make css          # Build Tailwind CSS
+make css-watch    # Watch mode for Tailwind
+```
+
+## 9. Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SESSION_SECRET` | Secret key for cookie signing |
+| `PORT` | Server port (default: 8080) |
+| `ENV` | Environment: development, production |
