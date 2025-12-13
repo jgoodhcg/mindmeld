@@ -1,59 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mindmeld
 
-## Local database (Postgres)
+Multiplayer party games that bring people together through shared thinking.
 
-- Preferred: run Postgres via Docker so dev matches prod.
-- Copy `.env.example` to `.env.local` and adjust if needed.
-- Start DB: `docker compose up -d db`
-- Stop DB: `docker compose down` (add `--volumes` to reset data)
-- If you prefer native Postgres, skip Docker and point `DATABASE_URL` to your local instance.
+## Stack
 
-## Migrations
+- **Go** - Server
+- **templ** - Type-safe HTML templates
+- **HTMX** - Frontend interactivity (coming soon)
+- **Tailwind CSS** - Styling
+- **PostgreSQL** - Database
+- **Air** - Hot reload for development
 
-- Install deps if you haven’t since pulling changes: `npm install`
-- Make sure `DATABASE_URL` is set (via `.env.local` or env).
-- Apply migrations: `npm run db:migrate` (uses `db/migrations/*.sql`, tracks state in `migrations` table).
-- On DigitalOcean App Platform, run `npm run db:migrate` as a deploy/release command with the managed Postgres `DATABASE_URL` and a strong `LOBBY_TOKEN_SECRET`.
+## Prerequisites
 
-## Deployment (DigitalOcean App Platform)
+- Go 1.25+
+- Docker (for PostgreSQL)
+- [Tailwind CSS CLI](https://github.com/tailwindlabs/tailwindcss/releases) (standalone binary)
 
-- Attach a managed Postgres and use its connection string as `DATABASE_URL`.
-- Set `LOBBY_TOKEN_SECRET` to a strong random string.
-- Build command: `npm run build`
-- Run command: `npm run start` (will switch to `node server.js` once the custom WS server is added).
-- App Platform sets `PORT` for you; Next.js reads it automatically.
+### Install Tailwind CLI (macOS ARM)
+
+```bash
+curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-macos-arm64
+chmod +x tailwindcss-macos-arm64
+sudo mv tailwindcss-macos-arm64 /usr/local/bin/tailwindcss
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Copy environment config
+cp .env.example .env.local
+
+# Start PostgreSQL
+make db-up
+
+# Build CSS
+make css
+
+# Start dev server with hot reload
+make dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---------|-------------|
+| `make dev` | Start server with hot reload |
+| `make run` | Run server directly |
+| `make build` | Build production binary |
+| `make templ` | Generate templ templates |
+| `make css` | Build Tailwind CSS |
+| `make css-watch` | Watch and rebuild CSS |
+| `make db-up` | Start PostgreSQL container |
+| `make db-down` | Stop PostgreSQL container |
+| `make clean` | Remove build artifacts |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+mindmeld/
+├── cmd/server/main.go    # Server entrypoint
+├── templates/            # templ templates
+├── static/css/           # Tailwind CSS
+├── tools.go              # Pinned tool versions
+├── Makefile              # Build commands
+├── .air.toml             # Hot reload config
+└── docker-compose.yml    # PostgreSQL
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `PORT` | Server port (default: 3000) |
