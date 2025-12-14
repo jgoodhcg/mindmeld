@@ -105,7 +105,7 @@ docker run -p 8080:8080 -e DATABASE_URL="postgres://mindmeld:mindmeld@host.docke
 
 **Migrations:**
 
-Run migrations against production DB after deploy:
+Run migrations against production DB after deploy (run goose directly to avoid `.env.local` override):
 ```bash
-DATABASE_URL="your-prod-url" make migrate
+go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "your-prod-connection-string" up
 ```
