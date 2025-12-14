@@ -2,13 +2,14 @@
 
 ## Vision
 
-Mindmeld is a platform for multiplayer party games that bring people together through shared thinking. The games explore how aligned (or misaligned) players' minds are - through trivia, word association, and other social challenges.
+Mindmeld is a platform for multiplayer party games that bring people together through shared thinking. The games explore how aligned (or misaligned) players' minds are - through trivia, word association, and other social games. The primary goal is social connection with a secondary fun goal of stats tracking and visualization.
 
 **First game: Trivia** - Players submit questions for each other, answer under time pressure, and see how well they know each other and the world.
 
 **Future games:**
 - Word association (Wavelength-style)
 - Turn-based strategy (simple 2D)
+- Puzzles (word guessing, crosswords, word grouping)
 - Other social/party games TBD
 
 ---
@@ -21,7 +22,8 @@ Mindmeld is a platform for multiplayer party games that bring people together th
 
 - Created by a host, generates a unique join code
 - Shareable URL contains the join code (e.g., `/trivia/ABC123`)
-- Host configures:
+- Lobby will be a general concept across many games
+- For this game Host configures:
   - Questions per person (how many each player submits)
   - Team mode: manual assignment, auto-assign, or solo (teams of 1)
 - Lobby persists in database until explicitly cleaned up (cleanup strategy TBD)
