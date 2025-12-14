@@ -24,6 +24,17 @@
 .DS_Store
 *.pem
 
+# Go
+/bin
+/tmp
+
+# Generated files
+# Built at deploy time via Dockerfile
+# For local dev: make generate (templ + sqlc), make css (tailwind)
+/internal/db/
+templates/*_templ.go
+static/css/output.css
+
 # debug
 npm-debug.log*
 yarn-debug.log*
