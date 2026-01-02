@@ -2,24 +2,19 @@ package main
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
 	"github.com/jgoodhcg/mindmeld/internal/db"
-	"github.com/jgoodhcg/mindmeld/templates"
+	"github.com/jgoodhcg/mindmeld/internal/server"
 )
 
 func main() {
@@ -53,64 +48,14 @@ func main() {
 	}
 	log.Println("Connected to database")
 
-	// Create queries instance
+	// Create queries and server
 	queries := db.New(pool)
+	srvInstance := server.NewServer(queries)
 
-	// Set up router
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-
-	// Static files
-	fileServer := http.FileServer(http.Dir("static"))
-	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
-
-	// Routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		lobbies, err := queries.ListLobbies(r.Context())
-		if err != nil {
-			log.Printf("Error listing lobbies: %v", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-		templates.Home(lobbies).Render(r.Context(), w)
-	})
-
-	r.Post("/lobbies", func(w http.ResponseWriter, r *http.Request) {
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Invalid form", http.StatusBadRequest)
-			return
-		}
-
-		name := strings.TrimSpace(r.FormValue("name"))
-		if name == "" {
-			http.Error(w, "Name is required", http.StatusBadRequest)
-			return
-		}
-
-		code := generateCode()
-
-		_, err := queries.CreateLobby(r.Context(), db.CreateLobbyParams{
-			Code: code,
-			Name: name,
-		})
-		if err != nil {
-			log.Printf("Error creating lobby: %v", err)
-			http.Error(w, "Failed to create lobby", http.StatusInternalServerError)
-			return
-		}
-
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	})
-
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok"))
-	})
-
-	// Create server
+	// Create http server
 	srv := &http.Server{
 		Addr:    ":" + port,
-		Handler: r,
+		Handler: srvInstance.Router(),
 	}
 
 	// Start server
@@ -131,10 +76,4 @@ func main() {
 	defer cancel()
 	srv.Shutdown(ctx)
 	fmt.Println("Server exited")
-}
-
-func generateCode() string {
-	bytes := make([]byte, 3)
-	rand.Read(bytes)
-	return strings.ToUpper(hex.EncodeToString(bytes))
 }

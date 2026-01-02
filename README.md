@@ -26,6 +26,9 @@ cp .env.example .env.local
 # Start PostgreSQL
 make db-up
 
+# Run migrations
+make migrate
+
 # Build CSS
 make css
 
@@ -47,6 +50,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 | `make css-watch` | Watch and rebuild CSS |
 | `make db-up` | Start PostgreSQL container |
 | `make db-down` | Stop PostgreSQL container |
+| `make migrate` | Run database migrations |
 | `make clean` | Remove build artifacts |
 
 ## Project Structure
