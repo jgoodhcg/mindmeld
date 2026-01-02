@@ -14,7 +14,7 @@ import (
 const createLobby = `-- name: CreateLobby :one
 INSERT INTO lobbies (code, name)
 VALUES ($1, $2)
-RETURNING id, code, name, created_at
+RETURNING id, code, name, created_at, game_type, phase
 `
 
 type CreateLobbyParams struct {
@@ -30,6 +30,8 @@ func (q *Queries) CreateLobby(ctx context.Context, arg CreateLobbyParams) (Lobby
 		&i.Code,
 		&i.Name,
 		&i.CreatedAt,
+		&i.GameType,
+		&i.Phase,
 	)
 	return i, err
 }
@@ -44,7 +46,7 @@ func (q *Queries) DeleteLobby(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getLobbyByCode = `-- name: GetLobbyByCode :one
-SELECT id, code, name, created_at FROM lobbies WHERE code = $1
+SELECT id, code, name, created_at, game_type, phase FROM lobbies WHERE code = $1
 `
 
 func (q *Queries) GetLobbyByCode(ctx context.Context, code string) (Lobby, error) {
@@ -55,12 +57,14 @@ func (q *Queries) GetLobbyByCode(ctx context.Context, code string) (Lobby, error
 		&i.Code,
 		&i.Name,
 		&i.CreatedAt,
+		&i.GameType,
+		&i.Phase,
 	)
 	return i, err
 }
 
 const listLobbies = `-- name: ListLobbies :many
-SELECT id, code, name, created_at FROM lobbies ORDER BY created_at DESC
+SELECT id, code, name, created_at, game_type, phase FROM lobbies ORDER BY created_at DESC
 `
 
 func (q *Queries) ListLobbies(ctx context.Context) ([]Lobby, error) {
@@ -77,6 +81,8 @@ func (q *Queries) ListLobbies(ctx context.Context) ([]Lobby, error) {
 			&i.Code,
 			&i.Name,
 			&i.CreatedAt,
+			&i.GameType,
+			&i.Phase,
 		); err != nil {
 			return nil, err
 		}
