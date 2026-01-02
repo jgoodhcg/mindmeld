@@ -36,38 +36,58 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 ## Data Model
 
 ```sql
-lobbies
-  - id (uuid, primary key)
-  - code (varchar, unique)
-  - host_player_id (uuid, foreign key)
-  - phase (enum: waiting | submitting | playing | finished)
-  - created_at (timestamptz)
+lobbies (existing table, extended)
+  + game_type (varchar, default 'trivia')
+  + phase (varchar: waiting | playing | finished)
 
 players
   - id (uuid, primary key)
-  - lobby_id (uuid, foreign key)
-  - name (varchar)
+  - device_token (varchar, unique) -- survives refreshes, enables rejoin
+  - user_id (uuid, nullable)       -- future auth integration
   - created_at (timestamptz)
+
+lobby_players
+  - id (uuid, primary key)
+  - lobby_id (uuid, fk lobbies)
+  - player_id (uuid, fk players)
+  - nickname (varchar)
+  - is_host (boolean)
+  - joined_at (timestamptz)
+  - unique(lobby_id, player_id)
+  - unique(lobby_id, nickname)
+
+trivia_rounds
+  - id (uuid, primary key)
+  - lobby_id (uuid, fk lobbies)
+  - round_number (integer)
+  - phase (varchar: submitting | playing | finished)
+  - created_at (timestamptz)
+  - unique(lobby_id, round_number)
 
 trivia_questions
   - id (uuid, primary key)
-  - lobby_id (uuid, foreign key)
-  - author_player_id (uuid, foreign key)
+  - round_id (uuid, fk trivia_rounds)
+  - author (uuid, fk players)
   - question_text (text)
-  - correct_answer (varchar)
-  - wrong_answer_1 (varchar)
-  - wrong_answer_2 (varchar)
-  - wrong_answer_3 (varchar)
-  - display_order (integer, set when game starts)
+  - correct_answer, wrong_answer_1/2/3 (varchar)
+  - display_order (integer, set when round starts)
+  - created_at (timestamptz)
 
 trivia_answers
   - id (uuid, primary key)
-  - question_id (uuid, foreign key)
-  - player_id (uuid, foreign key)
+  - question_id (uuid, fk trivia_questions)
+  - player_id (uuid, fk players)
   - selected_answer (varchar)
   - is_correct (boolean)
   - answered_at (timestamptz)
+  - unique(question_id, player_id)
 ```
+
+**Design notes:**
+- Device-token identity allows players to rejoin after refresh without re-entering name
+- Rounds abstraction enables "play again" without creating a new lobby
+- Host tracked via `is_host` flag on lobby_players (easy to transfer, guaranteed valid participant)
+- Two-level phase: lobby phase (waiting/playing/finished) and round phase (submitting/playing/finished)
 
 ---
 
