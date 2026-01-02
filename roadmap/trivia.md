@@ -1,47 +1,39 @@
-# Trivia
+# Trivia MVP
 
-Players submit questions for each other, answer them, and see how well they know each other and the world.
+## Work Unit Summary
 
-## MVP
+**Status:** active
 
-The simplest playable trivia experience.
+**Problem/Intent:**
+Build the first playable game on the Mindmeld platform. Players submit questions for each other, answer them, and see how well they know each other and the world. This establishes the core lobby/player infrastructure that future games will reuse.
 
-### Scope
+**Constraints:**
+- No timers or time-based scoring (auto-advance when all answer)
+- Solo play only (no teams)
+- Simple scoring: correct = 1 point, incorrect = 0
+- No real-time sync (use polling/refresh)
+- No session reconnection handling
+- No host configuration UI beyond starting the game
 
-**Included:**
-- Create lobby, get shareable code/URL
-- Join lobby with display name
-- Each player submits 1 question (multiple choice, 4 options)
-- Host starts game
-- Questions shown one at a time
-- Players answer (author cannot answer their own)
-- After all players answer, show correct answer
-- End screen: scoreboard showing X/Y correct per player
+**Proposed Approach:**
+Implement a minimal game loop: create lobby → join with name → submit questions → play through each question → show scoreboard. Keep the implementation simple and defer complexity (timers, teams, real-time) to future work units.
 
-**Excluded from MVP:**
-- Timers (auto-advance when all answer)
-- Teams (solo only)
-- Time-based scoring (just correct = 1 point, incorrect = 0)
-- Negative points
-- Complex stats
-- Host configuration UI
-- Real-time sync (use polling/refresh)
-- Session reconnection
+**Open Questions:**
+- How should question order be determined when the game starts? (Random shuffle? Order by submission time?)
+- What happens if a player disconnects mid-game?
 
-### Game Flow (MVP)
+---
+
+## Game Flow
 
 1. Host creates lobby → gets code
 2. Players join via URL, enter name
 3. Each player submits 1 question with 4 answers (mark correct one)
 4. Host starts game
-5. For each question:
-   - Show question + answers to all
-   - Players select answer (author blocked)
-   - When all have answered → reveal correct answer
-   - Next question
+5. For each question: show to all → players select answer (author blocked) → when all answered → reveal correct → next
 6. Show final scoreboard
 
-### Data Model
+## Data Model
 
 ```sql
 lobbies
@@ -79,51 +71,18 @@ trivia_answers
 
 ---
 
-## Future Enhancements
+## Future Enhancements (separate work units when ready)
 
-### Question Answering Modes
+These are noted here for context but should become their own work units when prioritized:
 
-Different ways to answer questions, selectable by host:
+**Question Answering Modes:** Timed mode with countdown, confidence wagering mode.
 
-| Mode | Description |
-|------|-------------|
-| **Basic** (MVP) | Select answer, no time pressure, 1 point for correct |
-| **Timed** | Countdown timer per question, faster = more points |
-| **Confidence** | Players wager points based on confidence before seeing options |
+**Question Types:** True/false, free text with fuzzy matching, numeric (closest guess wins).
 
-### Question Types
+**Teams:** Random auto-assign, manual assignment by host.
 
-| Type | Description |
-|------|-------------|
-| **Multiple Choice** (MVP) | 4 options, 1 correct |
-| **True/False** | Binary choice |
-| **Free Text** | Type answer, fuzzy matching |
-| **Numeric** | Closest guess wins |
+**Real-time:** WebSocket live updates, see others typing/answering, reconnection handling.
 
-### Teams
+**Stats & Scoring:** Time-based bonuses, negative points, detailed per-question and per-player stats.
 
-- Solo mode (MVP - everyone vs everyone)
-- Auto-assign teams (random balanced)
-- Manual team assignment by host
-
-### Real-time Features
-
-- WebSocket-based live updates
-- See other players typing/answering
-- Live scoreboard updates
-- Reconnection handling
-
-### Stats & Scoring
-
-- Time-based point bonuses
-- Negative points for wrong answers
-- Per-question stats (avg response time, % correct)
-- Per-player detailed stats
-- Per-team aggregate stats
-
-### Host Configuration
-
-- Questions per person (1, 2, 3, etc.)
-- Answer mode selection
-- Timer duration (10s, 15s, 30s)
-- Team mode selection
+**Host Configuration:** Questions per person, timer duration, mode selection.
