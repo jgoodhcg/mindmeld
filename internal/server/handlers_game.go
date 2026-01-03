@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 )
 
@@ -102,7 +103,134 @@ func (s *Server) handleSubmitQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Check if all players have submitted to auto-advance?
-	// For now, just redirect back to lobby
+	// Logic removed: Auto-advance is now manual via handleAdvanceRound
+
+	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
+}
+
+func (s *Server) handleAdvanceRound(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Lobby not found", http.StatusNotFound)
+		return
+	}
+
+	player := GetPlayer(r.Context())
+
+	// Verify Host
+	participation, err := s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
+		LobbyID:  lobby.ID,
+		PlayerID: player.ID,
+	})
+	if err != nil || !participation.IsHost {
+		http.Error(w, "Only the host can advance the round", http.StatusForbidden)
+		return
+	}
+
+	// Get active round
+	round, err := s.queries.GetActiveRound(r.Context(), lobby.ID)
+	if err != nil {
+		http.Error(w, "No active round", http.StatusBadRequest)
+		return
+	}
+
+	// Logic moved from handleSubmitQuestion:
+	questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
+	if err == nil {
+		// 1. Shuffle and assign order
+		for i, q := range questions {
+			err := s.queries.UpdateQuestionOrder(r.Context(), db.UpdateQuestionOrderParams{
+				ID:           q.ID,
+				DisplayOrder: pgtype.Int4{Int32: int32(i + 1), Valid: true},
+			})
+			if err != nil {
+				log.Printf("Error updating order for q %v: %v", q.ID, err)
+			}
+		}
+
+		// 2. Advance Round Phase
+		err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
+			ID:    round.ID,
+			Phase: "playing",
+		})
+		if err != nil {
+			log.Printf("Error advancing round phase: %v", err)
+		}
+	}
+
+	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
+}
+
+func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form", http.StatusBadRequest)
+		return
+	}
+
+	questionIDStr := r.FormValue("question_id")
+	selectedAnswer := r.FormValue("answer")
+
+	// Parse UUID
+	var questionID pgtype.UUID
+	if err := questionID.Scan(questionIDStr); err != nil {
+		http.Error(w, "Invalid question ID", http.StatusBadRequest)
+		return
+	}
+
+	// 1. Get Lobby
+	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Lobby not found", http.StatusNotFound)
+		return
+	}
+	
+	// 2. Get Active Round
+	round, err := s.queries.GetActiveRound(r.Context(), lobby.ID)
+	if err != nil {
+		http.Error(w, "No active round", http.StatusBadRequest)
+		return
+	}
+
+	// 3. Get Questions to verify it exists in this round
+	questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
+	if err != nil {
+		http.Error(w, "Error fetching questions", http.StatusInternalServerError)
+		return
+	}
+
+	var targetQuestion db.TriviaQuestion
+	found := false
+	for _, q := range questions {
+		if q.ID == questionID {
+			targetQuestion = q
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		http.Error(w, "Question not found in active round", http.StatusBadRequest)
+		return
+	}
+
+	// 4. Check Answer
+	isCorrect := (selectedAnswer == targetQuestion.CorrectAnswer)
+	player := GetPlayer(r.Context())
+
+	// 5. Submit Answer
+	_, err = s.queries.SubmitAnswer(r.Context(), db.SubmitAnswerParams{
+		QuestionID:     questionID,
+		PlayerID:       player.ID,
+		SelectedAnswer: selectedAnswer,
+		IsCorrect:      isCorrect,
+	})
+	if err != nil {
+		log.Printf("Error submitting answer: %v", err)
+		// Ignore error (maybe duplicate submission)
+	}
+
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }

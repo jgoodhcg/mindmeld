@@ -65,7 +65,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if player is already participating
-	_, err = s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
+	participation, err := s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
 		LobbyID:  lobby.ID,
 		PlayerID: player.ID,
 	})
@@ -87,27 +87,72 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	// If Playing, get active round
 	var activeRound db.TriviaRound
 	var hasSubmitted bool
+	var currentQuestion db.TriviaQuestion
+	var questionActive bool
+	var isAuthor bool
+	var hasAnswered bool
+	var submittedCount int
 	
 	if lobby.Phase == "playing" {
 		activeRound, err = s.queries.GetActiveRound(r.Context(), lobby.ID)
 		if err != nil {
 			log.Printf("Error fetching active round: %v", err)
 		} else {
-			// Check if player submitted
-			questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
-			if err == nil {
-				for _, q := range questions {
-					// Compare pgtype.UUID
-					if q.Author == player.ID {
-						hasSubmitted = true
-						break
+			if activeRound.Phase == "submitting" {
+				// Check if player submitted AND count total submissions
+				questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
+				if err == nil {
+					submittedCount = len(questions)
+					for _, q := range questions {
+						if q.Author == player.ID {
+							hasSubmitted = true
+						}
+					}
+				}
+			} else if activeRound.Phase == "playing" {
+				// Find current question
+				questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
+				if err == nil {
+					for _, q := range questions {
+						// How many answers?
+						count, err := s.queries.CountAnswersForQuestion(r.Context(), q.ID)
+						if err != nil {
+							continue
+						}
+						
+						// Target is players - 1 (author doesn't answer)
+						targetAnswers := int64(len(players) - 1)
+						if targetAnswers < 0 { targetAnswers = 0 }
+
+						if count < targetAnswers {
+							currentQuestion = q
+							questionActive = true
+							
+							// Check if Author
+							if q.Author == player.ID {
+								isAuthor = true
+							}
+
+							// Check if Answered
+							// We can fetch answers for this question
+							answers, err := s.queries.GetAnswersForQuestion(r.Context(), q.ID)
+							if err == nil {
+								for _, a := range answers {
+									if a.PlayerID == player.ID {
+										hasAnswered = true
+										break
+									}
+								}
+							}
+							break
+						}
 					}
 				}
 			}
 		}
 	}
 
-	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted).Render(r.Context(), w)
+	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,46 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/jgoodhcg/mindmeld/internal/db"
+)
+
+templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool) {
+	<div class="bg-gray-800 rounded-lg p-6 mt-8 border border-blue-500/30">
+		<h2 class="text-xl font-bold mb-4 text-blue-400">Current Question</h2>
+		
+		<div class="bg-gray-900 rounded p-6 mb-8 text-center">
+			<p class="text-2xl font-serif italic">"{ question.QuestionText }"</p>
+		</div>
+
+		if isAuthor {
+			<div class="text-center p-8 bg-gray-700/50 rounded border border-dashed border-gray-600">
+				<p class="text-gray-300 font-bold mb-2">You wrote this!</p>
+				<p class="text-sm text-gray-400">Watch your friends try to guess the answer.</p>
+				<p class="mt-4 text-xs text-gray-500">Correct Answer: <span class="text-green-400">{ question.CorrectAnswer }</span></p>
+			</div>
+		} else {
+			<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/answers") } method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<input type="hidden" name="question_id" value={ fmt.Sprintf("%x", question.ID.Bytes) } />
+				
+				<!-- TODO: Shuffle these! Currently fixed order which is cheating -->
+				<button type="submit" name="answer" value={ question.CorrectAnswer } class="bg-gray-700 hover:bg-purple-600 p-4 rounded text-left transition-colors border border-gray-600 hover:border-purple-500 group">
+					<span class="text-gray-400 group-hover:text-white mr-2">A.</span>
+					<span class="font-bold">{ question.CorrectAnswer }</span>
+				</button>
+				<button type="submit" name="answer" value={ question.WrongAnswer1 } class="bg-gray-700 hover:bg-purple-600 p-4 rounded text-left transition-colors border border-gray-600 hover:border-purple-500 group">
+					<span class="text-gray-400 group-hover:text-white mr-2">B.</span>
+					<span class="font-bold">{ question.WrongAnswer1 }</span>
+				</button>
+				<button type="submit" name="answer" value={ question.WrongAnswer2 } class="bg-gray-700 hover:bg-purple-600 p-4 rounded text-left transition-colors border border-gray-600 hover:border-purple-500 group">
+					<span class="text-gray-400 group-hover:text-white mr-2">C.</span>
+					<span class="font-bold">{ question.WrongAnswer2 }</span>
+				</button>
+				<button type="submit" name="answer" value={ question.WrongAnswer3 } class="bg-gray-700 hover:bg-purple-600 p-4 rounded text-left transition-colors border border-gray-600 hover:border-purple-500 group">
+					<span class="text-gray-400 group-hover:text-white mr-2">D.</span>
+					<span class="font-bold">{ question.WrongAnswer3 }</span>
+				</button>
+			</form>
+		}
+	</div>
+}

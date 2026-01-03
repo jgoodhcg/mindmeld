@@ -5,7 +5,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 )
 
-templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool) {
+templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool) {
 	@Layout("Lobby - " + lobby.Name) {
 		<div class="max-w-4xl mx-auto">
 			<div class="flex justify-between items-end mb-8">
@@ -30,15 +30,46 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 				</div>
 			</div>
 
-			if lobby.Phase == "playing" && activeRound.Phase == "submitting" {
-				if hasSubmitted {
-					<div class="bg-gray-800 rounded-lg p-8 text-center border border-green-500/30">
-						<div class="text-4xl mb-4">✅</div>
-						<h2 class="text-2xl font-bold text-white mb-2">Question Submitted!</h2>
-						<p class="text-gray-400">Waiting for other players...</p>
-					</div>
-				} else {
-					@SubmitQuestion(lobby, activeRound)
+			if lobby.Phase == "playing" {
+				if activeRound.Phase == "submitting" {
+					if hasSubmitted {
+						<div class="bg-gray-800 rounded-lg p-8 text-center border border-green-500/30">
+							<div class="text-4xl mb-4">✅</div>
+							<h2 class="text-2xl font-bold text-white mb-2">Question Submitted!</h2>
+							
+							<div class="mt-6 p-4 bg-gray-700/30 rounded inline-block">
+								<p class="text-gray-300 font-medium mb-1">Waiting for players...</p>
+								<p class="text-sm text-gray-400">{ fmt.Sprintf("%d / %d", submittedCount, len(players)) } ready</p>
+							</div>
+
+							if isHost {
+								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/advance") } method="POST" class="mt-6">
+									if submittedCount >= len(players) {
+										<button type="submit" class="bg-green-600 hover:bg-green-700 px-8 py-3 rounded font-bold transition-colors shadow-lg shadow-green-900/20">
+											Start Round
+										</button>
+									} else {
+										<button type="button" disabled class="bg-gray-600 px-8 py-3 rounded font-bold text-gray-400 cursor-not-allowed opacity-50">
+											Start Round
+										</button>
+										<p class="text-xs text-red-400 mt-2">Wait for everyone to submit!</p>
+									}
+								</form>
+							}
+						</div>
+					} else {
+						@SubmitQuestion(lobby, activeRound)
+					}
+				} else if activeRound.Phase == "playing" && questionActive {
+					if hasAnswered {
+						<div class="bg-gray-800 rounded-lg p-8 text-center border border-purple-500/30 mt-8">
+							<div class="text-4xl mb-4">🤔</div>
+							<h2 class="text-2xl font-bold text-white mb-2">Answer Submitted</h2>
+							<p class="text-gray-400">Waiting for others to guess...</p>
+						</div>
+					} else {
+						@AnswerQuestion(lobby, currentQuestion, isAuthor)
+					}
 				}
 			}
 
