@@ -16,10 +16,10 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow) {
 						<div class="flex items-center gap-4">
 							<span class="font-mono text-4xl text-purple-400 font-bold tracking-wider">{ lobby.Code }</span>
 							<button 
-								onclick="navigator.clipboard.writeText(window.location.href + '/join')"
+								onclick="navigator.clipboard.writeText(window.location.href)"
 								class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300 transition-colors"
 							>
-								Copy Join Link
+								Copy Link
 							</button>
 						</div>
 					</div>

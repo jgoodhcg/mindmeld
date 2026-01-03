@@ -1,0 +1,34 @@
+package templates
+
+import "github.com/jgoodhcg/mindmeld/internal/db"
+
+templ JoinLobby(lobby db.Lobby) {
+	@Layout("Join " + lobby.Name) {
+		<div class="max-w-md mx-auto mt-20">
+			<div class="bg-gray-800 rounded-lg p-8 shadow-lg">
+				<h1 class="text-3xl font-bold text-center mb-2">Join Lobby</h1>
+				<p class="text-center text-gray-400 mb-8">You are joining <span class="text-purple-400 font-bold">{ lobby.Name }</span></p>
+
+				<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/join") } method="POST" class="flex flex-col gap-6">
+					<div>
+						<label for="nickname" class="block text-sm font-medium text-gray-400 mb-2">Choose a Nickname</label>
+						<input
+							type="text"
+							name="nickname"
+							id="nickname"
+							placeholder="e.g. Brainy Smurf"
+							required
+							class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+						/>
+					</div>
+					<button
+						type="submit"
+						class="w-full bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded font-bold text-lg transition-colors"
+					>
+						Join Game
+					</button>
+				</form>
+			</div>
+		</div>
+	}
+}
