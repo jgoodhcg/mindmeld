@@ -5,7 +5,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 )
 
-templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool) {
+templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow) {
 	@Layout("Lobby - " + lobby.Name) {
 		<div class="max-w-4xl mx-auto">
 			<div class="flex justify-between items-end mb-8">
@@ -70,6 +70,8 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 					} else {
 						@AnswerQuestion(lobby, currentQuestion, isAuthor)
 					}
+				} else if activeRound.Phase == "finished" {
+					@Scoreboard(scoreboard)
 				}
 			}
 

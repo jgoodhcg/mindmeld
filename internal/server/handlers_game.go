@@ -232,5 +232,39 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 		// Ignore error (maybe duplicate submission)
 	}
 
+	// Check if round is finished (all questions answered by all other players)
+	// We reuse logic similar to lobby room check, or just check global counts.
+	// Simple check: do ANY questions remain with < (players-1) answers?
+	
+	lobbyPlayers, err := s.queries.GetLobbyPlayers(r.Context(), lobby.ID)
+	if err == nil {
+		allFinished := true
+		questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
+		if err == nil {
+			for _, q := range questions {
+				count, err := s.queries.CountAnswersForQuestion(r.Context(), q.ID)
+				if err != nil { continue }
+				
+				target := int64(len(lobbyPlayers) - 1)
+				if target < 0 { target = 0 }
+
+				if count < target {
+					allFinished = false
+					break
+				}
+			}
+		}
+		
+		if allFinished {
+			err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
+				ID:    round.ID,
+				Phase: "finished",
+			})
+			if err != nil {
+				log.Printf("Error finishing round: %v", err)
+			}
+		}
+	}
+
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }

@@ -101,6 +101,8 @@ These are noted here for context but should become their own work units when pri
 
 **Teams:** Random auto-assign, manual assignment by host.
 
+**Spectator Mode:** Allow users to join a lobby as non-players to watch the game progress without participating.
+
 **Real-time:** WebSocket live updates, see others typing/answering, reconnection handling.
 
 **Stats & Scoring:** Time-based bonuses, negative points, detailed per-question and per-player stats.

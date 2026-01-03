@@ -92,6 +92,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	var isAuthor bool
 	var hasAnswered bool
 	var submittedCount int
+	var scoreboard []db.GetLobbyScoreboardRow
 	
 	if lobby.Phase == "playing" {
 		activeRound, err = s.queries.GetActiveRound(r.Context(), lobby.ID)
@@ -147,12 +148,33 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 					}
+					
+					// If no question active, round is finished?
+					if !questionActive && len(questions) > 0 {
+						// Auto-finish round
+						err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
+							ID:    activeRound.ID,
+							Phase: "finished",
+						})
+						if err != nil {
+							log.Printf("Error auto-finishing round: %v", err)
+						} else {
+							// Update local state to render scoreboard immediately
+							activeRound.Phase = "finished"
+							scoreboard, _ = s.queries.GetLobbyScoreboard(r.Context(), lobby.ID)
+						}
+					}
+				}
+			} else if activeRound.Phase == "finished" {
+				scoreboard, err = s.queries.GetLobbyScoreboard(r.Context(), lobby.ID)
+				if err != nil {
+					log.Printf("Error fetching scoreboard: %v", err)
 				}
 			}
 		}
 	}
 
-	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost).Render(r.Context(), w)
+	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost, scoreboard).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {
