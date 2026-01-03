@@ -9,6 +9,7 @@ import (
 func (s *Server) routes() {
 	s.router.Use(middleware.Logger)
 	s.router.Use(middleware.Recoverer)
+	s.router.Use(s.playerIdentityMiddleware)
 
 	// Static files
 	fileServer := http.FileServer(http.Dir("static"))
