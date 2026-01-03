@@ -21,6 +21,9 @@ func (s *Server) routes() {
 	s.router.Get("/lobbies/{code}", s.handleLobbyRoom)
 	s.router.Post("/lobbies/{code}/join", s.handleJoinLobby)
 	
+	// Game actions
+	s.router.Post("/lobbies/{code}/start", s.handleStartGame)
+
 	// Health check
 	s.router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("ok"))

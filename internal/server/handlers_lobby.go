@@ -84,7 +84,17 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templates.LobbyRoom(lobby, players).Render(r.Context(), w)
+	// If Playing, get active round
+	var activeRound db.TriviaRound
+	if lobby.Phase == "playing" {
+		activeRound, err = s.queries.GetActiveRound(r.Context(), lobby.ID)
+		if err != nil {
+			log.Printf("Error fetching active round: %v", err)
+			// Fallback or show error? For now, render anyway but template might be empty
+		}
+	}
+
+	templates.LobbyRoom(lobby, players, activeRound).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {

@@ -5,9 +5,9 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 )
 
-templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow) {
+templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound) {
 	@Layout("Lobby - " + lobby.Name) {
-		<div class="max-w-2xl mx-auto">
+		<div class="max-w-4xl mx-auto">
 			<div class="flex justify-between items-end mb-8">
 				<div>
 					<h1 class="text-4xl font-bold">{ lobby.Name }</h1>
@@ -30,7 +30,11 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow) {
 				</div>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+			if lobby.Phase == "playing" && activeRound.Phase == "submitting" {
+				@SubmitQuestion(lobby, activeRound)
+			}
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
 				<!-- Players List -->
 				<div class="bg-gray-800 rounded-lg p-6">
 					<h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -57,10 +61,11 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow) {
 					if lobby.Phase == "waiting" {
 						<p class="text-gray-400 mb-6">Waiting for players to join...</p>
 						
-						<!-- Only host can start game? We'll handle that logic in the handler -->
-						<button class="w-full bg-green-600 hover:bg-green-700 py-3 rounded font-bold transition-colors">
-							Start Game
-						</button>
+						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/start") } method="POST">
+							<button type="submit" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded font-bold transition-colors">
+								Start Game
+							</button>
+						</form>
 					}
 				</div>
 			</div>
