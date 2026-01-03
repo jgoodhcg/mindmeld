@@ -43,7 +43,7 @@ func Home(lobbies []db.Lobby) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto\"><h1 class=\"text-4xl font-bold mb-8 text-center\">Mindmeld</h1><!-- Create Lobby Form --><div class=\"bg-gray-800 rounded-lg p-6 mb-8\"><h2 class=\"text-xl font-semibold mb-4\">Create a Lobby</h2><form action=\"/lobbies\" method=\"POST\" class=\"flex gap-4\"><input type=\"text\" name=\"name\" placeholder=\"Lobby name\" required class=\"flex-1 bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500\"> <button type=\"submit\" class=\"bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded font-semibold transition-colors\">Create</button></form></div><!-- Lobbies List --><div class=\"bg-gray-800 rounded-lg p-6\"><h2 class=\"text-xl font-semibold mb-4\">Lobbies</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto\"><h1 class=\"text-4xl font-bold mb-8 text-center\">Mindmeld</h1><!-- Create Lobby Form --><div class=\"bg-gray-800 rounded-lg p-6 mb-8\"><h2 class=\"text-xl font-semibold mb-4\">Create a Lobby</h2><form action=\"/lobbies\" method=\"POST\" class=\"flex flex-col gap-4\"><div class=\"flex gap-4\"><input type=\"text\" name=\"name\" placeholder=\"Lobby name\" required class=\"flex-1 bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500\"> <input type=\"text\" name=\"nickname\" placeholder=\"Your nickname\" required class=\"flex-1 bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500\"></div><button type=\"submit\" class=\"w-full bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded font-semibold transition-colors\">Create & Join</button></form></div><!-- Lobbies List --><div class=\"bg-gray-800 rounded-lg p-6\"><h2 class=\"text-xl font-semibold mb-4\">Lobbies</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -65,7 +65,7 @@ func Home(lobbies []db.Lobby) templ.Component {
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(lobby.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 40, Col: 47}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 49, Col: 47}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -78,7 +78,7 @@ func Home(lobbies []db.Lobby) templ.Component {
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(lobby.Code)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 41, Col: 63}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 50, Col: 63}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {

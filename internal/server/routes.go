@@ -18,6 +18,7 @@ func (s *Server) routes() {
 	// App Routes
 	s.router.Get("/", s.handleHome)
 	s.router.Post("/lobbies", s.handleCreateLobby)
+	s.router.Get("/lobbies/{code}", s.handleLobbyRoom)
 	
 	// Health check
 	s.router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
