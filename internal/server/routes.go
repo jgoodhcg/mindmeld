@@ -23,6 +23,7 @@ func (s *Server) routes() {
 	
 	// Game actions
 	s.router.Post("/lobbies/{code}/start", s.handleStartGame)
+	s.router.Post("/lobbies/{code}/questions", s.handleSubmitQuestion)
 
 	// Health check
 	s.router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
