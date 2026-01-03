@@ -7,12 +7,14 @@
 **Problem/Intent:**
 Build the first playable game on the Mindmeld platform. Players submit questions for each other, answer them, and see how well they know each other and the world. This establishes the core lobby/player infrastructure that future games will reuse.
 
-**Constraints:**
+**Constraints & Refinements:**
 - No timers or time-based scoring (auto-advance when all answer)
 - Solo play only (no teams)
 - Simple scoring: correct = 1 point, incorrect = 0
-- No real-time sync (use polling/refresh)
-- No session reconnection handling
+- **Real-time:** Use HTMX WebSockets for live updates (no manual refreshing).
+- **Shuffle:** Answers must be shuffled so "A" isn't always correct. Questions shuffled for playback.
+- **Styling:** Basic Tailwind CSS polish.
+- No session reconnection handling (beyond basic cookie)
 - No host configuration UI beyond starting the game
 
 **Proposed Approach:**
@@ -103,8 +105,11 @@ These are noted here for context but should become their own work units when pri
 
 **Spectator Mode:** Allow users to join a lobby as non-players to watch the game progress without participating.
 
-**Real-time:** WebSocket live updates, see others typing/answering, reconnection handling.
+**Real-time (Advanced):** Live typing indicators, "User X answered" notifications.
 
-**Stats & Scoring:** Time-based bonuses, negative points, detailed per-question and per-player stats.
+**Stats & Scoring:**
+- **Round Summary:** Breakdown of who picked what after each question.
+- **Game Recap:** Fun visualizations (e.g., "Most confusing question", "Speediest player").
+- Time-based bonuses, negative points.
 
 **Host Configuration:** Questions per person, timer duration, mode selection.
