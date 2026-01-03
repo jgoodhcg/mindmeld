@@ -1,10 +1,13 @@
 package templates
 
-import "github.com/jgoodhcg/mindmeld/internal/db"
+import (
+	"fmt"
+	"github.com/jgoodhcg/mindmeld/internal/db"
+)
 
 templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 	<div class="bg-gray-800 rounded-lg p-6 mt-8 border border-purple-500/30">
-		<h2 class="text-2xl font-bold mb-2 text-purple-400">Round { string(rune(round.RoundNumber + '0')) }</h2>
+		<h2 class="text-2xl font-bold mb-2 text-purple-400">Round { fmt.Sprintf("%d", round.RoundNumber) }</h2>
 		<p class="text-gray-300 mb-6">Write a question to stump your friends!</p>
 
 		<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/questions") } method="POST" class="space-y-4">

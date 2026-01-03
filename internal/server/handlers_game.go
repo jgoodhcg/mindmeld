@@ -162,6 +162,47 @@ func (s *Server) handleAdvanceRound(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
 
+func (s *Server) handlePlayAgain(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Lobby not found", http.StatusNotFound)
+		return
+	}
+
+	player := GetPlayer(r.Context())
+
+	// Verify Host
+	participation, err := s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
+		LobbyID:  lobby.ID,
+		PlayerID: player.ID,
+	})
+	if err != nil || !participation.IsHost {
+		http.Error(w, "Only the host can start a new round", http.StatusForbidden)
+		return
+	}
+
+	// Get current active round to increment number
+	lastRound, err := s.queries.GetActiveRound(r.Context(), lobby.ID)
+	nextRoundNum := int32(1)
+	if err == nil {
+		nextRoundNum = lastRound.RoundNumber + 1
+	}
+
+	// Create New Round
+	_, err = s.queries.CreateTriviaRound(r.Context(), db.CreateTriviaRoundParams{
+		LobbyID:     lobby.ID,
+		RoundNumber: nextRoundNum,
+	})
+	if err != nil {
+		log.Printf("Error creating new round: %v", err)
+		http.Error(w, "Failed to start new round", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
+}
+
 func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	

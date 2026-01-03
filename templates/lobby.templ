@@ -71,7 +71,7 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 						@AnswerQuestion(lobby, currentQuestion, isAuthor)
 					}
 				} else if activeRound.Phase == "finished" {
-					@Scoreboard(scoreboard)
+					@Scoreboard(scoreboard, lobby.Code, isHost)
 				}
 			}
 

@@ -25,6 +25,7 @@ func (s *Server) routes() {
 	s.router.Post("/lobbies/{code}/start", s.handleStartGame)
 	s.router.Post("/lobbies/{code}/questions", s.handleSubmitQuestion)
 	s.router.Post("/lobbies/{code}/advance", s.handleAdvanceRound)
+	s.router.Post("/lobbies/{code}/play-again", s.handlePlayAgain)
 	s.router.Post("/lobbies/{code}/answers", s.handleSubmitAnswer)
 
 	// Health check
