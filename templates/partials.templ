@@ -1,0 +1,30 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/jgoodhcg/mindmeld/internal/db"
+)
+
+// PlayerList renders the player list panel.
+// This partial is used both in the initial page render and for WebSocket updates.
+// The id="player-list" is required for HTMX WebSocket OOB swaps.
+templ PlayerList(players []db.GetLobbyPlayersRow) {
+	<div id="player-list" class="bg-gray-800 rounded-lg p-6">
+		<h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+			Players
+			<span class="bg-purple-600 text-xs px-2 py-0.5 rounded-full">{ fmt.Sprintf("%d", len(players)) }</span>
+		</h2>
+		<ul class="space-y-3">
+			for _, p := range players {
+				<li class="flex items-center justify-between bg-gray-700 rounded px-4 py-2">
+					<div class="flex items-center gap-2">
+						<span>{ p.Nickname }</span>
+						if p.IsHost {
+							<span class="text-[10px] bg-yellow-600 text-white px-1.5 py-0.5 rounded uppercase font-bold">Host</span>
+						}
+					</div>
+				</li>
+			}
+		</ul>
+	</div>
+}

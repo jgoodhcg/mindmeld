@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/templates"
 )
 
@@ -50,6 +51,16 @@ func (s *Server) handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to join lobby", http.StatusInternalServerError)
 		return
 	}
+
+	// Publish event for real-time updates (host joining counts as a player join)
+	s.eventBus.Publish(r.Context(), events.Event{
+		Type:      events.EventPlayerJoined,
+		LobbyCode: code,
+		Payload: events.PlayerJoinedPayload{
+			PlayerID: player.ID.String(),
+			Nickname: nickname,
+		},
+	})
 
 	http.Redirect(w, r, "/lobbies/"+lobby.Code, http.StatusSeeOther)
 }
@@ -208,6 +219,16 @@ func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to join lobby (Name taken?)", http.StatusInternalServerError)
 		return
 	}
+
+	// Publish event for real-time updates
+	s.eventBus.Publish(r.Context(), events.Event{
+		Type:      events.EventPlayerJoined,
+		LobbyCode: code,
+		Payload: events.PlayerJoinedPayload{
+			PlayerID: player.ID.String(),
+			Nickname: nickname,
+		},
+	})
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }

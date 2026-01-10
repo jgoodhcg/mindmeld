@@ -31,9 +31,41 @@ We will likely use a middleware in `internal/server/middleware.go` to set the `C
 **Draft Policy:**
 ```http
 default-src 'self';
-script-src 'self' 'unsafe-inline'; 
+script-src 'self' 'unsafe-inline';
 style-src 'self' 'unsafe-inline';
 img-src 'self' data:;
 connect-src 'self';
 ```
 *Note: `unsafe-inline` might be needed initially for HTMX/Alpine/Tailwind unless we implement nonces.*
+
+---
+
+### WebSocket Security
+
+Current implementation uses `InsecureSkipVerify: true` for development. Before production:
+
+**1. Authorization (High Priority)**
+- Verify the connecting player is a member of the lobby before accepting the WebSocket
+- Check `lobby_players` table in `handleWebSocket` before calling `hub.Register`
+- Reject unauthorized connections with appropriate close code
+
+**2. Origin Validation**
+- Remove `InsecureSkipVerify: true` from `websocket.AcceptOptions`
+- Configure allowed origins for production domain(s)
+- Prevents cross-site WebSocket hijacking attacks
+
+**3. Rate Limiting**
+- Limit WebSocket connection attempts per IP/device token
+- Consider middleware or connection-time checks
+- Prevents resource exhaustion attacks
+
+**4. Connection Limits**
+- Cap maximum connections per lobby (e.g., 50)
+- Cap maximum total connections server-wide
+- Prevents memory exhaustion
+
+**5. TLS/WSS**
+- Ensure production deployment uses HTTPS (WSS automatic when page is HTTPS)
+- Prevents eavesdropping on WebSocket traffic
+
+**Implementation location:** `internal/server/handlers_ws.go`
