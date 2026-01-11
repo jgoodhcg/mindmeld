@@ -20,6 +20,13 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the player from context (set by middleware)
+	player := GetPlayer(r.Context())
+	if !player.ID.Valid {
+		http.Error(w, "Player identity required", http.StatusUnauthorized)
+		return
+	}
+
 	// Accept the WebSocket connection
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		// Allow connections from any origin for development
@@ -31,8 +38,8 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Register with hub
-	s.hub.Register(code, conn)
+	// Register with hub, including the player ID as UUID string
+	s.hub.Register(code, conn, player.ID.String())
 
 	// Ensure cleanup on exit
 	defer func() {

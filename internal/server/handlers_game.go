@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/events"
 )
 
 func (s *Server) handleStartGame(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +63,15 @@ func (s *Server) handleStartGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 3. Publish game started event for real-time updates
+	s.eventBus.Publish(r.Context(), events.Event{
+		Type:      events.EventGameStarted,
+		LobbyCode: code,
+		Payload: events.GameStartedPayload{
+			RoundNumber: 1,
+		},
+	})
+
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
 
@@ -103,7 +113,35 @@ func (s *Server) handleSubmitQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Logic removed: Auto-advance is now manual via handleAdvanceRound
+	// Get updated counts for real-time update
+	players, err := s.queries.GetLobbyPlayers(r.Context(), lobby.ID)
+	if err != nil {
+		log.Printf("Error getting players: %v", err)
+	}
+	questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
+	if err != nil {
+		log.Printf("Error getting questions: %v", err)
+	}
+
+	// Find the host player ID
+	var hostPlayerID string
+	for _, p := range players {
+		if p.IsHost {
+			hostPlayerID = p.PlayerID.String()
+			break
+		}
+	}
+
+	// Publish question submitted event for real-time updates
+	s.eventBus.Publish(r.Context(), events.Event{
+		Type:      events.EventQuestionSubmitted,
+		LobbyCode: code,
+		Payload: events.QuestionSubmittedPayload{
+			SubmittedCount: len(questions),
+			TotalPlayers:   len(players),
+			HostPlayerID:   hostPlayerID,
+		},
+	})
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
@@ -157,6 +195,15 @@ func (s *Server) handleAdvanceRound(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("Error advancing round phase: %v", err)
 		}
+
+		// Publish round advanced event for real-time updates
+		s.eventBus.Publish(r.Context(), events.Event{
+			Type:      events.EventRoundAdvanced,
+			LobbyCode: code,
+			Payload: events.RoundAdvancedPayload{
+				RoundNumber: round.RoundNumber,
+			},
+		})
 	}
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
@@ -199,6 +246,15 @@ func (s *Server) handlePlayAgain(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to start new round", http.StatusInternalServerError)
 		return
 	}
+
+	// Publish new round event for real-time updates
+	s.eventBus.Publish(r.Context(), events.Event{
+		Type:      events.EventNewRoundCreated,
+		LobbyCode: code,
+		Payload: events.NewRoundCreatedPayload{
+			RoundNumber: nextRoundNum,
+		},
+	})
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
@@ -276,27 +332,45 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 	// Check if round is finished (all questions answered by all other players)
 	// We reuse logic similar to lobby room check, or just check global counts.
 	// Simple check: do ANY questions remain with < (players-1) answers?
-	
+
 	lobbyPlayers, err := s.queries.GetLobbyPlayers(r.Context(), lobby.ID)
+	roundFinished := false
+	totalAnswered := 0
+	totalExpected := 0
+
 	if err == nil {
 		allFinished := true
 		questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
 		if err == nil {
+			// Calculate totals for the event payload
+			numPlayers := len(lobbyPlayers)
+			numQuestions := len(questions)
+			// Each question can be answered by (players - 1) since author doesn't answer their own
+			totalExpected = numQuestions * (numPlayers - 1)
+			if totalExpected < 0 {
+				totalExpected = 0
+			}
+
 			for _, q := range questions {
 				count, err := s.queries.CountAnswersForQuestion(r.Context(), q.ID)
-				if err != nil { continue }
-				
-				target := int64(len(lobbyPlayers) - 1)
-				if target < 0 { target = 0 }
+				if err != nil {
+					continue
+				}
+				totalAnswered += int(count)
+
+				target := int64(numPlayers - 1)
+				if target < 0 {
+					target = 0
+				}
 
 				if count < target {
 					allFinished = false
-					break
 				}
 			}
 		}
-		
+
 		if allFinished {
+			roundFinished = true
 			err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
 				ID:    round.ID,
 				Phase: "finished",
@@ -306,6 +380,17 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
+	// Publish answer submitted event for real-time updates
+	s.eventBus.Publish(r.Context(), events.Event{
+		Type:      events.EventAnswerSubmitted,
+		LobbyCode: code,
+		Payload: events.AnswerSubmittedPayload{
+			AnsweredCount: totalAnswered,
+			TotalExpected: totalExpected,
+			RoundFinished: roundFinished,
+		},
+	})
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }

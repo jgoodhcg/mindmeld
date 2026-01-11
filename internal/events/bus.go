@@ -78,10 +78,40 @@ const (
 	EventQuestionSubmitted = "question.submitted"
 	EventAnswerSubmitted   = "answer.submitted"
 	EventRoundAdvanced     = "round.advanced"
+	EventNewRoundCreated   = "round.created" // For "Play Again" - new round started
 )
 
 // PlayerJoinedPayload is the payload for EventPlayerJoined.
 type PlayerJoinedPayload struct {
 	PlayerID string
 	Nickname string
+}
+
+// GameStartedPayload is the payload for EventGameStarted.
+type GameStartedPayload struct {
+	RoundNumber int32
+}
+
+// QuestionSubmittedPayload is the payload for EventQuestionSubmitted.
+type QuestionSubmittedPayload struct {
+	SubmittedCount int
+	TotalPlayers   int
+	HostPlayerID   string // The player ID (UUID string) of the lobby host
+}
+
+// RoundAdvancedPayload is the payload for EventRoundAdvanced.
+type RoundAdvancedPayload struct {
+	RoundNumber int32
+}
+
+// AnswerSubmittedPayload is the payload for EventAnswerSubmitted.
+type AnswerSubmittedPayload struct {
+	AnsweredCount int
+	TotalExpected int
+	RoundFinished bool
+}
+
+// NewRoundCreatedPayload is the payload for EventNewRoundCreated (Play Again).
+type NewRoundCreatedPayload struct {
+	RoundNumber int32
 }

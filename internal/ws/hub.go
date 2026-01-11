@@ -11,29 +11,29 @@ import (
 
 // Hub manages WebSocket connections grouped by lobby.
 type Hub struct {
-	// lobbies maps lobby codes to their connected clients
-	lobbies map[string]map[*websocket.Conn]bool
+	// lobbies maps lobby codes to their connected clients with player IDs (as UUID strings)
+	lobbies map[string]map[*websocket.Conn]string
 	mu      sync.RWMutex
 }
 
 // NewHub creates a new WebSocket hub.
 func NewHub() *Hub {
 	return &Hub{
-		lobbies: make(map[string]map[*websocket.Conn]bool),
+		lobbies: make(map[string]map[*websocket.Conn]string),
 	}
 }
 
-// Register adds a connection to a lobby.
-func (h *Hub) Register(lobbyCode string, conn *websocket.Conn) {
+// Register adds a connection to a lobby with the associated player ID (UUID string).
+func (h *Hub) Register(lobbyCode string, conn *websocket.Conn, playerID string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	if h.lobbies[lobbyCode] == nil {
-		h.lobbies[lobbyCode] = make(map[*websocket.Conn]bool)
+		h.lobbies[lobbyCode] = make(map[*websocket.Conn]string)
 	}
-	h.lobbies[lobbyCode][conn] = true
+	h.lobbies[lobbyCode][conn] = playerID
 
-	log.Printf("[ws] Client connected to lobby %s (%d total)", lobbyCode, len(h.lobbies[lobbyCode]))
+	log.Printf("[ws] Client connected to lobby %s (playerID: %s, %d total)", lobbyCode, playerID, len(h.lobbies[lobbyCode]))
 }
 
 // Unregister removes a connection from a lobby.
@@ -87,4 +87,37 @@ func (h *Hub) ConnectionCount(lobbyCode string) int {
 		return len(clients)
 	}
 	return 0
+}
+
+// BroadcastPersonalized sends a personalized message to each connection in a lobby.
+// The renderFunc is called for each player ID (UUID string) and should return the message bytes for that player.
+func (h *Hub) BroadcastPersonalized(ctx context.Context, lobbyCode string, renderFunc func(playerID string) []byte) {
+	h.mu.RLock()
+	type clientInfo struct {
+		conn     *websocket.Conn
+		playerID string
+	}
+	clients := make([]clientInfo, 0)
+	if lobby, ok := h.lobbies[lobbyCode]; ok {
+		for conn, playerID := range lobby {
+			clients = append(clients, clientInfo{conn: conn, playerID: playerID})
+		}
+	}
+	h.mu.RUnlock()
+
+	if len(clients) == 0 {
+		return
+	}
+
+	log.Printf("[ws] Broadcasting personalized messages to %d clients in lobby %s", len(clients), lobbyCode)
+
+	for _, client := range clients {
+		message := renderFunc(client.playerID)
+		if message != nil {
+			err := client.conn.Write(ctx, websocket.MessageText, message)
+			if err != nil {
+				log.Printf("[ws] Error writing to client (playerID: %s): %v", client.playerID, err)
+			}
+		}
+	}
 }

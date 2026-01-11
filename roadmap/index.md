@@ -12,6 +12,7 @@ Building the **Trivia MVP** - the first playable game on the platform.
 
 - [trivia.md](./trivia.md) - Trivia MVP implementation
 - [security.md](./security.md) - App Security Hardening
+- [analytics.md](./analytics.md) - Plausible analytics for gameplay + stats
 
 ## Key Links
 
