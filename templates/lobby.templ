@@ -6,47 +6,55 @@ import (
 
 templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow) {
 	@Layout("Lobby - " + lobby.Name) {
-		<div class="max-w-4xl mx-auto">
-			<div class="flex justify-between items-end mb-8">
-				<div>
-					<h1 class="text-4xl font-bold">{ lobby.Name }</h1>
-					<div class="mt-2">
-						<p class="text-gray-400 text-sm">Join Code</p>
-						<div class="flex items-center gap-4">
-							<span class="font-mono text-4xl text-purple-400 font-bold tracking-wider">{ lobby.Code }</span>
-							<button
-								onclick="navigator.clipboard.writeText(window.location.href)"
-								class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300 transition-colors"
-							>
-								Copy Link
-							</button>
+		<div class="max-w-4xl mx-auto space-y-6">
+			<!-- Header -->
+			<div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl">
+				<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+					<div class="flex-1">
+						<h1 class="text-3xl sm:text-4xl font-bold mb-3">{ lobby.Name }</h1>
+						<div>
+							<p class="text-gray-400 text-xs sm:text-sm uppercase tracking-wide mb-1">Join Code</p>
+							<div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+								<span class="font-mono text-3xl sm:text-4xl text-purple-400 font-bold tracking-wider">{ lobby.Code }</span>
+								<button
+									onclick="navigator.clipboard.writeText(window.location.href)"
+									class="self-start text-xs bg-gray-700/50 hover:bg-gray-600/50 px-3 py-2 rounded-lg text-gray-300 transition-all active:scale-95"
+								>
+									📋 Copy Link
+								</button>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="bg-gray-800 px-4 py-2 rounded border border-gray-700">
-					<span class="text-sm text-gray-400 block uppercase tracking-tight">Phase</span>
-					<span class="font-semibold text-purple-400 capitalize">{ lobby.Phase }</span>
+					<div class="bg-gray-900/50 px-4 py-3 rounded-xl border border-gray-700/50 self-start">
+						<span class="text-xs text-gray-400 block uppercase tracking-wide mb-0.5">Phase</span>
+						<span class="font-bold text-purple-400 capitalize text-lg">{ lobby.Phase }</span>
+					</div>
 				</div>
 			</div>
 
 			<!-- Game content area - updates via WebSocket OOB swap -->
 			@GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard)
 
-			<div hx-ext="ws" ws-connect={ "/lobbies/" + lobby.Code + "/ws" } class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+			<div hx-ext="ws" ws-connect={ "/lobbies/" + lobby.Code + "/ws" } class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 				<!-- Players List (updates via WebSocket) -->
 				@PlayerList(players)
 
 				<!-- Game Info / Actions -->
-				<div class="bg-gray-800 rounded-lg p-6">
-					<h2 class="text-xl font-semibold mb-4">Game Status</h2>
+				<div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl">
+					<h2 class="text-xl sm:text-2xl font-semibold mb-4">Game Status</h2>
 					if lobby.Phase == "waiting" {
-						<p class="text-gray-400 mb-6">Waiting for players to join...</p>
+						<div class="space-y-4">
+							<div class="text-center py-6">
+								<div class="text-4xl mb-3">⏳</div>
+								<p class="text-gray-400">Waiting for players to join...</p>
+							</div>
 
-						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/start") } method="POST">
-							<button type="submit" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded font-bold transition-colors">
-								Start Game
-							</button>
-						</form>
+							<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/start") } method="POST">
+								<button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-green-500/50 active:scale-[0.98]">
+									Start Game
+								</button>
+							</form>
+						</div>
 					}
 				</div>
 			</div>
