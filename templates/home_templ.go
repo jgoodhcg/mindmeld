@@ -43,48 +43,48 @@ func Home(lobbies []db.Lobby) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto\"><h1 class=\"text-4xl font-bold mb-8 text-center\">Mindmeld</h1><!-- Create Lobby Form --><div class=\"bg-gray-800 rounded-lg p-6 mb-8\"><h2 class=\"text-xl font-semibold mb-4\">Create a Lobby</h2><form action=\"/lobbies\" method=\"POST\" class=\"flex flex-col gap-4\"><div class=\"flex gap-4\"><input type=\"text\" name=\"name\" placeholder=\"Lobby name\" required class=\"flex-1 bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500\"> <input type=\"text\" name=\"nickname\" placeholder=\"Your nickname\" required class=\"flex-1 bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500\"></div><button type=\"submit\" class=\"w-full bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded font-semibold transition-colors\">Create & Join</button></form></div><!-- Lobbies List --><div class=\"bg-gray-800 rounded-lg p-6\"><h2 class=\"text-xl font-semibold mb-4\">Lobbies</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto space-y-6 sm:space-y-8\"><!-- Header --><div class=\"text-center pt-4 sm:pt-8\"><h1 class=\"text-5xl sm:text-6xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent\">Mindmeld</h1><p class=\"text-gray-400 text-sm sm:text-base\">Trivia party game with friends</p></div><!-- Create Lobby Form --><div class=\"bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl\"><h2 class=\"text-xl sm:text-2xl font-semibold mb-5 sm:mb-6\">Create a Lobby</h2><form action=\"/lobbies\" method=\"POST\" class=\"space-y-4\"><div class=\"flex flex-col sm:flex-row gap-3 sm:gap-4\"><input type=\"text\" name=\"name\" placeholder=\"Lobby name\" required class=\"flex-1 bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors text-base\"> <input type=\"text\" name=\"nickname\" placeholder=\"Your nickname\" required class=\"flex-1 bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors text-base\"></div><button type=\"submit\" class=\"w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-600 px-6 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-purple-500/50 active:scale-[0.98]\">Create & Join</button></form></div><!-- Lobbies List --><div class=\"bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl\"><h2 class=\"text-xl sm:text-2xl font-semibold mb-4 sm:mb-6\">Active Lobbies</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(lobbies) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<p class=\"text-gray-400\">No lobbies yet. Create one above!</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"text-center py-8\"><div class=\"text-4xl mb-3\">🎮</div><p class=\"text-gray-400\">No lobbies yet. Create one above!</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<ul class=\"space-y-3\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<ul class=\"space-y-2 sm:space-y-3\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				for _, lobby := range lobbies {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<li class=\"flex justify-between items-center bg-gray-700 rounded px-4 py-3\"><div><span class=\"font-medium\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<li class=\"flex justify-between items-center bg-gray-900/30 hover:bg-gray-900/50 rounded-xl px-4 py-4 transition-colors border border-gray-700/30\"><div class=\"flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3\"><span class=\"font-semibold text-base\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(lobby.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 49, Col: 47}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 58, Col: 59}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"text-gray-400 text-sm ml-2\">(")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"text-gray-500 text-sm font-mono\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(lobby.Code)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 50, Col: 63}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 59, Col: 67}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, ")</span></div></li>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span></div></li>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
