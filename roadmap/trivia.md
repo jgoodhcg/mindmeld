@@ -2,7 +2,7 @@
 
 ## Work Unit Summary
 
-**Status:** active
+**Status:** active (core complete, polish remaining)
 
 **Problem/Intent:**
 Build the first playable game on the Mindmeld platform. Players submit questions for each other, answer them, and see how well they know each other and the world. This establishes the core lobby/player infrastructure that future games will reuse.
@@ -21,8 +21,33 @@ Build the first playable game on the Mindmeld platform. Players submit questions
 Implement a minimal game loop: create lobby → join with name → submit questions → play through each question → show scoreboard. Keep the implementation simple and defer complexity (timers, teams, real-time) to future work units.
 
 **Open Questions:**
-- How should question order be determined when the game starts? (Random shuffle? Order by submission time?)
+- ~~How should question order be determined when the game starts?~~ → Random shuffle implemented
 - What happens if a player disconnects mid-game?
+
+---
+
+## Completed
+
+- [x] Database schema (lobbies, players, lobby_players, trivia_rounds, trivia_questions, trivia_answers)
+- [x] Create lobby flow
+- [x] Join lobby with name
+- [x] Question submission phase
+- [x] Game playback (show questions, collect answers, reveal correct)
+- [x] Scoreboard display
+- [x] WebSocket real-time updates
+- [x] Answer shuffling
+- [x] Basic Tailwind CSS styling
+- [x] Host can start game
+
+---
+
+## TODO (Polish & UX)
+
+- [ ] **Join by code on home page**: Add a simple code input field so players can join a lobby without needing a direct link
+- [ ] **Remove public lobby list**: Hide the lobby list to keep games private; show only a count of active lobbies (total + lobbies with players)
+- [ ] **Host-only start button**: Only display the "Start Game" button to the host player
+- [ ] **Fix white background on scroll**: Body/html background color shows white when scrolling past content
+- [ ] **Show answer status while waiting**: Display which players have answered in the players section (for both question author and players who have already answered)
 
 ---
 
