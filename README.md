@@ -107,7 +107,7 @@ docker run -p 8080:8080 -e DATABASE_URL="postgres://mindmeld:mindmeld@host.docke
 4. Set `DATABASE_URL` env var (auto-injected from managed Postgres)
 5. HTTP Port: `8080`
 
-**Migrations:**
+### Migrations:
 
 Run migrations against production DB after deploy (run goose directly to avoid `.env.local` override):
 ```bash

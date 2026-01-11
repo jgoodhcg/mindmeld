@@ -105,7 +105,7 @@ These are noted here for context but should become their own work units when pri
 
 **Spectator Mode:** Allow users to join a lobby as non-players to watch the game progress without participating.
 
-**Real-time (Advanced):** Live typing indicators, "User X answered" notifications.
+**Real-time (Advanced):** Live typing indicators, "User X answered" notifications. Partial DOM updates for answer progress (avoid full page refresh that could interrupt players mid-answer).
 
 **Stats & Scoring:**
 - **Round Summary:** Breakdown of who picked what after each question.
