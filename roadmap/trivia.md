@@ -48,6 +48,12 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 - [ ] **Host-only start button**: Only display the "Start Game" button to the host player
 - [ ] **Fix white background on scroll**: Body/html background color shows white when scrolling past content
 - [ ] **Show answer status while waiting**: Display which players have answered in the players section (for both question author and players who have already answered)
+- [ ] **Fix answer flicker**: UI flickers when other players submit answers (likely WebSocket update causing full re-render)
+
+## TODO (Game Flow)
+
+- [ ] **Round results screen**: After each question, show a breakdown of who answered what before moving to the next question (adds a "results" phase between questions)
+- [ ] **Consider batch answering mode**: Alternative flow where players answer all questions at once, with progress shown, then reveal results together (vs current one-at-a-time with enforced sync)
 
 ---
 
