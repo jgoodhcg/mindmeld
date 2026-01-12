@@ -8,9 +8,9 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/jgoodhcg/mindmeld/internal/db"
+import "fmt"
 
-func Home(lobbies []db.Lobby) templ.Component {
+func Home(totalLobbies int64, lobbiesWithPlayers int64) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -43,58 +43,33 @@ func Home(lobbies []db.Lobby) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto space-y-6 sm:space-y-8\"><!-- Header --><div class=\"text-center pt-4 sm:pt-8\"><h1 class=\"text-5xl sm:text-6xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent\">Mindmeld</h1><p class=\"text-gray-400 text-sm sm:text-base\">Trivia party game with friends</p></div><!-- Create Lobby Form --><div class=\"bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl\"><h2 class=\"text-xl sm:text-2xl font-semibold mb-5 sm:mb-6\">Create a Lobby</h2><form action=\"/lobbies\" method=\"POST\" class=\"space-y-4\"><div class=\"flex flex-col sm:flex-row gap-3 sm:gap-4\"><input type=\"text\" name=\"name\" placeholder=\"Lobby name\" required class=\"flex-1 bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors text-base\"> <input type=\"text\" name=\"nickname\" placeholder=\"Your nickname\" required class=\"flex-1 bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors text-base\"></div><button type=\"submit\" class=\"w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-600 px-6 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-purple-500/50 active:scale-[0.98]\">Create & Join</button></form></div><!-- Lobbies List --><div class=\"bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl\"><h2 class=\"text-xl sm:text-2xl font-semibold mb-4 sm:mb-6\">Active Lobbies</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto space-y-6 sm:space-y-8\"><!-- Header --><div class=\"text-center pt-4 sm:pt-8\"><h1 class=\"text-5xl sm:text-6xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent\">Mindmeld</h1><p class=\"text-gray-400 text-sm sm:text-base\">Trivia party game with friends</p></div><!-- Join Lobby Form --><div class=\"bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl\"><h2 class=\"text-xl sm:text-2xl font-semibold mb-5 sm:mb-6\">Join a Lobby</h2><form action=\"/join\" method=\"POST\" class=\"space-y-4\"><input type=\"text\" name=\"code\" placeholder=\"Enter lobby code\" required maxlength=\"6\" class=\"w-full bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors text-base font-mono text-center text-2xl tracking-widest uppercase\"> <button type=\"submit\" class=\"w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 px-6 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-green-500/50 active:scale-[0.98]\">Join Game</button></form></div><!-- Create Lobby Form --><div class=\"bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl\"><h2 class=\"text-xl sm:text-2xl font-semibold mb-5 sm:mb-6\">Create a Lobby</h2><form action=\"/lobbies\" method=\"POST\" class=\"space-y-4\"><div class=\"flex flex-col sm:flex-row gap-3 sm:gap-4\"><input type=\"text\" name=\"name\" placeholder=\"Lobby name\" required class=\"flex-1 bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors text-base\"> <input type=\"text\" name=\"nickname\" placeholder=\"Your nickname\" required class=\"flex-1 bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors text-base\"></div><button type=\"submit\" class=\"w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-600 px-6 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-purple-500/50 active:scale-[0.98]\">Create & Join</button></form></div><!-- Lobby Stats --><div class=\"bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl\"><div class=\"flex justify-center gap-8 sm:gap-12\"><div class=\"text-center\"><div class=\"text-3xl sm:text-4xl font-bold text-purple-400\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if len(lobbies) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"text-center py-8\"><div class=\"text-4xl mb-3\">🎮</div><p class=\"text-gray-400\">No lobbies yet. Create one above!</p></div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<ul class=\"space-y-2 sm:space-y-3\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				for _, lobby := range lobbies {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<li class=\"flex justify-between items-center bg-gray-900/30 hover:bg-gray-900/50 rounded-xl px-4 py-4 transition-colors border border-gray-700/30\"><div class=\"flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3\"><span class=\"font-semibold text-base\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var3 string
-					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(lobby.Name)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 58, Col: 59}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"text-gray-500 text-sm font-mono\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var4 string
-					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(lobby.Code)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 59, Col: 67}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span></div></li>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</ul>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", totalLobbies))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 70, Col: 99}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><div class=\"text-gray-400 text-sm mt-1\">Total Lobbies</div></div><div class=\"text-center\"><div class=\"text-3xl sm:text-4xl font-bold text-green-400\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", lobbiesWithPlayers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/home.templ`, Line: 74, Col: 104}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div class=\"text-gray-400 text-sm mt-1\">Active Games</div></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
