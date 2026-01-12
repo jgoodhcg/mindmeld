@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   entrypoint = "./tmp/main"
-  cmd = "go run github.com/a-h/templ/cmd/templ generate && go build -o ./tmp/main ./cmd/server"
+  cmd = "go run github.com/a-h/templ/cmd/templ generate && go run github.com/sqlc-dev/sqlc/cmd/sqlc generate && tailwindcss -i styles/input.css -o static/css/output.css --minify && go build -o ./tmp/main ./cmd/server"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules"]
   exclude_file = []

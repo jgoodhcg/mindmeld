@@ -49,11 +49,15 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 								<p class="text-gray-400">Waiting for players to join...</p>
 							</div>
 
-							<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/start") } method="POST">
-								<button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-green-500/50 active:scale-[0.98]">
-									Start Game
-								</button>
-							</form>
+							if isHost {
+								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/start") } method="POST">
+									<button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-green-500/50 active:scale-[0.98]">
+										Start Game
+									</button>
+								</form>
+							} else {
+								<p class="text-center text-gray-400 py-4">Waiting for host to start the game...</p>
+							}
 						</div>
 					}
 				</div>

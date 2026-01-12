@@ -28,7 +28,7 @@ RUN go run github.com/a-h/templ/cmd/templ generate
 RUN go run github.com/sqlc-dev/sqlc/cmd/sqlc generate
 
 # Build Tailwind CSS
-RUN tailwindcss -i static/css/input.css -o static/css/output.css --minify
+RUN tailwindcss -i styles/input.css -o static/css/output.css --minify
 
 # Build Go binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server

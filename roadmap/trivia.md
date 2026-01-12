@@ -45,8 +45,8 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 
 - [ ] **Join by code on home page**: Add a simple code input field so players can join a lobby without needing a direct link
 - [ ] **Remove public lobby list**: Hide the lobby list to keep games private; show only a count of active lobbies (total + lobbies with players)
-- [ ] **Host-only start button**: Only display the "Start Game" button to the host player
-- [ ] **Fix white background on scroll**: Body/html background color shows white when scrolling past content
+- [x] **Host-only start button**: Only display the "Start Game" button to the host player
+- [x] **Fix white background on scroll**: Body/html background color shows white when scrolling past content
 - [ ] **Show answer status while waiting**: Display which players have answered in the players section (for both question author and players who have already answered)
 - [ ] **Fix answer flicker**: UI flickers when other players submit answers (likely WebSocket update causing full re-render)
 

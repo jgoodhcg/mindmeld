@@ -11,15 +11,10 @@ Clean up build artifacts and project structure to prevent staleness issues and i
 
 ## TODO
 
-- [ ] **Move CSS input file**: Relocate `static/css/input.css` to a more appropriate location (e.g., `styles/input.css` or root `input.css`). The `static/` directory should only contain generated/output files. Update paths in:
-  - `Makefile` (css and css-watch targets)
-  - `Dockerfile` (line 31)
-- [ ] **Remove generated files from git**: Several generated files are tracked despite gitignore rules (added before rules existed). Run:
-  ```bash
-  git rm --cached static/css/output.css
-  git rm --cached templates/*_templ.go
-  git rm --cached internal/db/db.go internal/db/lobbies.sql.go internal/db/models.go
-  ```
+- [x] **Move CSS input file**: ~~Relocate `static/css/input.css` to a more appropriate location~~ → Moved to `styles/input.css`
+- [x] **Remove generated files from git**: Untracked via `git rm --cached`
+
+## Done
 
 ---
 

@@ -1,4 +1,4 @@
-.PHONY: dev build run generate templ sqlc css css-watch clean db-up db-down migrate migrate-down migrate-status
+.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status
 
 # Load environment variables
 include .env.local
@@ -29,11 +29,7 @@ sqlc:
 
 # Build Tailwind CSS
 css:
-	tailwindcss -i static/css/input.css -o static/css/output.css --minify
-
-# Watch Tailwind CSS
-css-watch:
-	tailwindcss -i static/css/input.css -o static/css/output.css --watch
+	tailwindcss -i styles/input.css -o static/css/output.css --minify
 
 # Start database
 db-up:
