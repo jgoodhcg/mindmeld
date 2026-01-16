@@ -18,14 +18,12 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Ensure go.mod is tidy
-RUN go mod tidy
-
-# Generate templ templates
+# Generate code BEFORE go mod tidy (so internal/db/ exists for import resolution)
 RUN go run github.com/a-h/templ/cmd/templ generate
-
-# Generate sqlc code
 RUN go run github.com/sqlc-dev/sqlc/cmd/sqlc generate
+
+# Ensure go.mod is tidy (must run after code generation)
+RUN go mod tidy
 
 # Build Tailwind CSS
 RUN tailwindcss -i styles/input.css -o static/css/output.css --minify
