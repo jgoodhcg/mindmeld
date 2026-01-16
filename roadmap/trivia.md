@@ -56,6 +56,9 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 ## TODO (Game Flow)
 
 - [ ] **Round results screen**: After each question, show a breakdown of who answered what before moving to the next question (adds a "results" phase between questions)
+- [ ] **Per-round point analysis**: Show point breakdown per question/round - who got what right, running totals, etc.
+- [ ] **Enhanced end-of-game stats**: More detailed statistics at the end (most missed question, player accuracy %, question difficulty rankings, etc.)
+- [ ] **Mid-game player join sync**: When a new player joins mid-game, broadcast update to all connected clients so player list stays in sync
 - [ ] **Consider batch answering mode**: Alternative flow where players answer all questions at once, with progress shown, then reveal results together (vs current one-at-a-time with enforced sync)
 
 ---
