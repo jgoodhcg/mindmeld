@@ -13,8 +13,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
+	"github.com/jgoodhcg/mindmeld/internal/assets"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/server"
+	"github.com/jgoodhcg/mindmeld/templates"
 )
 
 func main() {
@@ -22,6 +24,10 @@ func main() {
 	if err := godotenv.Load(".env.local"); err != nil {
 		log.Println("No .env.local file found, using environment variables")
 	}
+
+	// Compute CSS hash for cache busting
+	templates.CSSHash = assets.ComputeFileHash("static/css/output.css")
+	log.Printf("CSS hash: %s", templates.CSSHash)
 
 	// Get configuration
 	port := os.Getenv("PORT")

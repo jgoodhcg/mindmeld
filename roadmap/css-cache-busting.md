@@ -2,7 +2,7 @@
 
 ## Work Unit Summary
 
-**Status:** idea
+**Status:** done
 
 **Problem/Intent:**
 After deployments, users may have stale CSS cached in their browsers, causing visual bugs or broken layouts until they hard-refresh. We need a way to invalidate old CSS automatically when deploying new versions.
