@@ -11,6 +11,7 @@ Clean up build artifacts and project structure to prevent staleness issues and i
 
 ## TODO
 
+- [ ] **URGENT: Remove generated files from git history**: Use `git filter-repo` or BFG to completely remove compiled CSS and generated files from repo history (not just untrack them)
 - [x] **Move CSS input file**: ~~Relocate `static/css/input.css` to a more appropriate location~~ → Moved to `styles/input.css`
 - [x] **Remove generated files from git**: Untracked via `git rm --cached`
 
