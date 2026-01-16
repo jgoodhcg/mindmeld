@@ -1,13 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  /* Color palette optimized for mobile trivia game */
-  --color-primary: #8b5cf6;
-  --color-primary-hover: #7c3aed;
-  --color-success: #10b981;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
+  /* 1970s Cerebral Sci-Fi Palette */
+  --color-base: #0d0f12;
+  --color-elevated: #151a1f;
+  --color-border: #1e2730;
+  --color-text: #e8e6e3;
+  --color-text-muted: #6b7280;
+  --color-amber: #d4a254;
+  --color-cyan: #4fd1c5;
+  --color-danger: #c45c4a;
+  --color-success: #3d9a8b;
 
   /* Mobile-friendly spacing */
   --spacing-touch-target: 44px;
+
+  /* Typography */
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syncopate", ui-sans-serif, sans-serif;
 }

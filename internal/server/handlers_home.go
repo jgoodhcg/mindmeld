@@ -8,7 +8,11 @@ import (
 	"github.com/jgoodhcg/mindmeld/templates"
 )
 
-func (s *Server) handleHome(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handlePlatform(w http.ResponseWriter, r *http.Request) {
+	templates.Platform().Render(r.Context(), w)
+}
+
+func (s *Server) handleTriviaHome(w http.ResponseWriter, r *http.Request) {
 	stats, err := s.queries.GetLobbyStats(r.Context())
 	if err != nil {
 		log.Printf("Error getting lobby stats: %v", err)
@@ -21,7 +25,7 @@ func (s *Server) handleHome(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleJoinByCode(w http.ResponseWriter, r *http.Request) {
 	code := strings.ToUpper(strings.TrimSpace(r.FormValue("code")))
 	if code == "" {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/trivia", http.StatusSeeOther)
 		return
 	}
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)

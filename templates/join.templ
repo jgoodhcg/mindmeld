@@ -4,40 +4,41 @@ import "github.com/jgoodhcg/mindmeld/internal/db"
 
 templ JoinLobby(lobby db.Lobby) {
 	@Layout("Join " + lobby.Name) {
-		<div class="max-w-md mx-auto mt-12 sm:mt-20 px-4">
-			<div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-2xl border border-gray-700/50">
-				<!-- Icon -->
+		<div class="max-w-md mx-auto py-12 sm:py-20 px-4">
+			<!-- Platform brand -->
+			<div class="text-center mb-8">
+				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">Trivia</span></span>
+			</div>
+
+			<div class="bg-elevated border border-border rounded p-6 sm:p-8">
 				<div class="text-center mb-6">
-					<div class="inline-block p-4 bg-purple-500/10 rounded-2xl mb-4">
-						<div class="text-4xl">🎯</div>
-					</div>
-					<h1 class="text-3xl sm:text-4xl font-bold mb-3">Join Lobby</h1>
-					<p class="text-gray-400 text-sm sm:text-base">
-						You're joining
-						<span class="text-purple-400 font-bold block sm:inline mt-1 sm:mt-0">{ lobby.Name }</span>
+					<h1 class="font-mono text-2xl sm:text-3xl font-bold text-text mb-3">JOIN SESSION</h1>
+					<p class="text-text-muted text-sm">
+						Connecting to
+						<span class="text-cyan font-mono font-bold block mt-1">{ lobby.Name }</span>
 					</p>
 				</div>
 
 				<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/join") } method="POST" class="space-y-6">
 					<div>
-						<label for="nickname" class="block text-sm font-semibold text-gray-300 mb-2">
-							Choose a Nickname
+						<label for="nickname" class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">
+							Identifier
 						</label>
 						<input
 							type="text"
 							name="nickname"
 							id="nickname"
-							placeholder="e.g. Brainy Smurf"
+							placeholder="Enter your name"
 							required
 							autocomplete="off"
-							class="w-full bg-gray-900/50 border-2 border-gray-700 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+							class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
 						/>
 					</div>
 					<button
 						type="submit"
-						class="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-600 px-6 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-purple-500/50 active:scale-[0.98]"
+						class="w-full bg-amber hover:bg-amber/80 text-base px-6 py-3 rounded font-mono font-bold tracking-wide transition-colors"
 					>
-						Join Game
+						CONNECT
 					</button>
 				</form>
 			</div>

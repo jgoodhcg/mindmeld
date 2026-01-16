@@ -13,32 +13,31 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 		if lobby.Phase == "playing" {
 			if activeRound.Phase == "submitting" {
 				if hasSubmitted {
-					<div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 text-center border border-green-500/30 shadow-xl">
-						<div class="text-5xl sm:text-6xl mb-4">✅</div>
-						<h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">Question Submitted!</h2>
+					<div class="bg-elevated border border-success rounded p-6 sm:p-8 text-center">
+						<h2 class="font-mono text-xl sm:text-2xl font-bold text-text mb-2">QUESTION SUBMITTED</h2>
 
 						<div id="submit-status">
-							<div class="mt-6 p-5 bg-gray-700/30 rounded-xl inline-block border border-gray-600/50">
-								<p class="text-gray-200 font-semibold mb-2 text-base sm:text-lg">Waiting for players...</p>
+							<div class="mt-6 p-5 bg-base rounded border border-border inline-block">
+								<p class="text-text-muted text-sm mb-2">Waiting for players...</p>
 								<div class="flex items-center justify-center gap-2">
-									<span class="text-2xl font-bold text-purple-400">{ fmt.Sprintf("%d", submittedCount) }</span>
-									<span class="text-gray-500">/</span>
-									<span class="text-xl font-semibold text-gray-400">{ fmt.Sprintf("%d", len(players)) }</span>
-									<span class="text-xs text-gray-500 uppercase font-bold ml-1">ready</span>
+									<span class="font-mono text-2xl font-bold text-cyan">{ fmt.Sprintf("%d", submittedCount) }</span>
+									<span class="text-text-muted">/</span>
+									<span class="font-mono text-xl text-text-muted">{ fmt.Sprintf("%d", len(players)) }</span>
+									<span class="text-xs text-text-muted uppercase font-mono ml-1">ready</span>
 								</div>
 							</div>
 
 							if isHost {
 								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/advance") } method="POST" class="mt-6">
 									if submittedCount >= len(players) {
-										<button type="submit" class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-green-500/50 active:scale-[0.98]">
-											Start Round
+										<button type="submit" class="bg-amber hover:bg-amber/80 text-base px-8 py-3 rounded font-mono font-bold tracking-wide transition-colors">
+											START ROUND
 										</button>
 									} else {
-										<button type="button" disabled class="bg-gray-700 px-8 py-4 rounded-xl font-bold text-gray-500 cursor-not-allowed opacity-50">
-											Start Round
+										<button type="button" disabled class="bg-border px-8 py-3 rounded font-mono font-bold text-text-muted cursor-not-allowed">
+											START ROUND
 										</button>
-										<p class="text-sm text-red-400 mt-3">⏳ Wait for everyone to submit!</p>
+										<p class="text-sm text-text-muted mt-3">Waiting for all submissions...</p>
 									}
 								</form>
 							}
@@ -49,10 +48,9 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 				}
 			} else if activeRound.Phase == "playing" && questionActive {
 				if hasAnswered {
-					<div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 text-center border border-purple-500/30 shadow-xl">
-						<div class="text-5xl sm:text-6xl mb-4">🤔</div>
-						<h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">Answer Submitted</h2>
-						<p class="text-gray-400 text-base sm:text-lg">Waiting for others to guess...</p>
+					<div class="bg-elevated border border-cyan rounded p-6 sm:p-8 text-center">
+						<h2 class="font-mono text-xl sm:text-2xl font-bold text-text mb-2">ANSWER SUBMITTED</h2>
+						<p class="text-text-muted">Waiting for others...</p>
 					</div>
 				} else {
 					@AnswerQuestion(lobby, currentQuestion, isAuthor)
@@ -69,26 +67,26 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 // The id="submit-status" wrapper ensures the entire section is swapped.
 templ SubmitStatus(submittedCount int, totalPlayers int, lobbyCode string, isHost bool) {
 	<div id="submit-status">
-		<div class="mt-6 p-5 bg-gray-700/30 rounded-xl inline-block border border-gray-600/50">
-			<p class="text-gray-200 font-semibold mb-2 text-base sm:text-lg">Waiting for players...</p>
+		<div class="mt-6 p-5 bg-base rounded border border-border inline-block">
+			<p class="text-text-muted text-sm mb-2">Waiting for players...</p>
 			<div class="flex items-center justify-center gap-2">
-				<span class="text-2xl font-bold text-purple-400">{ fmt.Sprintf("%d", submittedCount) }</span>
-				<span class="text-gray-500">/</span>
-				<span class="text-xl font-semibold text-gray-400">{ fmt.Sprintf("%d", totalPlayers) }</span>
-				<span class="text-xs text-gray-500 uppercase font-bold ml-1">ready</span>
+				<span class="font-mono text-2xl font-bold text-cyan">{ fmt.Sprintf("%d", submittedCount) }</span>
+				<span class="text-text-muted">/</span>
+				<span class="font-mono text-xl text-text-muted">{ fmt.Sprintf("%d", totalPlayers) }</span>
+				<span class="text-xs text-text-muted uppercase font-mono ml-1">ready</span>
 			</div>
 		</div>
 		if isHost {
 			<form action={ templ.SafeURL("/lobbies/" + lobbyCode + "/advance") } method="POST" class="mt-6">
 				if submittedCount >= totalPlayers {
-					<button type="submit" class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-green-500/50 active:scale-[0.98]">
-						Start Round
+					<button type="submit" class="bg-amber hover:bg-amber/80 text-base px-8 py-3 rounded font-mono font-bold tracking-wide transition-colors">
+						START ROUND
 					</button>
 				} else {
-					<button type="button" disabled class="bg-gray-700 px-8 py-4 rounded-xl font-bold text-gray-500 cursor-not-allowed opacity-50">
-						Start Round
+					<button type="button" disabled class="bg-border px-8 py-3 rounded font-mono font-bold text-text-muted cursor-not-allowed">
+						START ROUND
 					</button>
-					<p class="text-sm text-red-400 mt-3">⏳ Wait for everyone to submit!</p>
+					<p class="text-sm text-text-muted mt-3">Waiting for all submissions...</p>
 				}
 			</form>
 		}
@@ -99,18 +97,18 @@ templ SubmitStatus(submittedCount int, totalPlayers int, lobbyCode string, isHos
 // This partial is used both in the initial page render and for WebSocket updates.
 // The id="player-list" is required for HTMX WebSocket OOB swaps.
 templ PlayerList(players []db.GetLobbyPlayersRow) {
-	<div id="player-list" class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-gray-700/50 shadow-xl">
-		<h2 class="text-xl sm:text-2xl font-semibold mb-4 flex items-center gap-2">
-			<span>👥 Players</span>
-			<span class="bg-purple-500/20 border border-purple-500/50 text-purple-300 text-xs px-2.5 py-1 rounded-lg font-bold">{ fmt.Sprintf("%d", len(players)) }</span>
+	<div id="player-list" class="bg-elevated border border-border rounded p-5 sm:p-6">
+		<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4 flex items-center gap-2">
+			<span>Players</span>
+			<span class="bg-base border border-border text-cyan text-xs px-2 py-0.5 rounded font-mono">{ fmt.Sprintf("%d", len(players)) }</span>
 		</h2>
-		<ul class="space-y-2 sm:space-y-3">
+		<ul class="space-y-2">
 			for _, p := range players {
-				<li class="flex items-center justify-between bg-gray-900/30 rounded-xl px-4 py-3 border border-gray-700/30 hover:bg-gray-900/50 transition-colors">
+				<li class="flex items-center justify-between bg-base rounded px-4 py-3 border border-border">
 					<div class="flex items-center gap-2">
-						<span class="font-medium text-base">{ p.Nickname }</span>
+						<span class="text-text">{ p.Nickname }</span>
 						if p.IsHost {
-							<span class="text-[10px] bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 px-2 py-0.5 rounded uppercase font-bold">Host</span>
+							<span class="text-xs bg-amber/20 border border-amber/50 text-amber px-2 py-0.5 rounded font-mono uppercase">Host</span>
 						}
 					</div>
 				</li>

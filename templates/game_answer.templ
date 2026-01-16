@@ -6,48 +6,35 @@ import (
 )
 
 templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool) {
-	<div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-blue-500/30 shadow-xl">
+	<div class="bg-elevated border border-border rounded p-5 sm:p-6">
 		<div class="text-center mb-6">
-			<div class="inline-block px-4 py-2 bg-blue-500/10 rounded-xl mb-4">
-				<h2 class="text-xl sm:text-2xl font-bold text-blue-400">❓ Answer Time</h2>
-			</div>
+			<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4">Select Answer</h2>
 		</div>
 
-		<div class="bg-gradient-to-br from-gray-900/80 to-gray-800/80 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 text-center border border-gray-700/50">
-			<p class="text-xl sm:text-2xl font-medium leading-relaxed">{ question.QuestionText }</p>
+		<div class="bg-base rounded p-6 sm:p-8 mb-6 text-center border border-border">
+			<p class="text-lg sm:text-xl text-text leading-relaxed">{ question.QuestionText }</p>
 		</div>
 
 		if isAuthor {
-			<div class="text-center p-6 sm:p-8 bg-gray-700/30 rounded-2xl border-2 border-dashed border-gray-600">
-				<div class="text-3xl sm:text-4xl mb-3">👀</div>
-				<p class="text-gray-200 font-bold text-lg mb-2">You wrote this!</p>
-				<p class="text-sm sm:text-base text-gray-400 mb-4">Watch your friends try to guess the answer.</p>
-				<div class="inline-block px-4 py-2 bg-green-500/10 rounded-xl border border-green-500/30">
-					<p class="text-xs text-gray-400">Correct Answer</p>
-					<p class="text-green-400 font-bold">{ question.CorrectAnswer }</p>
+			<div class="text-center p-6 sm:p-8 bg-base rounded border-2 border-dashed border-border">
+				<p class="text-text font-mono font-bold text-lg mb-2">YOUR QUESTION</p>
+				<p class="text-sm text-text-muted mb-4">Observe as others attempt to answer</p>
+				<div class="inline-block px-4 py-2 bg-elevated rounded border border-success/30">
+					<p class="text-xs text-text-muted font-mono uppercase">Correct Answer</p>
+					<p class="text-success font-bold">{ question.CorrectAnswer }</p>
 				</div>
 			</div>
 		} else {
+			{{ shuffled := ShuffleAnswers(question) }}
 			<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/answers") } method="POST" class="space-y-3">
 				<input type="hidden" name="question_id" value={ fmt.Sprintf("%x", question.ID.Bytes) } />
 
-				<!-- TODO: Shuffle these! Currently fixed order which is cheating -->
-				<button type="submit" name="answer" value={ question.CorrectAnswer } class="w-full bg-gray-900/50 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-500 p-4 sm:p-5 rounded-xl text-left transition-all border-2 border-gray-700 hover:border-purple-500 group active:scale-[0.98]">
-					<span class="text-gray-400 group-hover:text-white text-lg mr-3 font-bold">A.</span>
-					<span class="font-semibold text-base sm:text-lg">{ question.CorrectAnswer }</span>
-				</button>
-				<button type="submit" name="answer" value={ question.WrongAnswer1 } class="w-full bg-gray-900/50 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-500 p-4 sm:p-5 rounded-xl text-left transition-all border-2 border-gray-700 hover:border-purple-500 group active:scale-[0.98]">
-					<span class="text-gray-400 group-hover:text-white text-lg mr-3 font-bold">B.</span>
-					<span class="font-semibold text-base sm:text-lg">{ question.WrongAnswer1 }</span>
-				</button>
-				<button type="submit" name="answer" value={ question.WrongAnswer2 } class="w-full bg-gray-900/50 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-500 p-4 sm:p-5 rounded-xl text-left transition-all border-2 border-gray-700 hover:border-purple-500 group active:scale-[0.98]">
-					<span class="text-gray-400 group-hover:text-white text-lg mr-3 font-bold">C.</span>
-					<span class="font-semibold text-base sm:text-lg">{ question.WrongAnswer2 }</span>
-				</button>
-				<button type="submit" name="answer" value={ question.WrongAnswer3 } class="w-full bg-gray-900/50 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-500 p-4 sm:p-5 rounded-xl text-left transition-all border-2 border-gray-700 hover:border-purple-500 group active:scale-[0.98]">
-					<span class="text-gray-400 group-hover:text-white text-lg mr-3 font-bold">D.</span>
-					<span class="font-semibold text-base sm:text-lg">{ question.WrongAnswer3 }</span>
-				</button>
+				for _, ans := range shuffled {
+					<button type="submit" name="answer" value={ ans.Value } class="w-full bg-base hover:bg-cyan hover:text-base p-4 sm:p-5 rounded text-left transition-colors border border-border hover:border-cyan group">
+						<span class="text-text-muted group-hover:text-base font-mono font-bold mr-3">{ ans.Label }.</span>
+						<span class="text-text group-hover:text-base">{ ans.Value }</span>
+					</button>
+				}
 			</form>
 		}
 	</div>

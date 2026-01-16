@@ -16,8 +16,9 @@ func (s *Server) routes() {
 	s.router.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
 	// App Routes
-	s.router.Get("/", s.handleHome)
-	s.router.Post("/join", s.handleJoinByCode)
+	s.router.Get("/", s.handlePlatform)
+	s.router.Get("/trivia", s.handleTriviaHome)
+	s.router.Post("/trivia/join", s.handleJoinByCode)
 	s.router.Post("/lobbies", s.handleCreateLobby)
 	s.router.Get("/lobbies/{code}", s.handleLobbyRoom)
 	s.router.Post("/lobbies/{code}/join", s.handleJoinLobby)
