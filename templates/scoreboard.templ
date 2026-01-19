@@ -18,20 +18,42 @@ func getRank(index int, scores []db.GetLobbyScoreboardRow) int {
 	return index + 1
 }
 
-templ Scoreboard(scores []db.GetLobbyScoreboardRow, lobbyCode string, isHost bool) {
+templ Scoreboard(scores []db.GetLobbyScoreboardRow, roundScores []db.GetRoundScoreboardRow, lobbyCode string, isHost bool) {
 	<div class="bg-elevated border border-border rounded p-5 sm:p-8">
 		<!-- Header -->
 		<div class="text-center mb-8 sm:mb-10">
 			<h2 class="font-display text-3xl sm:text-4xl font-bold text-text mb-2">
 				RESULTS
 			</h2>
-			<p class="text-text-muted text-sm">Session complete</p>
+			<p class="text-text-muted text-sm">Round complete</p>
 		</div>
 
-		<!-- Rankings -->
-		<div class="space-y-3 max-w-lg mx-auto mb-8 sm:mb-10">
+		<!-- Round Winner -->
+		if len(roundScores) > 0 {
+			<div class="mb-10 text-center">
+				<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winner</p>
+				<div class="inline-block bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-6 sm:p-8 shadow-lg shadow-amber/5 transform scale-110">
+					<div class="flex flex-col items-center gap-2">
+						<span class="text-4xl">👑</span>
+						<h3 class="font-display text-2xl sm:text-3xl font-bold text-amber">{ roundScores[0].Nickname }</h3>
+						<span class="font-mono text-xl font-bold text-text mt-1">{ fmt.Sprintf("%d", roundScores[0].Score) } pts</span>
+					</div>
+				</div>
+			</div>
+		}
+
+		<!-- Rankings Table -->
+		<div class="space-y-3 max-w-2xl mx-auto mb-8 sm:mb-10">
+			<!-- Table Header -->
+			<div class="grid grid-cols-12 gap-2 text-xs uppercase tracking-widest text-text-muted px-4 mb-2 font-mono">
+				<div class="col-span-1 text-center">#</div>
+				<div class="col-span-7">Player</div>
+				<div class="col-span-2 text-center">Round</div>
+				<div class="col-span-2 text-center">Total</div>
+			</div>
+
 			for i, s := range scores {
-				@ScoreRow(i, s, scores)
+				@ScoreRow(i, s, scores, roundScores)
 			}
 		</div>
 
@@ -49,51 +71,46 @@ templ Scoreboard(scores []db.GetLobbyScoreboardRow, lobbyCode string, isHost boo
 	</div>
 }
 
-templ ScoreRow(index int, s db.GetLobbyScoreboardRow, scores []db.GetLobbyScoreboardRow) {
-	{{ rank := getRank(index, scores) }}
-	if rank == 1 {
-		<div class="flex items-center justify-between p-4 sm:p-5 rounded bg-amber/10 border border-amber/50">
-			<div class="flex items-center gap-3 sm:gap-4">
-				<span class="font-mono text-2xl sm:text-3xl font-bold text-amber w-10 sm:w-12 flex-shrink-0">01</span>
-				<span class="text-lg sm:text-xl font-bold text-text">{ s.Nickname }</span>
-			</div>
-			<div class="flex items-center gap-2">
-				<span class="font-mono text-2xl sm:text-3xl font-bold text-amber">{ fmt.Sprintf("%d", s.Score) }</span>
-				<span class="text-xs text-text-muted uppercase font-mono">pts</span>
-			</div>
+templ ScoreRow(index int, s db.GetLobbyScoreboardRow, scores []db.GetLobbyScoreboardRow, roundScores []db.GetRoundScoreboardRow) {
+	{{ 
+		rank := getRank(index, scores)
+		roundScore := int64(0)
+		for _, rs := range roundScores {
+			if rs.PlayerID == s.PlayerID {
+				roundScore = rs.Score
+				break
+			}
+		}
+
+		bgClass := "bg-base border-border"
+		rankColor := "text-text-muted"
+		if rank == 1 {
+			bgClass = "bg-amber/10 border-amber/50"
+			rankColor = "text-amber"
+		} else if rank == 2 || rank == 3 {
+			rankColor = "text-text" // Silver/Bronzeish
+		}
+	}}
+	
+	<div class={ "grid grid-cols-12 gap-2 items-center p-3 sm:p-4 rounded border " + bgClass }>
+		<!-- Rank -->
+		<div class="col-span-1 flex justify-center">
+			<span class={ "font-mono text-xl sm:text-2xl font-bold " + rankColor }>{ fmt.Sprintf("%02d", rank) }</span>
 		</div>
-	} else if rank == 2 {
-		<div class="flex items-center justify-between p-4 sm:p-5 rounded bg-base border border-border">
-			<div class="flex items-center gap-3 sm:gap-4">
-				<span class="font-mono text-2xl sm:text-3xl font-bold text-text-muted w-10 sm:w-12 flex-shrink-0">02</span>
-				<span class="text-lg sm:text-xl font-bold text-text">{ s.Nickname }</span>
-			</div>
-			<div class="flex items-center gap-2">
-				<span class="font-mono text-2xl sm:text-3xl font-bold text-text">{ fmt.Sprintf("%d", s.Score) }</span>
-				<span class="text-xs text-text-muted uppercase font-mono">pts</span>
-			</div>
+		
+		<!-- Player Name -->
+		<div class="col-span-7 pl-2">
+			<span class="text-base sm:text-lg font-bold text-text truncate block">{ s.Nickname }</span>
 		</div>
-	} else if rank == 3 {
-		<div class="flex items-center justify-between p-4 sm:p-5 rounded bg-base border border-border">
-			<div class="flex items-center gap-3 sm:gap-4">
-				<span class="font-mono text-2xl sm:text-3xl font-bold text-text-muted w-10 sm:w-12 flex-shrink-0">03</span>
-				<span class="text-lg sm:text-xl font-bold text-text">{ s.Nickname }</span>
-			</div>
-			<div class="flex items-center gap-2">
-				<span class="font-mono text-2xl sm:text-3xl font-bold text-text">{ fmt.Sprintf("%d", s.Score) }</span>
-				<span class="text-xs text-text-muted uppercase font-mono">pts</span>
-			</div>
+
+		<!-- Round Score -->
+		<div class="col-span-2 flex justify-center">
+			<span class="font-mono text-lg font-bold text-cyan">{ fmt.Sprintf("%d", roundScore) }</span>
 		</div>
-	} else {
-		<div class="flex items-center justify-between p-4 sm:p-5 rounded bg-base border border-border">
-			<div class="flex items-center gap-3 sm:gap-4">
-				<span class="font-mono text-xl sm:text-2xl font-bold text-text-muted w-10 sm:w-12 flex-shrink-0">{ fmt.Sprintf("%02d", rank) }</span>
-				<span class="text-lg sm:text-xl font-bold text-text">{ s.Nickname }</span>
-			</div>
-			<div class="flex items-center gap-2">
-				<span class="font-mono text-2xl sm:text-3xl font-bold text-text-muted">{ fmt.Sprintf("%d", s.Score) }</span>
-				<span class="text-xs text-text-muted uppercase font-mono">pts</span>
-			</div>
+
+		<!-- Total Score -->
+		<div class="col-span-2 flex justify-center">
+			<span class="font-mono text-lg font-bold text-text-muted">{ fmt.Sprintf("%d", s.Score) }</span>
 		</div>
-	}
+	</div>
 }

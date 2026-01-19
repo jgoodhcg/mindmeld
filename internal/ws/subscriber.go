@@ -102,6 +102,7 @@ func (s *Subscriber) broadcastGameStarted(ctx context.Context, lobbyCode string,
 	var buf bytes.Buffer
 	var emptyQuestion db.TriviaQuestion
 	var emptyScoreboard []db.GetLobbyScoreboardRow
+	var emptyRoundScoreboard []db.GetRoundScoreboardRow
 	var emptyDistribution []events.AnswerStat
 	err = templates.GameContent(
 		lobby,
@@ -115,6 +116,7 @@ func (s *Subscriber) broadcastGameStarted(ctx context.Context, lobbyCode string,
 		0,     // submittedCount
 		false, // isHost - this is tricky, but the form doesn't need it in submitting state
 		emptyScoreboard,
+		emptyRoundScoreboard,
 		emptyDistribution,
 		0,
 	).Render(ctx, &buf)

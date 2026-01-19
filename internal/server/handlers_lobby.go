@@ -105,6 +105,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	var hasAnswered bool
 	var submittedCount int
 	var scoreboard []db.GetLobbyScoreboardRow
+	var roundScoreboard []db.GetRoundScoreboardRow
 	var distribution []events.AnswerStat
 	var totalAnswers int
 	
@@ -114,6 +115,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error fetching active round: %v", err)
 		} else {
 			if activeRound.Phase == "submitting" {
+				// ... (existing submitting logic) ...
 				// Check if player submitted AND count total submissions
 				questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
 				if err == nil {
@@ -172,20 +174,24 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 							}
 						}
 					}
-				} else {
-					// No current question set? Should be finished or error.
-					// Fallback to checking if round is actually finished
 				}
 			} else if activeRound.Phase == "finished" {
+				// Cumulative Score
 				scoreboard, err = s.queries.GetLobbyScoreboard(r.Context(), lobby.ID)
 				if err != nil {
 					log.Printf("Error fetching scoreboard: %v", err)
+				}
+				
+				// Round Score
+				roundScoreboard, err = s.queries.GetRoundScoreboard(r.Context(), activeRound.ID)
+				if err != nil {
+					log.Printf("Error fetching round scoreboard: %v", err)
 				}
 			}
 		}
 	}
 
-	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost, scoreboard, distribution, totalAnswers).Render(r.Context(), w)
+	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost, scoreboard, roundScoreboard, distribution, totalAnswers).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {

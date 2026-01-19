@@ -9,7 +9,7 @@ import (
 // GameContent renders the main game content area.
 // This partial is used both in the initial page render and for WebSocket updates.
 // The id="game-content" is required for HTMX WebSocket OOB swaps.
-templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, distribution []events.AnswerStat, totalAnswers int) {
+templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, roundScoreboard []db.GetRoundScoreboardRow, distribution []events.AnswerStat, totalAnswers int) {
 	<div id="game-content">
 		if lobby.Phase == "playing" {
 			if activeRound.Phase == "submitting" {
@@ -57,7 +57,7 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 					@AnswerQuestion(lobby, currentQuestion, isAuthor)
 				}
 			} else if activeRound.Phase == "finished" {
-				@Scoreboard(scoreboard, lobby.Code, isHost)
+				@Scoreboard(scoreboard, roundScoreboard, lobby.Code, isHost)
 			}
 		}
 	</div>
