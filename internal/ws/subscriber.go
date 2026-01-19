@@ -35,6 +35,8 @@ func (s *Subscriber) HandleEvent(ctx context.Context, event events.Event) {
 		s.broadcastQuestionSubmitted(ctx, event.LobbyCode, event.Payload.(events.QuestionSubmittedPayload))
 	case events.EventRoundAdvanced:
 		s.broadcastRoundAdvanced(ctx, event.LobbyCode, event.Payload.(events.RoundAdvancedPayload))
+	case events.EventQuestionRevealed:
+		s.broadcastQuestionRevealed(ctx, event.LobbyCode, event.Payload.(events.QuestionRevealedPayload))
 	case events.EventAnswerSubmitted:
 		s.broadcastAnswerSubmitted(ctx, event.LobbyCode, event.Payload.(events.AnswerSubmittedPayload))
 	case events.EventNewRoundCreated:
@@ -100,6 +102,7 @@ func (s *Subscriber) broadcastGameStarted(ctx context.Context, lobbyCode string,
 	var buf bytes.Buffer
 	var emptyQuestion db.TriviaQuestion
 	var emptyScoreboard []db.GetLobbyScoreboardRow
+	var emptyDistribution []events.AnswerStat
 	err = templates.GameContent(
 		lobby,
 		players,
@@ -112,6 +115,8 @@ func (s *Subscriber) broadcastGameStarted(ctx context.Context, lobbyCode string,
 		0,     // submittedCount
 		false, // isHost - this is tricky, but the form doesn't need it in submitting state
 		emptyScoreboard,
+		emptyDistribution,
+		0,
 	).Render(ctx, &buf)
 	if err != nil {
 		log.Printf("[ws-subscriber] Failed to render game content: %v", err)
@@ -153,20 +158,91 @@ func (s *Subscriber) broadcastRoundAdvanced(ctx context.Context, lobbyCode strin
 	s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
 }
 
-// broadcastAnswerSubmitted broadcasts answer progress updates.
-// Only triggers a page refresh when the current question is complete (all expected answers in).
-// This prevents flickering for players who are still answering.
-func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode string, payload events.AnswerSubmittedPayload) {
-	log.Printf("[ws-subscriber] Answer submitted for lobby %s: %d/%d (question complete: %v, round finished: %v)",
-		lobbyCode, payload.AnsweredCount, payload.TotalExpected, payload.QuestionComplete, payload.RoundFinished)
+// broadcastQuestionRevealed broadcasts when everyone has answered.
+// Triggers a page refresh so everyone sees the revealed results.
+func (s *Subscriber) broadcastQuestionRevealed(ctx context.Context, lobbyCode string, payload events.QuestionRevealedPayload) {
+	log.Printf("[ws-subscriber] Question revealed for lobby %s", lobbyCode)
+	refreshHTML := []byte(`<div id="game-content"><script>window.location.reload()</script></div>`)
+	s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
+}
 
-	// Only trigger refresh when the current question is complete
-	// This advances everyone to the next question (or scoreboard if round finished)
-	// Players still answering won't be interrupted by intermediate answer submissions
+// broadcastAnswerSubmitted broadcasts answer progress updates.
+// If question is complete, handled by broadcastQuestionRevealed.
+// Otherwise, sends Live Graph to players who have already answered.
+func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode string, payload events.AnswerSubmittedPayload) {
 	if payload.QuestionComplete {
-		refreshHTML := []byte(`<div id="game-content"><script>window.location.reload()</script></div>`)
-		s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
+		// Do nothing, QuestionRevealed event will handle the reload
+		return
 	}
+
+	// Fetch necessary data to render the graph
+	lobby, err := s.queries.GetLobbyByCode(ctx, lobbyCode)
+	if err != nil {
+		log.Printf("[ws-subscriber] Error fetching lobby: %v", err)
+		return
+	}
+
+	activeRound, err := s.queries.GetActiveRound(ctx, lobby.ID)
+	if err != nil || !activeRound.CurrentQuestionID.Valid {
+		log.Printf("[ws-subscriber] Error fetching active round/question: %v", err)
+		return
+	}
+
+	// Fetch Current Question
+	questions, err := s.queries.GetQuestionsForRound(ctx, activeRound.ID)
+	var currentQuestion db.TriviaQuestion
+	found := false
+	if err == nil {
+		for _, q := range questions {
+			if q.ID == activeRound.CurrentQuestionID {
+				currentQuestion = q
+				found = true
+				break
+			}
+		}
+	}
+	if !found {
+		return
+	}
+
+	// Fetch who has answered
+	answers, err := s.queries.GetAnswersForQuestion(ctx, currentQuestion.ID)
+	if err != nil {
+		return
+	}
+	answeredMap := make(map[string]bool)
+	totalAnswers := len(answers)
+	for _, a := range answers {
+		answeredMap[a.PlayerID.String()] = true
+	}
+
+	// Broadcast Personalized
+	s.hub.BroadcastPersonalized(ctx, lobbyCode, func(playerID string) []byte {
+		// Only send update if player has answered OR is the author
+		hasAnswered := answeredMap[playerID]
+		isAuthor := currentQuestion.Author.String() == playerID
+		
+		if hasAnswered || isAuthor {
+			var buf bytes.Buffer
+			// QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, isRevealed bool, isHost bool)
+			err := templates.QuestionResults(
+				lobbyCode,
+				currentQuestion,
+				payload.Distribution,
+				totalAnswers,
+				false, // Not revealed yet
+				false, // Host button hidden anyway
+			).Render(ctx, &buf)
+			
+			if err != nil {
+				log.Printf("[ws-subscriber] Error rendering live graph: %v", err)
+				return nil
+			}
+			return buf.Bytes()
+		}
+		
+		return nil // Send nothing to players still answering
+	})
 }
 
 // broadcastNewRoundCreated broadcasts when a new round is created (Play Again).

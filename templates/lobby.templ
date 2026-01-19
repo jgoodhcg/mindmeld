@@ -2,9 +2,10 @@ package templates
 
 import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/events"
 )
 
-templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow) {
+templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, distribution []events.AnswerStat, totalAnswers int) {
 	@Layout("Trivia - " + lobby.Name) {
 		<div class="max-w-4xl mx-auto space-y-6">
 			<!-- Platform brand -->
@@ -38,7 +39,7 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 			</div>
 
 			<!-- Game content area - updates via WebSocket OOB swap -->
-			@GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard)
+			@GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard, distribution, totalAnswers)
 
 			<div hx-ext="ws" ws-connect={ "/lobbies/" + lobby.Code + "/ws" } class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 				<!-- Players List (updates via WebSocket) -->

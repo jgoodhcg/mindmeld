@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/templates"
@@ -104,6 +105,8 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	var hasAnswered bool
 	var submittedCount int
 	var scoreboard []db.GetLobbyScoreboardRow
+	var distribution []events.AnswerStat
+	var totalAnswers int
 	
 	if lobby.Phase == "playing" {
 		activeRound, err = s.queries.GetActiveRound(r.Context(), lobby.ID)
@@ -122,59 +125,56 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 			} else if activeRound.Phase == "playing" {
-				// Find current question
-				questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
-				if err == nil {
-					for _, q := range questions {
-						// How many answers?
-						count, err := s.queries.CountAnswersForQuestion(r.Context(), q.ID)
-						if err != nil {
-							continue
-						}
-						
-						// Target is players - 1 (author doesn't answer)
-						targetAnswers := int64(len(players) - 1)
-						if targetAnswers < 0 { targetAnswers = 0 }
-
-						if count < targetAnswers {
-							currentQuestion = q
-							questionActive = true
-							
-							// Check if Author
-							if q.Author == player.ID {
-								isAuthor = true
+				// Use Explicit State
+				if activeRound.CurrentQuestionID.Valid {
+					// Get the current question
+					var qID pgtype.UUID = activeRound.CurrentQuestionID
+					questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
+					if err == nil {
+						for _, q := range questions {
+							if q.ID == qID {
+								currentQuestion = q
+								questionActive = true
+								break
 							}
+						}
+					}
 
-							// Check if Answered
-							// We can fetch answers for this question
-							answers, err := s.queries.GetAnswersForQuestion(r.Context(), q.ID)
-							if err == nil {
-								for _, a := range answers {
-									if a.PlayerID == player.ID {
-										hasAnswered = true
+					if questionActive {
+						// Check if Author
+						if currentQuestion.Author == player.ID {
+							isAuthor = true
+						}
+
+						// Check if Answered
+						answers, err := s.queries.GetAnswersForQuestion(r.Context(), currentQuestion.ID)
+						if err == nil {
+							totalAnswers = len(answers)
+							for _, a := range answers {
+								if a.PlayerID == player.ID {
+									hasAnswered = true
+								}
+								// Build Stats
+								found := false
+								for i, stat := range distribution {
+									if stat.Answer == a.SelectedAnswer {
+										distribution[i].Count++
+										found = true
 										break
 									}
 								}
+								if !found {
+									distribution = append(distribution, events.AnswerStat{
+										Answer: a.SelectedAnswer,
+										Count:  1,
+									})
+								}
 							}
-							break
 						}
 					}
-					
-					// If no question active, round is finished?
-					if !questionActive && len(questions) > 0 {
-						// Auto-finish round
-						err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
-							ID:    activeRound.ID,
-							Phase: "finished",
-						})
-						if err != nil {
-							log.Printf("Error auto-finishing round: %v", err)
-						} else {
-							// Update local state to render scoreboard immediately
-							activeRound.Phase = "finished"
-							scoreboard, _ = s.queries.GetLobbyScoreboard(r.Context(), lobby.ID)
-						}
-					}
+				} else {
+					// No current question set? Should be finished or error.
+					// Fallback to checking if round is actually finished
 				}
 			} else if activeRound.Phase == "finished" {
 				scoreboard, err = s.queries.GetLobbyScoreboard(r.Context(), lobby.ID)
@@ -185,7 +185,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost, scoreboard).Render(r.Context(), w)
+	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost, scoreboard, distribution, totalAnswers).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {

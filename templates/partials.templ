@@ -3,12 +3,13 @@ package templates
 import (
 	"fmt"
 	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/events"
 )
 
 // GameContent renders the main game content area.
 // This partial is used both in the initial page render and for WebSocket updates.
 // The id="game-content" is required for HTMX WebSocket OOB swaps.
-templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow) {
+templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, distribution []events.AnswerStat, totalAnswers int) {
 	<div id="game-content">
 		if lobby.Phase == "playing" {
 			if activeRound.Phase == "submitting" {
@@ -47,11 +48,11 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 					@SubmitQuestion(lobby, activeRound)
 				}
 			} else if activeRound.Phase == "playing" && questionActive {
-				if hasAnswered {
-					<div class="bg-elevated border border-cyan rounded p-6 sm:p-8 text-center">
-						<h2 class="font-mono text-xl sm:text-2xl font-bold text-text mb-2">ANSWER SUBMITTED</h2>
-						<p class="text-text-muted">Waiting for others...</p>
-					</div>
+				if activeRound.QuestionState == "revealed" {
+					@QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, true, isHost)
+				} else if hasAnswered {
+					// User answered, but question not fully revealed -> Show Live Graph (Hidden)
+					@QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, false, isHost)
 				} else {
 					@AnswerQuestion(lobby, currentQuestion, isAuthor)
 				}

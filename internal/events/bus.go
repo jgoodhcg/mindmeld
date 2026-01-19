@@ -77,6 +77,7 @@ const (
 	EventGameStarted       = "game.started"
 	EventQuestionSubmitted = "question.submitted"
 	EventAnswerSubmitted   = "answer.submitted"
+	EventQuestionRevealed  = "question.revealed" // Everyone answered, show correct answer
 	EventRoundAdvanced     = "round.advanced"
 	EventNewRoundCreated   = "round.created" // For "Play Again" - new round started
 )
@@ -104,12 +105,25 @@ type RoundAdvancedPayload struct {
 	RoundNumber int32
 }
 
+// AnswerStats holds the count for a specific answer option.
+type AnswerStat struct {
+	Answer string
+	Count  int
+}
+
 // AnswerSubmittedPayload is the payload for EventAnswerSubmitted.
 type AnswerSubmittedPayload struct {
 	AnsweredCount    int
 	TotalExpected    int
 	QuestionComplete bool // True when the current question has all expected answers
 	RoundFinished    bool
+	Distribution     []AnswerStat // Live stats for the graph
+}
+
+// QuestionRevealedPayload is the payload for EventQuestionRevealed.
+type QuestionRevealedPayload struct {
+	QuestionID   string
+	Distribution []AnswerStat
 }
 
 // NewRoundCreatedPayload is the payload for EventNewRoundCreated (Play Again).

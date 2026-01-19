@@ -1,0 +1,78 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/events"
+)
+
+templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, isRevealed bool, isHost bool) {
+	<div id="game-content" class="bg-elevated border border-border rounded p-5 sm:p-6">
+		<div class="text-center mb-6">
+			<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4">Results</h2>
+			<div class="bg-base rounded p-4 border border-border inline-block min-w-[50%]">
+				<p class="text-lg sm:text-xl text-text leading-relaxed font-bold">{ question.QuestionText }</p>
+			</div>
+		</div>
+
+		<div class="space-y-6 mb-8 max-w-2xl mx-auto">
+			{{ shuffled := ShuffleAnswers(question) }}
+			for _, ans := range shuffled {
+				{{ 
+					count := 0
+					for _, stat := range distribution {
+						if stat.Answer == ans.Value {
+							count = stat.Count
+							break
+						}
+					}
+					percent := CalculatePercentage(count, totalAnswers)
+					isCorrect := ans.Value == question.CorrectAnswer
+					
+					// Color logic
+					barColor := "bg-cyan" // Default for "answering" phase
+					wrapperBorder := "border-border"
+					
+					if isRevealed {
+						if isCorrect {
+							barColor = "bg-success"
+							wrapperBorder = "border-success"
+						} else {
+							barColor = "bg-text-muted" // Dim wrong answers
+						}
+					}
+				}}
+				<div class="relative">
+					<div class="flex items-center justify-between text-sm mb-1 px-1">
+						<span class="font-mono font-bold text-text-muted">{ ans.Label }. { ans.Value }</span>
+						<span class="font-mono text-text">{ fmt.Sprintf("%d%%", percent) }</span>
+					</div>
+					
+					<div class={ "h-12 w-full bg-base rounded-md border relative overflow-hidden " + wrapperBorder }>
+						<div class={ "h-full transition-all duration-700 ease-out " + barColor } style={ fmt.Sprintf("width: %d%%", percent) }></div>
+						if isRevealed && isCorrect {
+							<div class="absolute right-3 top-1/2 -translate-y-1/2 text-success font-bold text-xs uppercase tracking-widest bg-base/90 px-2 py-1 rounded border border-success/30 shadow-sm">
+								Correct
+							</div>
+						}
+					</div>
+				</div>
+			}
+		</div>
+
+		<div class="h-24 flex items-center justify-center">
+			if isHost && isRevealed {
+				<form action={ templ.SafeURL("/lobbies/" + lobbyCode + "/next-question") } method="POST">
+					<button type="submit" class="bg-amber hover:bg-amber/80 text-base px-10 py-4 rounded font-mono font-bold tracking-wide transition-all transform hover:scale-105 shadow-lg">
+						NEXT QUESTION →
+					</button>
+				</form>
+			} else if !isRevealed {
+				<div class="text-center animate-pulse">
+					<p class="text-cyan font-mono text-lg font-bold">LIVE RESULTS</p>
+					<p class="text-text-muted text-sm">Waiting for other players...</p>
+				</div>
+			}
+		</div>
+	</div>
+}

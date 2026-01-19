@@ -175,7 +175,7 @@ func (s *Server) handleAdvanceRound(w http.ResponseWriter, r *http.Request) {
 
 	// Logic moved from handleSubmitQuestion:
 	questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
-	if err == nil {
+	if err == nil && len(questions) > 0 {
 		// 1. Shuffle and assign order
 		for i, q := range questions {
 			err := s.queries.UpdateQuestionOrder(r.Context(), db.UpdateQuestionOrderParams{
@@ -187,7 +187,18 @@ func (s *Server) handleAdvanceRound(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// 2. Advance Round Phase
+		// 2. Set Initial Question State
+		firstQuestion := questions[0]
+		err = s.queries.UpdateRoundQuestionState(r.Context(), db.UpdateRoundQuestionStateParams{
+			ID:                round.ID,
+			CurrentQuestionID: firstQuestion.ID,
+			QuestionState:     "answering",
+		})
+		if err != nil {
+			log.Printf("Error setting initial question state: %v", err)
+		}
+
+		// 3. Advance Round Phase
 		err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
 			ID:    round.ID,
 			Phase: "playing",
@@ -197,6 +208,102 @@ func (s *Server) handleAdvanceRound(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Publish round advanced event for real-time updates
+		s.eventBus.Publish(r.Context(), events.Event{
+			Type:      events.EventRoundAdvanced,
+			LobbyCode: code,
+			Payload: events.RoundAdvancedPayload{
+				RoundNumber: round.RoundNumber,
+			},
+		})
+	}
+
+	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
+}
+
+func (s *Server) handleNextQuestion(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Lobby not found", http.StatusNotFound)
+		return
+	}
+
+	player := GetPlayer(r.Context())
+
+	// Verify Host
+	participation, err := s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
+		LobbyID:  lobby.ID,
+		PlayerID: player.ID,
+	})
+	if err != nil || !participation.IsHost {
+		http.Error(w, "Only the host can advance the question", http.StatusForbidden)
+		return
+	}
+
+	// Get active round
+	round, err := s.queries.GetActiveRound(r.Context(), lobby.ID)
+	if err != nil {
+		http.Error(w, "No active round", http.StatusBadRequest)
+		return
+	}
+
+	// Get Questions to find current and next
+	questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
+	if err != nil {
+		http.Error(w, "Error fetching questions", http.StatusInternalServerError)
+		return
+	}
+
+	var nextQuestion *db.TriviaQuestion
+	foundCurrent := false
+
+	// If no current question is set (shouldn't happen in playing phase but handle it), start with first
+	if !round.CurrentQuestionID.Valid {
+		if len(questions) > 0 {
+			nextQuestion = &questions[0]
+		}
+	} else {
+		for i, q := range questions {
+			if q.ID == round.CurrentQuestionID {
+				foundCurrent = true
+				if i+1 < len(questions) {
+					nextQuestion = &questions[i+1]
+				}
+				break
+			}
+		}
+	}
+
+	if nextQuestion != nil {
+		// Advance to next question
+		err = s.queries.UpdateRoundQuestionState(r.Context(), db.UpdateRoundQuestionStateParams{
+			ID:                round.ID,
+			CurrentQuestionID: nextQuestion.ID,
+			QuestionState:     "answering",
+		})
+		if err != nil {
+			log.Printf("Error updating next question: %v", err)
+		}
+
+		// Publish event
+		s.eventBus.Publish(r.Context(), events.Event{
+			Type:      events.EventRoundAdvanced, // Reuse this to trigger reload
+			LobbyCode: code,
+			Payload: events.RoundAdvancedPayload{
+				RoundNumber: round.RoundNumber,
+			},
+		})
+	} else if foundCurrent {
+		// No next question, finish round
+		err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
+			ID:    round.ID,
+			Phase: "finished",
+		})
+		if err != nil {
+			log.Printf("Error finishing round: %v", err)
+		}
+
+		// Publish event
 		s.eventBus.Publish(r.Context(), events.Event{
 			Type:      events.EventRoundAdvanced,
 			LobbyCode: code,
@@ -329,65 +436,70 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 		// Ignore error (maybe duplicate submission)
 	}
 
-	// Check if the current question is complete and if round is finished
+	// 6. Calculate Stats & Check Completion
 	lobbyPlayers, err := s.queries.GetLobbyPlayers(r.Context(), lobby.ID)
-	roundFinished := false
 	questionComplete := false
-	totalAnswered := 0
-	totalExpected := 0
+	
+	// Prepare distribution stats
+	distribution := []events.AnswerStat{}
+	rawStats, err := s.queries.GetAnswerStats(r.Context(), questionID)
+	if err == nil {
+		for _, s := range rawStats {
+			distribution = append(distribution, events.AnswerStat{
+				Answer: s.SelectedAnswer,
+				Count:  int(s.Count),
+			})
+		}
+	}
 
 	if err == nil {
-		allFinished := true
 		numPlayers := len(lobbyPlayers)
-		targetPerQuestion := int64(numPlayers - 1)
+		targetPerQuestion := int64(numPlayers - 1) // Minus author
 		if targetPerQuestion < 0 {
 			targetPerQuestion = 0
 		}
 
-		questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
+		currentCount, err := s.queries.CountAnswersForQuestion(r.Context(), questionID)
 		if err == nil {
-			numQuestions := len(questions)
-			totalExpected = numQuestions * int(targetPerQuestion)
-
-			for _, q := range questions {
-				count, err := s.queries.CountAnswersForQuestion(r.Context(), q.ID)
-				if err != nil {
-					continue
-				}
-				totalAnswered += int(count)
-
-				if count < targetPerQuestion {
-					allFinished = false
-				}
-
-				// Check if THIS specific question (the one just answered) is now complete
-				if q.ID == questionID && count >= targetPerQuestion {
-					questionComplete = true
-				}
-			}
-		}
-
-		if allFinished {
-			roundFinished = true
-			err = s.queries.UpdateRoundPhase(r.Context(), db.UpdateRoundPhaseParams{
-				ID:    round.ID,
-				Phase: "finished",
-			})
-			if err != nil {
-				log.Printf("Error finishing round: %v", err)
+			if currentCount >= targetPerQuestion {
+				questionComplete = true
 			}
 		}
 	}
 
-	// Publish answer submitted event for real-time updates
+	// 7. Update State & Publish Events
+	if questionComplete {
+		// Update state to revealed
+		err = s.queries.UpdateRoundQuestionState(r.Context(), db.UpdateRoundQuestionStateParams{
+			ID:                round.ID,
+			CurrentQuestionID: questionID,
+			QuestionState:     "revealed",
+		})
+		if err != nil {
+			log.Printf("Error updating question state to revealed: %v", err)
+		}
+
+		// Notify everyone that the question is revealed
+		s.eventBus.Publish(r.Context(), events.Event{
+			Type:      events.EventQuestionRevealed,
+			LobbyCode: code,
+			Payload: events.QuestionRevealedPayload{
+				QuestionID:   questionIDStr,
+				Distribution: distribution,
+			},
+		})
+	}
+
+	// Always publish update for live graphs (even if not complete)
 	s.eventBus.Publish(r.Context(), events.Event{
 		Type:      events.EventAnswerSubmitted,
 		LobbyCode: code,
 		Payload: events.AnswerSubmittedPayload{
-			AnsweredCount:    totalAnswered,
-			TotalExpected:    totalExpected,
+			// We don't really track totalAnswered for the whole round anymore in the new flow
+			// But we can send the question specific status
 			QuestionComplete: questionComplete,
-			RoundFinished:    roundFinished,
+			RoundFinished:    false, // Round finish is now manual or handled by handleNextQuestion
+			Distribution:     distribution,
 		},
 	})
 
