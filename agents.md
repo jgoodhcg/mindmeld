@@ -36,6 +36,8 @@ The agent **IS** permitted to run these commands to verify code compilation and 
 | `make sqlc` | Generates only sqlc DB code. |
 | `go build -o bin/server ./cmd/server` | Compiles the server binary. Fails if there are syntax/type errors. |
 | `make css` | Builds Tailwind CSS (safe to run, though usually handled by user/watcher). |
+| `make fmt` | Formats code using `go fmt` and `templ fmt`. Run this before finishing changes. |
+| `make lint` | Runs `go vet` to catch common errors. |
 
 ## User-Only Commands
 The agent must **NOT** run these unless explicitly instructed:

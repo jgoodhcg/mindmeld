@@ -23,6 +23,12 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 **Open Questions:**
 - ~~How should question order be determined when the game starts?~~ → Random shuffle implemented
 - What happens if a player disconnects mid-game?
+- How should host transfer work if host leaves?
+
+## TODO (Host & Players)
+
+- [ ] **Host transfer on disconnect**: If host leaves mid-game, automatically transfer host to another player (longest-joined or random)
+- [ ] **Manual host transfer**: Allow host to transfer host role to another player via UI
 
 ---
 

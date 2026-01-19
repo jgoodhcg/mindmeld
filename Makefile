@@ -1,4 +1,4 @@
-.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status
+.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint
 
 # Load environment variables
 include .env.local
@@ -18,6 +18,15 @@ run: generate css
 
 # Generate all code (templ + sqlc)
 generate: templ sqlc
+
+# Format all code (templ + go)
+fmt:
+	go run github.com/a-h/templ/cmd/templ fmt .
+	go fmt ./...
+
+# Lint code (go vet)
+lint:
+	go vet ./...
 
 # Generate templ templates
 templ:
