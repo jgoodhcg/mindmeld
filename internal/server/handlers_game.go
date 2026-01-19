@@ -329,27 +329,25 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 		// Ignore error (maybe duplicate submission)
 	}
 
-	// Check if round is finished (all questions answered by all other players)
-	// We reuse logic similar to lobby room check, or just check global counts.
-	// Simple check: do ANY questions remain with < (players-1) answers?
-
+	// Check if the current question is complete and if round is finished
 	lobbyPlayers, err := s.queries.GetLobbyPlayers(r.Context(), lobby.ID)
 	roundFinished := false
+	questionComplete := false
 	totalAnswered := 0
 	totalExpected := 0
 
 	if err == nil {
 		allFinished := true
+		numPlayers := len(lobbyPlayers)
+		targetPerQuestion := int64(numPlayers - 1)
+		if targetPerQuestion < 0 {
+			targetPerQuestion = 0
+		}
+
 		questions, err := s.queries.GetQuestionsForRound(r.Context(), round.ID)
 		if err == nil {
-			// Calculate totals for the event payload
-			numPlayers := len(lobbyPlayers)
 			numQuestions := len(questions)
-			// Each question can be answered by (players - 1) since author doesn't answer their own
-			totalExpected = numQuestions * (numPlayers - 1)
-			if totalExpected < 0 {
-				totalExpected = 0
-			}
+			totalExpected = numQuestions * int(targetPerQuestion)
 
 			for _, q := range questions {
 				count, err := s.queries.CountAnswersForQuestion(r.Context(), q.ID)
@@ -358,13 +356,13 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 				}
 				totalAnswered += int(count)
 
-				target := int64(numPlayers - 1)
-				if target < 0 {
-					target = 0
+				if count < targetPerQuestion {
+					allFinished = false
 				}
 
-				if count < target {
-					allFinished = false
+				// Check if THIS specific question (the one just answered) is now complete
+				if q.ID == questionID && count >= targetPerQuestion {
+					questionComplete = true
 				}
 			}
 		}
@@ -386,9 +384,10 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 		Type:      events.EventAnswerSubmitted,
 		LobbyCode: code,
 		Payload: events.AnswerSubmittedPayload{
-			AnsweredCount: totalAnswered,
-			TotalExpected: totalExpected,
-			RoundFinished: roundFinished,
+			AnsweredCount:    totalAnswered,
+			TotalExpected:    totalExpected,
+			QuestionComplete: questionComplete,
+			RoundFinished:    roundFinished,
 		},
 	})
 

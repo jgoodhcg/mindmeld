@@ -62,3 +62,33 @@ A holding pen for game concepts. These are not fully specced work units yet.
 *   **Concept:** Word generation under pressure.
 *   **Loop:** Letter given (e.g., "F") or Category ("Animals"). Player types as many unique words as possible in 60 seconds.
 *   **Why:** Classic metric for verbal processing speed and executive function.
+
+### 11. Mind Meld Ladders (Daily Convergence)
+*   **Concept:** Build a 5-7 word ladder that steadily converges on a shared theme; solo-friendly.
+*   **Loop:** Daily theme -> pick words in order -> score by semantic closeness to the crowd median.
+*   **Share/Archive:** Compact ladder card + emoji bar; archive shows percentile + streaks.
+*   **Why:** Daily ritual with group comparison and no live multiplayer.
+
+### 12. Thread Weave (Crowd Categories)
+*   **Concept:** Cluster 8-12 words into 3-4 latent "threads" and name them.
+*   **Loop:** Solve -> system compares clusters to crowd-labeled groupings.
+*   **Share/Archive:** 3/4 match grid + percentile; archive tracks improvement.
+*   **Why:** Connections-style consensus puzzle that works solo.
+
+### 13. Echo Chain (Hidden Rule)
+*   **Concept:** Build a word chain based on a hidden rule, then guess the rule.
+*   **Loop:** Start word -> extend chain -> submit rule -> score by accuracy/time.
+*   **Share/Archive:** Chain + rule guess; archive shows best rules solved.
+*   **Why:** Single-player puzzle sourced from community rules.
+
+### 14. Consensus Capsule (Daily Archive)
+*   **Concept:** Fill 8 blanks with answers you think others will pick for a daily prompt.
+*   **Loop:** Prompt -> submit list -> score by alignment with crowd distribution.
+*   **Share/Archive:** Shareable percentile card; archive calendar with trendline.
+*   **Why:** Pure solo play that still compares against the group.
+
+### 15. Meld Rush (Arcade High Score)
+*   **Concept:** Rapid-fire word associations with a score multiplier.
+*   **Loop:** 60-90 second timer -> each prompt expects "closest" association -> streaks boost score.
+*   **Share/Archive:** High-score board (daily/weekly/all-time) + copy-paste score line.
+*   **Why:** Arcade feel, easy to replay, leaderboard friendly.

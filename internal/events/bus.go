@@ -106,9 +106,10 @@ type RoundAdvancedPayload struct {
 
 // AnswerSubmittedPayload is the payload for EventAnswerSubmitted.
 type AnswerSubmittedPayload struct {
-	AnsweredCount int
-	TotalExpected int
-	RoundFinished bool
+	AnsweredCount    int
+	TotalExpected    int
+	QuestionComplete bool // True when the current question has all expected answers
+	RoundFinished    bool
 }
 
 // NewRoundCreatedPayload is the payload for EventNewRoundCreated (Play Again).

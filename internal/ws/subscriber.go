@@ -154,15 +154,19 @@ func (s *Subscriber) broadcastRoundAdvanced(ctx context.Context, lobbyCode strin
 }
 
 // broadcastAnswerSubmitted broadcasts answer progress updates.
-// Triggers a page refresh so all players see the updated state (including question authors).
+// Only triggers a page refresh when the current question is complete (all expected answers in).
+// This prevents flickering for players who are still answering.
 func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode string, payload events.AnswerSubmittedPayload) {
-	log.Printf("[ws-subscriber] Answer submitted for lobby %s: %d/%d (finished: %v)",
-		lobbyCode, payload.AnsweredCount, payload.TotalExpected, payload.RoundFinished)
+	log.Printf("[ws-subscriber] Answer submitted for lobby %s: %d/%d (question complete: %v, round finished: %v)",
+		lobbyCode, payload.AnsweredCount, payload.TotalExpected, payload.QuestionComplete, payload.RoundFinished)
 
-	// Always trigger refresh so all players see updated state
-	// This ensures question authors see answers coming in, and everyone sees round completion
-	refreshHTML := []byte(`<div id="game-content"><script>window.location.reload()</script></div>`)
-	s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
+	// Only trigger refresh when the current question is complete
+	// This advances everyone to the next question (or scoreboard if round finished)
+	// Players still answering won't be interrupted by intermediate answer submissions
+	if payload.QuestionComplete {
+		refreshHTML := []byte(`<div id="game-content"><script>window.location.reload()</script></div>`)
+		s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
+	}
 }
 
 // broadcastNewRoundCreated broadcasts when a new round is created (Play Again).
