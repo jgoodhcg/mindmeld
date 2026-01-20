@@ -31,10 +31,6 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 							</div>
 						</div>
 					</div>
-					<div class="bg-base px-4 py-3 rounded border border-border self-start">
-						<span class="text-xs text-text-muted block uppercase tracking-wide mb-0.5">Phase</span>
-						<span class="font-mono font-bold text-cyan capitalize text-lg">{ lobby.Phase }</span>
-					</div>
 				</div>
 			</div>
 
@@ -47,7 +43,6 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 
 				<!-- Game Info / Actions -->
 				<div class="bg-elevated border border-border rounded p-5 sm:p-6">
-					<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4">Status</h2>
 					if lobby.Phase == "waiting" {
 						<div class="space-y-4">
 							<div class="text-center py-6">

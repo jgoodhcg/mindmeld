@@ -51,6 +51,7 @@ Building the **Trivia MVP** - the first playable game on the platform.
 - [visual-redesign.md](./visual-redesign.md) - 1970s cerebral sci-fi UI theme
 - [question-system.md](./question-system.md) - Question types, sources, AI generation, pools
 - [housekeeping.md](./housekeeping.md) - Build cleanup & project structure
+- [game-isolation-refactor.md](./game-isolation-refactor.md) - Refactor to isolate game logic (Trivia vs Platform)
 - [security.md](./security.md) - App Security Hardening
 - [analytics.md](./analytics.md) - Plausible analytics for gameplay + stats
 - [codebase-map.md](./codebase-map.md) - Auto-generated docs & key touchpoints
