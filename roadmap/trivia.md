@@ -58,6 +58,8 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 - [ ] **Show answer status while waiting**: Display which players have answered in the players section (for both question author and players who have already answered)
 - [x] **Fix answer flicker**: UI flickers when other players submit answers (likely WebSocket update causing full re-render)
 - [x] **Handle ties on scoreboard**: Display a tie instead of arbitrarily choosing a winner when scores are equal
+- [ ] **Better tie visualization**: Visually distinct handling for tied round winners (multiple crowns) and tied game winners
+- [ ] **Author live results**: Allow the question author to see the live answer distribution graph while others are answering, instead of the static "Your Question" screen.
 
 ## TODO (Game Flow)
 
