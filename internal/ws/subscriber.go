@@ -243,7 +243,14 @@ func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 			return buf.Bytes()
 		}
 		
-		return nil // Send nothing to players still answering
+		// Send answer status to players still answering
+		var buf2 bytes.Buffer
+		err := templates.AnswerStatus(payload.AnsweredCount, payload.TotalExpected).Render(ctx, &buf2)
+		if err != nil {
+			log.Printf("[ws-subscriber] Error rendering answer status: %v", err)
+			return nil
+		}
+		return buf2.Bytes()
 	})
 }
 

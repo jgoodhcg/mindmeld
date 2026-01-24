@@ -491,12 +491,20 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Always publish update for live graphs (even if not complete)
+	answeredCount := 0
+	totalExpected := 0
+	if len(lobbyPlayers) > 0 {
+		totalExpected = len(lobbyPlayers) - 1 // minus author
+		if cnt, err := s.queries.CountAnswersForQuestion(r.Context(), questionID); err == nil {
+			answeredCount = int(cnt)
+		}
+	}
 	s.eventBus.Publish(r.Context(), events.Event{
 		Type:      events.EventAnswerSubmitted,
 		LobbyCode: code,
 		Payload: events.AnswerSubmittedPayload{
-			// We don't really track totalAnswered for the whole round anymore in the new flow
-			// But we can send the question specific status
+			AnsweredCount:    answeredCount,
+			TotalExpected:    totalExpected,
 			QuestionComplete: questionComplete,
 			RoundFinished:    false, // Round finish is now manual or handled by handleNextQuestion
 			Distribution:     distribution,
