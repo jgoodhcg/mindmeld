@@ -5,6 +5,23 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 )
 
+// getRoundWinners returns all players who share the top round score
+func getRoundWinners(roundScores []db.GetRoundScoreboardRow) []db.GetRoundScoreboardRow {
+	if len(roundScores) == 0 {
+		return nil
+	}
+	topScore := roundScores[0].Score
+	var winners []db.GetRoundScoreboardRow
+	for _, rs := range roundScores {
+		if rs.Score == topScore {
+			winners = append(winners, rs)
+		} else {
+			break // sorted descending, so no more ties
+		}
+	}
+	return winners
+}
+
 // getRank returns the 1-based rank for a player, accounting for ties
 func getRank(index int, scores []db.GetLobbyScoreboardRow) int {
 	if index == 0 {
@@ -28,17 +45,33 @@ templ Scoreboard(scores []db.GetLobbyScoreboardRow, roundScores []db.GetRoundSco
 			<p class="text-text-muted text-sm">Round complete</p>
 		</div>
 
-		<!-- Round Winner -->
+		<!-- Round Winner(s) -->
 		if len(roundScores) > 0 {
+			{{ winners := getRoundWinners(roundScores) }}
 			<div class="mb-10 text-center">
-				<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winner</p>
-				<div class="inline-block bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-6 sm:p-8 shadow-lg shadow-amber/5 transform scale-110">
-					<div class="flex flex-col items-center gap-2">
-						<span class="text-4xl">👑</span>
-						<h3 class="font-display text-2xl sm:text-3xl font-bold text-amber">{ roundScores[0].Nickname }</h3>
-						<span class="font-mono text-xl font-bold text-text mt-1">{ fmt.Sprintf("%d", roundScores[0].Score) } pts</span>
+				if len(winners) == 1 {
+					<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winner</p>
+					<div class="inline-block bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-6 sm:p-8 shadow-lg shadow-amber/5 transform scale-110">
+						<div class="flex flex-col items-center gap-2">
+							<span class="text-4xl">👑</span>
+							<h3 class="font-display text-2xl sm:text-3xl font-bold text-amber">{ winners[0].Nickname }</h3>
+							<span class="font-mono text-xl font-bold text-text mt-1">{ fmt.Sprintf("%d", winners[0].Score) } pts</span>
+						</div>
 					</div>
-				</div>
+				} else {
+					<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winners</p>
+					<div class="flex flex-wrap justify-center gap-4">
+						for _, w := range winners {
+							<div class="bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-4 sm:p-6 shadow-lg shadow-amber/5">
+								<div class="flex flex-col items-center gap-2">
+									<span class="text-3xl">👑</span>
+									<h3 class="font-display text-xl sm:text-2xl font-bold text-amber">{ w.Nickname }</h3>
+									<span class="font-mono text-lg font-bold text-text mt-1">{ fmt.Sprintf("%d", w.Score) } pts</span>
+								</div>
+							</div>
+						}
+					</div>
+				}
 			</div>
 		}
 
