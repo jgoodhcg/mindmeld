@@ -1,5 +1,7 @@
 # Question System Enhancements
 
+> **NOTE:** AI Question Assistance (MVP) is currently being implemented as part of **[Work Party Prep Phase 2](./work-party-prep.md)**.
+
 ## Work Unit Summary
 
 **Status:** idea

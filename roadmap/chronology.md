@@ -1,5 +1,7 @@
 # Chronology (Timeline Game)
 
+> **NOTE:** This game is scheduled for implementation as **[Work Party Prep Phase 3](./work-party-prep.md)**.
+
 **Status:** Planned / Idea Phase
 
 **Goal:** A daily single-player game where users place historical events on a timeline.

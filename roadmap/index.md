@@ -20,7 +20,7 @@ A platform for multiplayer party games that bring people together through shared
 
 ## Current Focus
 
-Building the **Trivia MVP** - the first playable game on the platform.
+**[Work Party Prep](./work-party-prep.md)** - Getting the platform polished and ready for a company social event.
 
 ---
 
@@ -30,23 +30,20 @@ Building the **Trivia MVP** - the first playable game on the platform.
 
 | # | Item | Why High Priority |
 |---|------|-------------------|
-| 1 | ~~**Fix answer flicker**~~ | ✅ Done |
-| 2 | **Round results screen** | Creates discussion moments between questions |
-| 3 | **Show answer status while waiting** | Reduces "is it frozen?" anxiety |
-| 4 | **Mid-game player join sync** | Prevents confusion when friends arrive late |
-| 5 | **Per-round point analysis** | Fuels friendly banter about who's winning |
-| 6 | **Visual redesign completion** | Polish remaining screens for cohesive feel |
-| 7 | **Enhanced end-of-game stats** | Conversation fuel: "most missed question" etc |
-| 8 | **Refine home stats** | Low urgency, nice-to-have vanity metrics |
-| 9 | **Batch answering mode** | Big change, needs validation before building |
-| 10 | **Security hardening** | Important but not blocking current usage |
-| 11 | **Codebase documentation** | Developer experience, not user-facing |
-| 12 | **Analytics** | Useful but not urgent for small user base |
+| 1 | **Refactor Flicker Fix** | Current `reload()` fix is jarring; needs HTMX/WS polish |
+| 2 | **AI Question Assist** | Reduces friction for players submitting questions |
+| 3 | **Round results screen** | Creates discussion moments between questions |
+| 4 | **Show answer status while waiting** | Reduces "is it frozen?" anxiety |
+| 5 | **Mid-game player join sync** | Prevents confusion when friends arrive late |
+| 6 | **Per-round point analysis** | Fuels friendly banter about who's winning |
+| 7 | **Visual redesign completion** | Polish remaining screens for cohesive feel |
+| 8 | **Enhanced end-of-game stats** | Conversation fuel: "most missed question" etc |
 
 ---
 
 ## Active Work Units
 
+- [work-party-prep.md](./work-party-prep.md) - **HIGHEST PRIORITY** - Stability & Polish
 - [trivia.md](./trivia.md) - Trivia MVP implementation (core complete, polish remaining)
 - [visual-redesign.md](./visual-redesign.md) - 1970s cerebral sci-fi UI theme
 - [question-system.md](./question-system.md) - Question types, sources, AI generation, pools

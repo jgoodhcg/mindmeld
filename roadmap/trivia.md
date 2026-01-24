@@ -1,5 +1,7 @@
 # Trivia MVP
 
+> **NOTE:** Immediate polish and stability tasks (flicker refactor, AI assist) are currently tracked in **[Work Party Prep](./work-party-prep.md)**. Please refer to that file for the active prioritized list.
+
 ## Work Unit Summary
 
 **Status:** active (core complete, polish remaining)
@@ -56,7 +58,7 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 - [x] **Host-only start button**: Only display the "Start Game" button to the host player
 - [x] **Fix white background on scroll**: Body/html background color shows white when scrolling past content
 - [ ] **Show answer status while waiting**: Display which players have answered in the players section (for both question author and players who have already answered)
-- [x] **Fix answer flicker**: UI flickers when other players submit answers (likely WebSocket update causing full re-render)
+- [ ] ~~**Fix answer flicker**: UI flickers when other players submit answers (likely WebSocket update causing full re-render)~~ (Being refactored in [Work Party Prep](./work-party-prep.md))
 - [x] **Handle ties on scoreboard**: Display a tie instead of arbitrarily choosing a winner when scores are equal
 - [ ] **Better tie visualization**: Visually distinct handling for tied round winners (multiple crowns) and tied game winners
 - [ ] **Author live results**: Allow the question author to see the live answer distribution graph while others are answering, instead of the static "Your Question" screen.
