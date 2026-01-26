@@ -31,13 +31,15 @@ A platform for multiplayer party games that bring people together through shared
 | # | Item | Why High Priority |
 |---|------|-------------------|
 | 1 | **Refactor Flicker Fix** | Current `reload()` fix is jarring; needs HTMX/WS polish |
-| 2 | **AI Question Assist** | Reduces friction for players submitting questions |
-| 3 | **Round results screen** | Creates discussion moments between questions |
-| 4 | **Show answer status while waiting** | Reduces "is it frozen?" anxiety |
-| 5 | **Mid-game player join sync** | Prevents confusion when friends arrive late |
-| 6 | **Per-round point analysis** | Fuels friendly banter about who's winning |
-| 7 | **Visual redesign completion** | Polish remaining screens for cohesive feel |
-| 8 | **Enhanced end-of-game stats** | Conversation fuel: "most missed question" etc |
+| 2 | **Game isolation refactor** | Enables adding new games without trivia coupling or handler sprawl |
+| 3 | **AI Question Assist** | Reduces friction for players submitting questions |
+| 4 | **Round results screen** | Creates discussion moments between questions |
+| 5 | **Accessibility pass** | Improves contrast, keyboard use, and screen reader flow for everyone |
+| 6 | **Show answer status while waiting** | Reduces "is it frozen?" anxiety |
+| 7 | **Mid-game player join sync** | Prevents confusion when friends arrive late |
+| 8 | **Per-round point analysis** | Fuels friendly banter about who's winning |
+| 9 | **Visual redesign completion** | Polish remaining screens for cohesive feel |
+| 10 | **Enhanced end-of-game stats** | Conversation fuel: "most missed question" etc |
 
 ---
 

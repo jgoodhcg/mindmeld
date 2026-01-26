@@ -36,7 +36,7 @@ templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool, 
 					</button>
 				}
 			</form>
-			@AnswerStatus(answeredCount, totalExpected)
+			@AnswerStatus(answeredCount, totalExpected, false)
 		}
 	</div>
 }

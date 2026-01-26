@@ -17,32 +17,7 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 					<div class="bg-elevated border border-success rounded p-6 sm:p-8 text-center">
 						<h2 class="font-mono text-xl sm:text-2xl font-bold text-text mb-2">QUESTION SUBMITTED</h2>
 
-						<div id="submit-status">
-							<div class="mt-6 p-5 bg-base rounded border border-border inline-block">
-								<p class="text-text-muted text-sm mb-2">Waiting for players...</p>
-								<div class="flex items-center justify-center gap-2">
-									<span class="font-mono text-2xl font-bold text-cyan">{ fmt.Sprintf("%d", submittedCount) }</span>
-									<span class="text-text-muted">/</span>
-									<span class="font-mono text-xl text-text-muted">{ fmt.Sprintf("%d", len(players)) }</span>
-									<span class="text-xs text-text-muted uppercase font-mono ml-1">ready</span>
-								</div>
-							</div>
-
-							if isHost {
-								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/advance") } method="POST" class="mt-6">
-									if submittedCount >= len(players) {
-										<button type="submit" class="bg-amber hover:bg-amber/80 text-base px-8 py-3 rounded font-mono font-bold tracking-wide transition-colors">
-											START ROUND
-										</button>
-									} else {
-										<button type="button" disabled class="bg-border px-8 py-3 rounded font-mono font-bold text-text-muted cursor-not-allowed">
-											START ROUND
-										</button>
-										<p class="text-sm text-text-muted mt-3">Waiting for all submissions...</p>
-									}
-								</form>
-							}
-						</div>
+						@SubmitStatus(submittedCount, len(players), lobby.Code, isHost, false)
 					</div>
 				} else {
 					@SubmitQuestion(lobby, activeRound)
@@ -66,8 +41,12 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 // SubmitStatus renders the status counter and start button for the host.
 // Used for WebSocket OOB swap when question.submitted event occurs.
 // The id="submit-status" wrapper ensures the entire section is swapped.
-templ SubmitStatus(submittedCount int, totalPlayers int, lobbyCode string, isHost bool) {
-	<div id="submit-status">
+templ SubmitStatus(submittedCount int, totalPlayers int, lobbyCode string, isHost bool, isUpdate bool) {
+	<div id="submit-status"
+		if isUpdate {
+			hx-swap-oob="true"
+		}
+	>
 		<div class="mt-6 p-5 bg-base rounded border border-border inline-block">
 			<p class="text-text-muted text-sm mb-2">Waiting for players...</p>
 			<div class="flex items-center justify-center gap-2">
@@ -96,9 +75,13 @@ templ SubmitStatus(submittedCount int, totalPlayers int, lobbyCode string, isHos
 
 // AnswerStatus renders the "X / Y answered" indicator for players who haven't answered yet.
 // Used for WebSocket OOB swap when answer.submitted event occurs.
-templ AnswerStatus(answeredCount int, totalExpected int) {
+templ AnswerStatus(answeredCount int, totalExpected int, isUpdate bool) {
 	if answeredCount > 0 {
-		<div id="answer-status" class="mt-4 text-center">
+		<div id="answer-status" class="mt-4 text-center"
+			if isUpdate {
+				hx-swap-oob="true"
+			}
+		>
 			<div class="inline-flex items-center gap-2 px-3 py-1.5 bg-base rounded border border-border">
 				<span class="font-mono text-sm font-bold text-cyan">{ fmt.Sprintf("%d", answeredCount) }</span>
 				<span class="text-text-muted text-sm">/</span>
@@ -107,15 +90,23 @@ templ AnswerStatus(answeredCount int, totalExpected int) {
 			</div>
 		</div>
 	} else {
-		<div id="answer-status"></div>
+		<div id="answer-status"
+			if isUpdate {
+				hx-swap-oob="true"
+			}
+		></div>
 	}
 }
 
 // PlayerList renders the player list panel.
 // This partial is used both in the initial page render and for WebSocket updates.
 // The id="player-list" is required for HTMX WebSocket OOB swaps.
-templ PlayerList(players []db.GetLobbyPlayersRow) {
-	<div id="player-list" class="bg-elevated border border-border rounded p-5 sm:p-6">
+templ PlayerList(players []db.GetLobbyPlayersRow, isUpdate bool) {
+	<div id="player-list" class="bg-elevated border border-border rounded p-5 sm:p-6"
+		if isUpdate {
+			hx-swap-oob="true"
+		}
+	>
 		<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4 flex items-center gap-2">
 			<span>Players</span>
 			<span class="bg-base border border-border text-cyan text-xs px-2 py-0.5 rounded font-mono">{ fmt.Sprintf("%d", len(players)) }</span>

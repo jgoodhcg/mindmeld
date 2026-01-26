@@ -21,6 +21,7 @@ func (s *Server) routes() {
 	s.router.Post("/trivia/join", s.handleJoinByCode)
 	s.router.Post("/lobbies", s.handleCreateLobby)
 	s.router.Get("/lobbies/{code}", s.handleLobbyRoom)
+	s.router.Get("/lobbies/{code}/content", s.handleGetGameContent)
 	s.router.Post("/lobbies/{code}/join", s.handleJoinLobby)
 	
 	// WebSocket for real-time updates

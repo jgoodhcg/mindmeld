@@ -3,6 +3,7 @@ package ws
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/jgoodhcg/mindmeld/internal/db"
@@ -46,6 +47,13 @@ func (s *Subscriber) HandleEvent(ctx context.Context, event events.Event) {
 	}
 }
 
+// broadcastUpdateTrigger sends an OOB swap that triggers the client to fetch updated game content.
+// This replaces full page reloads with smooth HTMX updates.
+func (s *Subscriber) broadcastUpdateTrigger(ctx context.Context, lobbyCode string) {
+	html := fmt.Sprintf(`<div id="game-updater" hx-swap-oob="true" hx-get="/lobbies/%s/content" hx-target="#game-content" hx-swap="outerHTML" hx-trigger="load" class="hidden"></div>`, lobbyCode)
+	s.hub.Broadcast(ctx, lobbyCode, []byte(html))
+}
+
 // broadcastPlayerList fetches the current player list and broadcasts it.
 func (s *Subscriber) broadcastPlayerList(ctx context.Context, lobbyCode string) {
 	// Get the lobby to find its ID
@@ -64,7 +72,7 @@ func (s *Subscriber) broadcastPlayerList(ctx context.Context, lobbyCode string) 
 
 	// Render the player list partial to HTML
 	var buf bytes.Buffer
-	err = templates.PlayerList(players).Render(ctx, &buf)
+	err = templates.PlayerList(players, true).Render(ctx, &buf)
 	if err != nil {
 		log.Printf("[ws-subscriber] Failed to render player list: %v", err)
 		return
@@ -140,6 +148,7 @@ func (s *Subscriber) broadcastQuestionSubmitted(ctx context.Context, lobbyCode s
 			payload.TotalPlayers,
 			lobbyCode,
 			isHost,
+			true,
 		).Render(ctx, &buf)
 		if err != nil {
 			log.Printf("[ws-subscriber] Failed to render submit status for player %s: %v", playerID, err)
@@ -150,22 +159,17 @@ func (s *Subscriber) broadcastQuestionSubmitted(ctx context.Context, lobbyCode s
 }
 
 // broadcastRoundAdvanced broadcasts when the round advances to playing phase.
-// Since each player sees personalized content (author vs answerer), we trigger a page refresh.
+// We trigger a smooth content update via HTMX instead of a full reload.
 func (s *Subscriber) broadcastRoundAdvanced(ctx context.Context, lobbyCode string, payload events.RoundAdvancedPayload) {
 	log.Printf("[ws-subscriber] Round advanced for lobby %s, round %d", lobbyCode, payload.RoundNumber)
-
-	// Broadcast a script that triggers a page reload for all clients
-	// This ensures each player fetches their personalized view
-	refreshHTML := []byte(`<div id="game-content"><script>window.location.reload()</script></div>`)
-	s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
+	s.broadcastUpdateTrigger(ctx, lobbyCode)
 }
 
 // broadcastQuestionRevealed broadcasts when everyone has answered.
-// Triggers a page refresh so everyone sees the revealed results.
+// We trigger a smooth content update via HTMX instead of a full reload.
 func (s *Subscriber) broadcastQuestionRevealed(ctx context.Context, lobbyCode string, payload events.QuestionRevealedPayload) {
 	log.Printf("[ws-subscriber] Question revealed for lobby %s", lobbyCode)
-	refreshHTML := []byte(`<div id="game-content"><script>window.location.reload()</script></div>`)
-	s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
+	s.broadcastUpdateTrigger(ctx, lobbyCode)
 }
 
 // broadcastAnswerSubmitted broadcasts answer progress updates.
@@ -245,7 +249,7 @@ func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 		
 		// Send answer status to players still answering
 		var buf2 bytes.Buffer
-		err := templates.AnswerStatus(payload.AnsweredCount, payload.TotalExpected).Render(ctx, &buf2)
+		err := templates.AnswerStatus(payload.AnsweredCount, payload.TotalExpected, true).Render(ctx, &buf2)
 		if err != nil {
 			log.Printf("[ws-subscriber] Error rendering answer status: %v", err)
 			return nil
@@ -255,11 +259,8 @@ func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 }
 
 // broadcastNewRoundCreated broadcasts when a new round is created (Play Again).
-// Triggers a page refresh so all players see the new question submission form.
+// We trigger a smooth content update via HTMX instead of a full reload.
 func (s *Subscriber) broadcastNewRoundCreated(ctx context.Context, lobbyCode string, payload events.NewRoundCreatedPayload) {
 	log.Printf("[ws-subscriber] New round created for lobby %s, round %d", lobbyCode, payload.RoundNumber)
-
-	// Trigger page refresh for all clients to see the new round
-	refreshHTML := []byte(`<div id="game-content"><script>window.location.reload()</script></div>`)
-	s.hub.Broadcast(ctx, lobbyCode, refreshHTML)
+	s.broadcastUpdateTrigger(ctx, lobbyCode)
 }
