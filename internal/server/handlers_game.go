@@ -8,7 +8,119 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
+	"github.com/jgoodhcg/mindmeld/templates"
 )
+
+func (s *Server) handleGetGameContent(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	player := GetPlayer(r.Context())
+
+	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Lobby not found", http.StatusNotFound)
+		return
+	}
+
+	// Participation check (implicit security)
+	participation, err := s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
+		LobbyID:  lobby.ID,
+		PlayerID: player.ID,
+	})
+	if err != nil {
+		http.Error(w, "Not in lobby", http.StatusForbidden)
+		return
+	}
+
+	// Fetch necessary data (Copied from handleLobbyRoom)
+	players, err := s.queries.GetLobbyPlayers(r.Context(), lobby.ID)
+	if err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
+	}
+
+	var activeRound db.TriviaRound
+	var hasSubmitted bool
+	var currentQuestion db.TriviaQuestion
+	var questionActive bool
+	var isAuthor bool
+	var hasAnswered bool
+	var submittedCount int
+	var scoreboard []db.GetLobbyScoreboardRow
+	var roundScoreboard []db.GetRoundScoreboardRow
+	var distribution []events.AnswerStat
+	var totalAnswers int
+
+	if lobby.Phase == "playing" {
+		activeRound, err = s.queries.GetActiveRound(r.Context(), lobby.ID)
+		if err == nil {
+			if activeRound.Phase == "submitting" {
+				questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
+				if err == nil {
+					submittedCount = len(questions)
+					for _, q := range questions {
+						if q.Author == player.ID {
+							hasSubmitted = true
+						}
+					}
+				}
+			} else if activeRound.Phase == "playing" {
+				if activeRound.CurrentQuestionID.Valid {
+					var qID pgtype.UUID = activeRound.CurrentQuestionID
+					questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
+					if err == nil {
+						for _, q := range questions {
+							if q.ID == qID {
+								currentQuestion = q
+								questionActive = true
+								break
+							}
+						}
+					}
+
+					if questionActive {
+						if currentQuestion.Author == player.ID {
+							isAuthor = true
+						}
+						answers, err := s.queries.GetAnswersForQuestion(r.Context(), currentQuestion.ID)
+						if err == nil {
+							totalAnswers = len(answers)
+							for _, a := range answers {
+								if a.PlayerID == player.ID {
+									hasAnswered = true
+								}
+								found := false
+								for i, stat := range distribution {
+									if stat.Answer == a.SelectedAnswer {
+										distribution[i].Count++
+										found = true
+										break
+									}
+								}
+								if !found {
+									distribution = append(distribution, events.AnswerStat{
+										Answer: a.SelectedAnswer,
+										Count:  1,
+									})
+								}
+							}
+						}
+					}
+				}
+			} else if activeRound.Phase == "finished" {
+				scoreboard, err = s.queries.GetLobbyScoreboard(r.Context(), lobby.ID)
+				if err != nil {
+					log.Printf("Error fetching scoreboard: %v", err)
+				}
+				roundScoreboard, err = s.queries.GetRoundScoreboard(r.Context(), activeRound.ID)
+				if err != nil {
+					log.Printf("Error fetching round scoreboard: %v", err)
+				}
+			}
+		}
+	}
+
+	templates.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost, scoreboard, roundScoreboard, distribution, totalAnswers).Render(r.Context(), w)
+}
 
 func (s *Server) handleStartGame(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
@@ -48,7 +160,7 @@ func (s *Server) handleStartGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal error", http.StatusInternalServerError)
 		return
 	}
-	
+
 	log.Printf("Lobby phase updated to playing")
 
 	// 2. Create Round 1
@@ -84,7 +196,7 @@ func (s *Server) handleSubmitQuestion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	player := GetPlayer(r.Context())
-	
+
 	// Get active round
 	round, err := s.queries.GetActiveRound(r.Context(), lobby.ID)
 	if err != nil {
@@ -368,7 +480,7 @@ func (s *Server) handlePlayAgain(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
-	
+
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Invalid form", http.StatusBadRequest)
 		return
@@ -390,7 +502,7 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Lobby not found", http.StatusNotFound)
 		return
 	}
-	
+
 	// 2. Get Active Round
 	round, err := s.queries.GetActiveRound(r.Context(), lobby.ID)
 	if err != nil {
@@ -439,7 +551,7 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 	// 6. Calculate Stats & Check Completion
 	lobbyPlayers, err := s.queries.GetLobbyPlayers(r.Context(), lobby.ID)
 	questionComplete := false
-	
+
 	// Prepare distribution stats
 	distribution := []events.AnswerStat{}
 	rawStats, err := s.queries.GetAnswerStats(r.Context(), questionID)
@@ -513,3 +625,4 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
+

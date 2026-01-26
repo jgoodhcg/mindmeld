@@ -36,10 +36,11 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 
 			<!-- Game content area - updates via WebSocket OOB swap -->
 			@GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers)
+			<div id="game-updater" class="hidden"></div>
 
 			<div hx-ext="ws" ws-connect={ "/lobbies/" + lobby.Code + "/ws" } class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 				<!-- Players List (updates via WebSocket) -->
-				@PlayerList(players)
+				@PlayerList(players, false)
 
 				<!-- Game Info / Actions -->
 				<div class="bg-elevated border border-border rounded p-5 sm:p-6">

@@ -5,16 +5,17 @@
 ## Phase 1: Stabilize (Immediate)
 **Objective:** Eliminate visual glitches ("flicker") and create a smooth, app-like feel.
 
-- [ ] **Refactor WebSocket Refreshes**:
+- [x] **Refactor WebSocket Refreshes**:
     - Current state: `window.location.reload()` causes full page reload white flash.
     - Desired state: Use HTMX event triggers or OOB swaps to fetch new content without refreshing.
     - **Tasks**:
-        - Change `broadcastRoundAdvanced` to send an HTMX trigger event (e.g., `events.EventRoundAdvanced`).
-        - Change `broadcastQuestionRevealed` to send an HTMX trigger event.
-        - Update frontend `game_content` container to listen for these events and perform an `hx-get` to refresh the partial.
+        - [x] Change `broadcastRoundAdvanced` to send an HTMX trigger event (e.g., `events.EventRoundAdvanced`).
+        - [x] Change `broadcastQuestionRevealed` to send an HTMX trigger event.
+        - [x] Update frontend `game_content` container to listen for these events and perform an `hx-get` to refresh the partial.
 
-- [ ] **Answer Status Polish**:
+- [x] **Answer Status Polish**:
     - Ensure the "Who has answered" indicators update smoothly without layout shifts.
+    - Added `hx-swap-oob="true"` to partial updates to ensure correct targeting.
 
 ## Phase 2: Enhance (Pre-Event)
 **Objective:** Remove "writer's block" friction during the question submission phase.
