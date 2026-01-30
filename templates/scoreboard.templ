@@ -22,6 +22,23 @@ func getRoundWinners(roundScores []db.GetRoundScoreboardRow) []db.GetRoundScoreb
 	return winners
 }
 
+// getOverallLeaders returns all players who share the top total score
+func getOverallLeaders(scores []db.GetLobbyScoreboardRow) []db.GetLobbyScoreboardRow {
+	if len(scores) == 0 {
+		return nil
+	}
+	topScore := scores[0].Score
+	var leaders []db.GetLobbyScoreboardRow
+	for _, s := range scores {
+		if s.Score == topScore {
+			leaders = append(leaders, s)
+		} else {
+			break // sorted descending, so no more ties
+		}
+	}
+	return leaders
+}
+
 // getRank returns the 1-based rank for a player, accounting for ties
 func getRank(index int, scores []db.GetLobbyScoreboardRow) int {
 	if index == 0 {
@@ -44,35 +61,67 @@ templ Scoreboard(scores []db.GetLobbyScoreboardRow, roundScores []db.GetRoundSco
 			</h2>
 			<p class="text-text-muted text-sm">Round complete</p>
 		</div>
-		<!-- Round Winner(s) -->
-		if len(roundScores) > 0 {
-			{{ winners := getRoundWinners(roundScores) }}
-			<div class="mb-10 text-center">
-				if len(winners) == 1 {
-					<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winner</p>
-					<div class="inline-block bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-6 sm:p-8 shadow-lg shadow-amber/5 transform scale-110">
-						<div class="flex flex-col items-center gap-2">
-							<span class="text-4xl">👑</span>
-							<h3 class="font-display text-2xl sm:text-3xl font-bold text-amber">{ winners[0].Nickname }</h3>
-							<span class="font-mono text-xl font-bold text-text mt-1">{ fmt.Sprintf("%d", winners[0].Score) } pts</span>
-						</div>
-					</div>
-				} else {
-					<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winners</p>
-					<div class="flex flex-wrap justify-center gap-4">
-						for _, w := range winners {
-							<div class="bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-4 sm:p-6 shadow-lg shadow-amber/5">
-								<div class="flex flex-col items-center gap-2">
-									<span class="text-3xl">👑</span>
-									<h3 class="font-display text-xl sm:text-2xl font-bold text-amber">{ w.Nickname }</h3>
-									<span class="font-mono text-lg font-bold text-text mt-1">{ fmt.Sprintf("%d", w.Score) } pts</span>
-								</div>
+		<!-- Winners Section -->
+		<div class="mb-10 flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-10">
+			<!-- Round Winner(s) -->
+			if len(roundScores) > 0 {
+				{{ winners := getRoundWinners(roundScores) }}
+				<div class="text-center">
+					if len(winners) == 1 {
+						<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winner</p>
+						<div class="inline-block bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-5 sm:p-6 shadow-lg shadow-amber/5">
+							<div class="flex flex-col items-center gap-2">
+								<span class="text-3xl">👑</span>
+								<h3 class="font-display text-xl sm:text-2xl font-bold text-amber">{ winners[0].Nickname }</h3>
+								<span class="font-mono text-lg font-bold text-text mt-1">{ fmt.Sprintf("%d", winners[0].Score) } pts</span>
 							</div>
-						}
-					</div>
-				}
-			</div>
-		}
+						</div>
+					} else {
+						<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Round Winners</p>
+						<div class="flex flex-wrap justify-center gap-3">
+							for _, w := range winners {
+								<div class="bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/50 rounded-xl p-4 shadow-lg shadow-amber/5">
+									<div class="flex flex-col items-center gap-1">
+										<span class="text-2xl">👑</span>
+										<h3 class="font-display text-lg font-bold text-amber">{ w.Nickname }</h3>
+										<span class="font-mono text-base font-bold text-text">{ fmt.Sprintf("%d", w.Score) } pts</span>
+									</div>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			}
+			<!-- Overall Leader(s) -->
+			if len(scores) > 0 {
+				{{ leaders := getOverallLeaders(scores) }}
+				<div class="text-center">
+					if len(leaders) == 1 {
+						<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Overall Leader</p>
+						<div class="inline-block bg-gradient-to-br from-cyan/20 to-cyan/5 border border-cyan/50 rounded-xl p-5 sm:p-6 shadow-lg shadow-cyan/5">
+							<div class="flex flex-col items-center gap-2">
+								<span class="text-3xl">🏆</span>
+								<h3 class="font-display text-xl sm:text-2xl font-bold text-cyan">{ leaders[0].Nickname }</h3>
+								<span class="font-mono text-lg font-bold text-text mt-1">{ fmt.Sprintf("%d", leaders[0].Score) } total</span>
+							</div>
+						</div>
+					} else {
+						<p class="text-text-muted text-xs uppercase tracking-widest mb-3">Overall Leaders</p>
+						<div class="flex flex-wrap justify-center gap-3">
+							for _, l := range leaders {
+								<div class="bg-gradient-to-br from-cyan/20 to-cyan/5 border border-cyan/50 rounded-xl p-4 shadow-lg shadow-cyan/5">
+									<div class="flex flex-col items-center gap-1">
+										<span class="text-2xl">🏆</span>
+										<h3 class="font-display text-lg font-bold text-cyan">{ l.Nickname }</h3>
+										<span class="font-mono text-base font-bold text-text">{ fmt.Sprintf("%d", l.Score) } total</span>
+									</div>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			}
+		</div>
 		<!-- Rankings Table -->
 		<div class="space-y-3 max-w-2xl mx-auto mb-8 sm:mb-10">
 			<!-- Table Header -->

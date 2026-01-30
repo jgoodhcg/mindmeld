@@ -53,7 +53,7 @@ templ SubmitStatus(submittedCount int, totalPlayers int, lobbyCode string, isHos
 				<span class="font-mono text-2xl font-bold text-cyan">{ fmt.Sprintf("%d", submittedCount) }</span>
 				<span class="text-text-muted">/</span>
 				<span class="font-mono text-xl text-text-muted">{ fmt.Sprintf("%d", totalPlayers) }</span>
-				<span class="text-xs text-text-muted uppercase font-mono ml-1">ready</span>
+				<span class="text-xs text-text-muted uppercase font-mono ml-1">submitted</span>
 			</div>
 		</div>
 		if isHost {
@@ -69,6 +69,8 @@ templ SubmitStatus(submittedCount int, totalPlayers int, lobbyCode string, isHos
 					<p class="text-sm text-text-muted mt-3">Waiting for all submissions...</p>
 				}
 			</form>
+		} else {
+			<p class="text-sm text-text-muted mt-4">Host will start the round when ready</p>
 		}
 	</div>
 }

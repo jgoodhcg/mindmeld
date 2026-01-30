@@ -1,4 +1,4 @@
-.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint e2e-install e2e-screenshot e2e-flow e2e-test
+.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint e2e-install e2e-screenshot e2e-flow e2e-multiplayer e2e-test
 
 # Load environment variables
 include .env.local
@@ -78,6 +78,10 @@ e2e-screenshot:
 # E2E: Run a UI flow (usage: make e2e-flow or make e2e-flow ARGS="join ABC123")
 e2e-flow:
 	cd e2e && npm run flow -- $(ARGS)
+
+# E2E: Run multiplayer round simulation
+e2e-multiplayer:
+	cd e2e && npm run multiplayer
 
 # E2E: Run playwright tests
 e2e-test:

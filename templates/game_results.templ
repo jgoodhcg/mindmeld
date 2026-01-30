@@ -69,6 +69,10 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 					<p class="text-cyan font-mono text-lg font-bold">LIVE RESULTS</p>
 					<p class="text-text-muted text-sm">Waiting for other players...</p>
 				</div>
+			} else {
+				<div class="text-center">
+					<p class="text-text-muted text-sm">Waiting for host to continue...</p>
+				</div>
 			}
 		</div>
 	</div>

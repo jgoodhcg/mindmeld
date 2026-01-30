@@ -6,6 +6,7 @@
     "install-browsers": "playwright install chromium",
     "screenshot": "tsx scripts/screenshot.ts",
     "flow": "tsx scripts/flow.ts",
+    "multiplayer": "tsx scripts/multiplayer-round.ts",
     "test": "playwright test",
     "test:headed": "playwright test --headed"
   },
