@@ -89,6 +89,14 @@ func (h *Hub) ConnectionCount(lobbyCode string) int {
 	return 0
 }
 
+// LiveLobbyCount returns the number of lobbies with active connections.
+func (h *Hub) LiveLobbyCount() int {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	return len(h.lobbies)
+}
+
 // BroadcastPersonalized sends a personalized message to each connection in a lobby.
 // The renderFunc is called for each player ID (UUID string) and should return the message bytes for that player.
 func (h *Hub) BroadcastPersonalized(ctx context.Context, lobbyCode string, renderFunc func(playerID string) []byte) {

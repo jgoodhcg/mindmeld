@@ -12,7 +12,6 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 			<div class="text-center pt-2">
 				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">Trivia</span></span>
 			</div>
-
 			<!-- Header -->
 			<div class="bg-elevated border border-border rounded p-5 sm:p-6">
 				<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
@@ -33,15 +32,12 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 					</div>
 				</div>
 			</div>
-
 			<!-- Game content area - updates via WebSocket OOB swap -->
 			@GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers)
 			<div id="game-updater" class="hidden"></div>
-
 			<div hx-ext="ws" ws-connect={ "/lobbies/" + lobby.Code + "/ws" } class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 				<!-- Players List (updates via WebSocket) -->
 				@PlayerList(players, false)
-
 				<!-- Game Info / Actions -->
 				<div class="bg-elevated border border-border rounded p-5 sm:p-6">
 					if lobby.Phase == "waiting" {
@@ -49,7 +45,6 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 							<div class="text-center py-6">
 								<p class="text-text-muted">Waiting for players to join...</p>
 							</div>
-
 							if isHost {
 								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/start") } method="POST">
 									<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">

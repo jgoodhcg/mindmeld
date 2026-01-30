@@ -1,4 +1,4 @@
-.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint
+.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint e2e-install e2e-screenshot e2e-flow e2e-test
 
 # Load environment variables
 include .env.local
@@ -66,3 +66,19 @@ clean:
 	rm -f static/css/output.css
 	rm -f templates/*_templ.go
 	rm -rf internal/db/
+
+# E2E: Install playwright and browsers
+e2e-install:
+	cd e2e && npm install && npm run install-browsers
+
+# E2E: Take a screenshot (usage: make e2e-screenshot or make e2e-screenshot ARGS="/lobby/ABC123")
+e2e-screenshot:
+	cd e2e && npm run screenshot -- $(ARGS)
+
+# E2E: Run a UI flow (usage: make e2e-flow or make e2e-flow ARGS="join ABC123")
+e2e-flow:
+	cd e2e && npm run flow -- $(ARGS)
+
+# E2E: Run playwright tests
+e2e-test:
+	cd e2e && npm test

@@ -53,7 +53,7 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 
 - [x] **Join by code on home page**: Add a simple code input field so players can join a lobby without needing a direct link
 - [x] **Remove public lobby list**: Hide the lobby list to keep games private; show only a count of active lobbies (total + lobbies with players)
-- [ ] **Refine home stats (active)**: Define active lobbies based on active WebSocket sessions, not just lobbies with players
+- [x] **Refine home stats (active)**: Define active lobbies based on active WebSocket sessions, not just lobbies with players
 - [ ] **Refine home stats (total)**: Show total trivia games ever played (e.g., via trivia rounds), not total lobbies
 - [x] **Host-only start button**: Only display the "Start Game" button to the host player
 - [x] **Fix white background on scroll**: Body/html background color shows white when scrolling past content

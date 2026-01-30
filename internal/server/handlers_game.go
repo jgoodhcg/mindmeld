@@ -625,4 +625,3 @@ func (s *Server) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
-

@@ -2,14 +2,13 @@ package templates
 
 import "fmt"
 
-templ Home(totalLobbies int64, lobbiesWithPlayers int64) {
+templ Home(totalLobbies int64, totalAnswers int64, totalRounds int64, liveLobbies int64) {
 	@Layout("Mindmeld") {
 		<div class="max-w-md mx-auto space-y-8 sm:space-y-12 py-8 sm:py-16">
 			<!-- Platform brand -->
 			<div class="text-center">
 				<span class="text-text-muted text-xs font-display tracking-widest uppercase">Mindmeld</span>
 			</div>
-
 			<!-- Game title -->
 			<header class="text-center space-y-3">
 				<h1 class="font-mono text-4xl sm:text-5xl font-bold tracking-wide text-text">
@@ -17,7 +16,6 @@ templ Home(totalLobbies int64, lobbiesWithPlayers int64) {
 				</h1>
 				<p class="text-text-muted text-sm tracking-wide">Questions from minds you know</p>
 			</header>
-
 			<!-- Join Lobby -->
 			<section class="bg-elevated border border-border rounded p-6 sm:p-8">
 				<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-6">Join Session</h2>
@@ -38,7 +36,6 @@ templ Home(totalLobbies int64, lobbiesWithPlayers int64) {
 					</button>
 				</form>
 			</section>
-
 			<!-- Create Lobby -->
 			<section class="bg-elevated border border-border rounded p-6 sm:p-8">
 				<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-6">Initialize Session</h2>
@@ -65,17 +62,24 @@ templ Home(totalLobbies int64, lobbiesWithPlayers int64) {
 					</button>
 				</form>
 			</section>
-
 			<!-- Stats -->
 			<footer class="border-t border-border pt-8">
-				<div class="flex justify-center gap-12 text-center">
+				<div class="flex justify-center gap-6 sm:gap-10 text-center">
 					<div>
-						<div class="font-mono text-2xl text-text">{ fmt.Sprintf("%d", totalLobbies) }</div>
-						<div class="text-text-muted text-xs tracking-wide uppercase mt-1">Sessions</div>
+						<div class="font-mono text-2xl text-success">{ fmt.Sprintf("%d", liveLobbies) }</div>
+						<div class="text-text-muted text-xs tracking-wide uppercase mt-1">Live</div>
 					</div>
 					<div>
-						<div class="font-mono text-2xl text-cyan">{ fmt.Sprintf("%d", lobbiesWithPlayers) }</div>
-						<div class="text-text-muted text-xs tracking-wide uppercase mt-1">Active</div>
+						<div class="font-mono text-2xl text-text">{ fmt.Sprintf("%d", totalLobbies) }</div>
+						<div class="text-text-muted text-xs tracking-wide uppercase mt-1">Lobbies</div>
+					</div>
+					<div>
+						<div class="font-mono text-2xl text-cyan">{ fmt.Sprintf("%d", totalAnswers) }</div>
+						<div class="text-text-muted text-xs tracking-wide uppercase mt-1">Answers</div>
+					</div>
+					<div>
+						<div class="font-mono text-2xl text-amber">{ fmt.Sprintf("%d", totalRounds) }</div>
+						<div class="text-text-muted text-xs tracking-wide uppercase mt-1">Rounds</div>
 					</div>
 				</div>
 			</footer>

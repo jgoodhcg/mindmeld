@@ -9,7 +9,6 @@ templ JoinLobby(lobby db.Lobby) {
 			<div class="text-center mb-8">
 				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">Trivia</span></span>
 			</div>
-
 			<div class="bg-elevated border border-border rounded p-6 sm:p-8">
 				<div class="text-center mb-6">
 					<h1 class="font-mono text-2xl sm:text-3xl font-bold text-text mb-3">JOIN SESSION</h1>
@@ -18,7 +17,6 @@ templ JoinLobby(lobby db.Lobby) {
 						<span class="text-cyan font-mono font-bold block mt-1">{ lobby.Name }</span>
 					</p>
 				</div>
-
 				<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/join") } method="POST" class="space-y-6">
 					<div>
 						<label for="nickname" class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">

@@ -39,6 +39,27 @@ The agent **IS** permitted to run these commands to verify code compilation and 
 | `make fmt` | Formats code using `go fmt` and `templ fmt`. Run this before finishing changes. |
 | `make lint` | Runs `go vet` to catch common errors. |
 
+## E2E Visual Validation (Playwright)
+The agent **IS** permitted to run these commands to validate UI changes visually:
+
+| Command | Description |
+|---------|-------------|
+| `make e2e-screenshot` | Take screenshot of homepage. Output: `e2e/screenshots/` |
+| `make e2e-screenshot ARGS="/path"` | Screenshot a specific page (e.g., `/lobby/ABC123`). |
+| `make e2e-flow` | Run create-lobby flow with screenshots at checkpoints. |
+| `make e2e-flow ARGS="join CODE"` | Run join-lobby flow for a specific lobby. |
+| `make e2e-flow ARGS="trivia CODE"` | Run trivia game flow for a specific lobby. |
+| `make e2e-test` | Run Playwright smoke tests. |
+
+**Usage:**
+- **Run these commands proactively** after making UI changes to validate they work correctly.
+- After running, **read the PNG files** in `e2e/screenshots/` to visually verify the UI state.
+- If commands fail with connection errors (e.g., "Failed to load", "ECONNREFUSED"), the dev server is not running. **Ask the user to start it** with `make dev`.
+
+**Prerequisites:**
+- Server must be running (`make dev` started by user)
+- First run: `make e2e-install` to install dependencies
+
 ## User-Only Commands
 The agent must **NOT** run these unless explicitly instructed:
 

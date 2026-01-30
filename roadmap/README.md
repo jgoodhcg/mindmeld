@@ -57,6 +57,7 @@ The rest of the file contains narrative detail about the work - design notes, da
 
 - [visual-redesign.md](./visual-redesign.md) - 1970s cerebral sci-fi UI redesign
 - [css-cache-busting.md](./css-cache-busting.md) - Invalidate stale CSS on deployments
+- [infrastructure.md](./infrastructure.md) - Horizontal scaling for WebSockets
 
 ### Archived
 

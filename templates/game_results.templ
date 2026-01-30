@@ -14,11 +14,10 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 				<p class="text-lg sm:text-xl text-text leading-relaxed font-bold">{ question.QuestionText }</p>
 			</div>
 		</div>
-
 		<div class="space-y-6 mb-8 max-w-2xl mx-auto">
 			{{ shuffled := ShuffleAnswers(question) }}
 			for _, ans := range shuffled {
-				{{ 
+				{{
 					count := 0
 					for _, stat := range distribution {
 						if stat.Answer == ans.Value {
@@ -28,11 +27,11 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 					}
 					percent := CalculatePercentage(count, totalAnswers)
 					isCorrect := ans.Value == question.CorrectAnswer
-					
+
 					// Color logic
 					barColor := "bg-cyan" // Default for "answering" phase
 					wrapperBorder := "border-border"
-					
+
 					if isRevealed {
 						if isCorrect {
 							barColor = "bg-success"
@@ -47,7 +46,6 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 						<span class="font-mono font-bold text-text-muted">{ ans.Label }. { ans.Value }</span>
 						<span class="font-mono text-text">{ fmt.Sprintf("%d%%", percent) }</span>
 					</div>
-					
 					<div class={ "h-12 w-full bg-base rounded-md border relative overflow-hidden " + wrapperBorder }>
 						<div class={ "h-full transition-all duration-700 ease-out " + barColor } style={ fmt.Sprintf("width: %d%%", percent) }></div>
 						if isRevealed && isCorrect {
@@ -59,7 +57,6 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 				</div>
 			}
 		</div>
-
 		<div class="h-24 flex items-center justify-center">
 			if isHost && isRevealed {
 				<form action={ templ.SafeURL("/lobbies/" + lobbyCode + "/next-question") } method="POST">

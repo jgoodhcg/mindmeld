@@ -227,7 +227,7 @@ func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 		// Only send update if player has answered OR is the author
 		hasAnswered := answeredMap[playerID]
 		isAuthor := currentQuestion.Author.String() == playerID
-		
+
 		if hasAnswered || isAuthor {
 			var buf bytes.Buffer
 			// QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, isRevealed bool, isHost bool)
@@ -239,14 +239,14 @@ func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 				false, // Not revealed yet
 				false, // Host button hidden anyway
 			).Render(ctx, &buf)
-			
+
 			if err != nil {
 				log.Printf("[ws-subscriber] Error rendering live graph: %v", err)
 				return nil
 			}
 			return buf.Bytes()
 		}
-		
+
 		// Send answer status to players still answering
 		var buf2 bytes.Buffer
 		err := templates.AnswerStatus(payload.AnsweredCount, payload.TotalExpected, true).Render(ctx, &buf2)

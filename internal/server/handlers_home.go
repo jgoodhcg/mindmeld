@@ -19,7 +19,8 @@ func (s *Server) handleTriviaHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	templates.Home(stats.TotalLobbies, stats.LobbiesWithPlayers).Render(r.Context(), w)
+	liveLobbies := int64(s.hub.LiveLobbyCount())
+	templates.Home(stats.TotalLobbies, stats.TotalAnswers, stats.TotalRounds, liveLobbies).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinByCode(w http.ResponseWriter, r *http.Request) {

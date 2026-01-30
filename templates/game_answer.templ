@@ -10,11 +10,9 @@ templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool, 
 		<div class="text-center mb-6">
 			<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4">Select Answer</h2>
 		</div>
-
 		<div class="bg-base rounded p-6 sm:p-8 mb-6 text-center border border-border">
 			<p class="text-lg sm:text-xl text-text leading-relaxed">{ question.QuestionText }</p>
 		</div>
-
 		if isAuthor {
 			<div class="text-center p-6 sm:p-8 bg-base rounded border-2 border-dashed border-border">
 				<p class="text-text font-mono font-bold text-lg mb-2">YOUR QUESTION</p>
@@ -27,8 +25,7 @@ templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool, 
 		} else {
 			{{ shuffled := ShuffleAnswers(question) }}
 			<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/answers") } method="POST" class="space-y-3">
-				<input type="hidden" name="question_id" value={ fmt.Sprintf("%x", question.ID.Bytes) } />
-
+				<input type="hidden" name="question_id" value={ fmt.Sprintf("%x", question.ID.Bytes) }/>
 				for _, ans := range shuffled {
 					<button type="submit" name="answer" value={ ans.Value } class="w-full bg-base hover:bg-cyan hover:text-base p-4 sm:p-5 rounded text-left transition-colors border border-border hover:border-cyan group">
 						<span class="text-text-muted group-hover:text-base font-mono font-bold mr-3">{ ans.Label }.</span>

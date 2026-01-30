@@ -69,7 +69,7 @@ func (s *Server) handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	player := GetPlayer(r.Context())
-	
+
 	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
 	if err != nil {
 		http.Error(w, "Lobby not found", http.StatusNotFound)
@@ -81,7 +81,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 		LobbyID:  lobby.ID,
 		PlayerID: player.ID,
 	})
-	
+
 	// If checking failed (not found), show Join screen
 	if err != nil {
 		templates.JoinLobby(lobby).Render(r.Context(), w)
@@ -108,7 +108,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	var roundScoreboard []db.GetRoundScoreboardRow
 	var distribution []events.AnswerStat
 	var totalAnswers int
-	
+
 	if lobby.Phase == "playing" {
 		activeRound, err = s.queries.GetActiveRound(r.Context(), lobby.ID)
 		if err != nil {
@@ -181,7 +181,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					log.Printf("Error fetching scoreboard: %v", err)
 				}
-				
+
 				// Round Score
 				roundScoreboard, err = s.queries.GetRoundScoreboard(r.Context(), activeRound.ID)
 				if err != nil {

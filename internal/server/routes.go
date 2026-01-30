@@ -23,7 +23,7 @@ func (s *Server) routes() {
 	s.router.Get("/lobbies/{code}", s.handleLobbyRoom)
 	s.router.Get("/lobbies/{code}/content", s.handleGetGameContent)
 	s.router.Post("/lobbies/{code}/join", s.handleJoinLobby)
-	
+
 	// WebSocket for real-time updates
 	s.router.Get("/lobbies/{code}/ws", s.handleWebSocket)
 

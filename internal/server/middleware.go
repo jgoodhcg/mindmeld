@@ -30,8 +30,8 @@ func (s *Server) playerIdentityMiddleware(next http.Handler) http.Handler {
 			player, err = s.queries.GetPlayerByDeviceToken(ctx, cookie.Value)
 			if err != nil && err != sql.ErrNoRows {
 				log.Printf("Error fetching player by token: %v", err)
-				// Continue without player? Or fail? 
-				// For now, if DB error, we treat as new session to be safe or fail 500. 
+				// Continue without player? Or fail?
+				// For now, if DB error, we treat as new session to be safe or fail 500.
 				// Let's treat as new session (fall through) unless it's a real DB outage.
 			}
 		}
@@ -39,7 +39,7 @@ func (s *Server) playerIdentityMiddleware(next http.Handler) http.Handler {
 		// 2. If no valid player found, create one
 		if !player.ID.Valid {
 			token := uuid.NewString()
-			
+
 			// Create new player in DB
 			// We pass sql.NullUUID{} for user_id as it's optional
 			player, err = s.queries.CreatePlayer(ctx, db.CreatePlayerParams{
