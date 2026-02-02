@@ -103,8 +103,8 @@ GROUP BY lp.player_id, lp.nickname
 ORDER BY score DESC;
 
 -- name: GetRoundScoreboard :many
-SELECT 
-    lp.player_id, 
+SELECT
+    lp.player_id,
     lp.nickname,
     COUNT(ta.id) FILTER (WHERE ta.is_correct) as score
 FROM lobby_players lp
@@ -113,3 +113,11 @@ LEFT JOIN trivia_answers ta ON ta.question_id = tq.id AND ta.player_id = lp.play
 WHERE lp.lobby_id = (SELECT lobby_id FROM trivia_rounds WHERE id = $1)
 GROUP BY lp.player_id, lp.nickname
 ORDER BY score DESC;
+
+-- name: GetUsedTemplatesForLobby :many
+SELECT template_id FROM used_question_templates WHERE lobby_id = $1;
+
+-- name: MarkTemplateUsed :exec
+INSERT INTO used_question_templates (lobby_id, template_id)
+VALUES ($1, $2)
+ON CONFLICT (lobby_id, template_id) DO NOTHING;

@@ -54,9 +54,8 @@ func main() {
 	}
 	log.Println("Connected to database")
 
-	// Create queries and server
-	queries := db.New(pool)
-	srvInstance := server.NewServer(queries)
+	// Create server
+	srvInstance := server.NewServer(pool)
 
 	// Create http server
 	srv := &http.Server{

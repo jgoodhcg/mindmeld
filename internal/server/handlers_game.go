@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
+	"github.com/jgoodhcg/mindmeld/internal/questions"
 	"github.com/jgoodhcg/mindmeld/templates"
 )
 
@@ -187,6 +188,41 @@ func (s *Server) handleStartGame(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
 
+func (s *Server) handleGetQuestionTemplates(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	player := GetPlayer(r.Context())
+
+	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Lobby not found", http.StatusNotFound)
+		return
+	}
+
+	// Verify player is in lobby
+	_, err = s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
+		LobbyID:  lobby.ID,
+		PlayerID: player.ID,
+	})
+	if err != nil {
+		http.Error(w, "Not in lobby", http.StatusForbidden)
+		return
+	}
+
+	// Get used templates for this lobby
+	usedTemplateIDs, err := s.queries.GetUsedTemplatesForLobby(r.Context(), lobby.ID)
+	if err != nil {
+		log.Printf("Error getting used templates: %v", err)
+		usedTemplateIDs = []string{}
+	}
+
+	// Get available templates (not yet used)
+	available := questions.GetAvailableTemplates(usedTemplateIDs)
+	grouped := questions.GroupByCategory(available)
+	categories := questions.GetCategories()
+
+	templates.QuestionTemplatesModal(grouped, categories).Render(r.Context(), w)
+}
+
 func (s *Server) handleSubmitQuestion(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
@@ -209,8 +245,19 @@ func (s *Server) handleSubmitQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := r.Context()
+	tx, err := s.dbPool.Begin(ctx)
+	if err != nil {
+		log.Printf("Error starting transaction: %v", err)
+		http.Error(w, "Failed to submit question", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := s.queries.WithTx(tx)
+
 	// Create Question
-	_, err = s.queries.CreateQuestion(r.Context(), db.CreateQuestionParams{
+	_, err = qtx.CreateQuestion(ctx, db.CreateQuestionParams{
 		RoundID:       round.ID,
 		Author:        player.ID,
 		QuestionText:  r.FormValue("question_text"),
@@ -221,6 +268,26 @@ func (s *Server) handleSubmitQuestion(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		log.Printf("Error creating question: %v", err)
+		http.Error(w, "Failed to submit question", http.StatusInternalServerError)
+		return
+	}
+
+	// Check if a template was used and mark it
+	templateID := r.FormValue("template_id")
+	if templateID != "" {
+		err = qtx.MarkTemplateUsed(ctx, db.MarkTemplateUsedParams{
+			LobbyID:    lobby.ID,
+			TemplateID: templateID,
+		})
+		if err != nil {
+			log.Printf("Error marking template as used: %v", err)
+			http.Error(w, "Failed to submit question", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Printf("Error committing transaction: %v", err)
 		http.Error(w, "Failed to submit question", http.StatusInternalServerError)
 		return
 	}

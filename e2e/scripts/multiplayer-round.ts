@@ -101,15 +101,41 @@ async function main() {
     await capture(hostPage, 'host', 'question-submit-form');
     await capture(playerPage, 'player', 'question-submit-form');
 
+    // ========== PHASE 3.5: Template Modal ==========
+    console.log('\n--- Phase 3.5: Template Modal ---');
+
+    const templateCta = hostPage.locator('button:has-text("Need help? Use a template")');
+    if (await templateCta.isVisible().catch(() => false)) {
+      await templateCta.click();
+      await hostPage.waitForSelector('#templates-modal', { timeout: 5000 });
+      await capture(hostPage, 'host', 'templates-modal-open');
+
+      const firstTemplate = hostPage.locator('#templates-content button').first();
+      await firstTemplate.waitFor({ state: 'visible', timeout: 5000 });
+      await firstTemplate.click();
+      await hostPage.waitForTimeout(300);
+      await capture(hostPage, 'host', 'template-selected');
+
+      const templateIdValue = await hostPage.locator('#template_id').inputValue();
+      const questionValue = await hostPage.locator('#question_text').inputValue();
+      console.log(`  ✓ Template selected: ${templateIdValue !== ''} | question filled: ${questionValue.trim() !== ''}`);
+    } else {
+      console.log('  ⚠ Template CTA not visible');
+    }
+
     // ========== PHASE 4: Submit Questions ==========
     console.log('\n--- Phase 4: Submit Questions ---');
 
     // Host submits question
-    await hostPage.fill('textarea[name="question_text"]', 'What is the capital of France?');
-    await hostPage.fill('input[name="correct_answer"]', 'Paris');
-    await hostPage.fill('input[name="wrong_answer_1"]', 'London');
-    await hostPage.fill('input[name="wrong_answer_2"]', 'Berlin');
-    await hostPage.fill('input[name="wrong_answer_3"]', 'Madrid');
+    const hostQuestionValue = (await hostPage.locator('textarea[name="question_text"]').inputValue()).trim();
+    const hostCorrectValue = (await hostPage.locator('input[name="correct_answer"]').inputValue()).trim();
+    if (!hostQuestionValue || !hostCorrectValue) {
+      await hostPage.fill('textarea[name="question_text"]', 'What is the capital of France?');
+      await hostPage.fill('input[name="correct_answer"]', 'Paris');
+      await hostPage.fill('input[name="wrong_answer_1"]', 'London');
+      await hostPage.fill('input[name="wrong_answer_2"]', 'Berlin');
+      await hostPage.fill('input[name="wrong_answer_3"]', 'Madrid');
+    }
     await hostPage.click('button:has-text("SUBMIT QUESTION")');
     await hostPage.waitForLoadState('networkidle');
 
@@ -219,8 +245,8 @@ async function main() {
     console.log(`  ✓ "Overall Leader" visible (player): ${overallLeaderPlayer}`);
 
     // Check for trophy emoji
-    const trophyVisible = await hostPage.locator('text=🏆').isVisible();
-    console.log(`  ✓ Trophy emoji visible: ${trophyVisible}`);
+    const trophyCount = await hostPage.locator('text=🏆').count();
+    console.log(`  ✓ Trophy emoji visible: ${trophyCount > 0} (count: ${trophyCount})`);
 
     console.log('\n=== Flow Complete ===');
     console.log(`Screenshots saved to: ${SCREENSHOTS_DIR}`);

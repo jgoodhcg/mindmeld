@@ -5,12 +5,19 @@ This is the source of truth for all AI agents (Claude, Gemini, etc.) working on 
 ## Workflow Preferences
 - **One Step at a Time:** Perform a single logical task, then stop and ask for validation/feedback. Do not chain multiple feature implementations or fixes together.
 - **Validation First:** Always reflect on the current state and plan before executing.
+- **E2E Validation Required:** After implementing UI changes, **always** run e2e visual validation (see E2E Visual Validation section below). Ask the user to start the dev server if needed.
 - **User Control:**
     - **Never** run the dev server (`make dev`, `air`, `go run`) automatically.
     - **Never** run migrations (`make migrate`) automatically.
     - **Never** query the local database unless explicitly asked.
     - **Never** assume the state of the database; ask the user to verify if unsure.
 - **Roadmap Driven:** Keep the roadmap up-to-date and reference it frequently.
+
+## Planning New Features
+When creating implementation plans for new features, **always include an E2E validation step** at the end:
+- Specify which e2e commands to run (e.g., `make e2e-flow ARGS="trivia CODE"`)
+- Note that the dev server must be running (user will start it)
+- Include reading the screenshots to verify the UI works as expected
 
 ## Development Context
 - **Tooling:** Dev tools (air, templ, sqlc, goose) are pinned in `go.mod`. Always use `go run ...` or the `Makefile`, do not assume global installs.
@@ -40,7 +47,7 @@ The agent **IS** permitted to run these commands to verify code compilation and 
 | `make lint` | Runs `go vet` to catch common errors. |
 
 ## E2E Visual Validation (Playwright)
-The agent **IS** permitted to run these commands to validate UI changes visually:
+**REQUIRED:** After any UI changes, agents **MUST** run e2e validation to verify the changes work correctly. This is not optional.
 
 | Command | Description |
 |---------|-------------|
@@ -51,10 +58,13 @@ The agent **IS** permitted to run these commands to validate UI changes visually
 | `make e2e-flow ARGS="trivia CODE"` | Run trivia game flow for a specific lobby. |
 | `make e2e-test` | Run Playwright smoke tests. |
 
-**Usage:**
-- **Run these commands proactively** after making UI changes to validate they work correctly.
-- After running, **read the PNG files** in `e2e/screenshots/` to visually verify the UI state.
-- If commands fail with connection errors (e.g., "Failed to load", "ECONNREFUSED"), the dev server is not running. **Ask the user to start it** with `make dev`.
+**Workflow:**
+1. After implementing UI changes, ask the user to start the dev server (`make dev`) and run migrations if needed
+2. Run the appropriate e2e command(s) for the feature
+3. **Read the PNG files** in `e2e/screenshots/` to visually verify the UI state
+4. If issues are found, fix them and re-run validation
+
+**If connection errors occur** (e.g., "Failed to load", "ECONNREFUSED"), the dev server is not running. Ask the user to start it with `make dev`.
 
 **Prerequisites:**
 - Server must be running (`make dev` started by user)

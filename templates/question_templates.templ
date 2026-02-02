@@ -1,0 +1,58 @@
+package templates
+
+import "github.com/jgoodhcg/mindmeld/internal/questions"
+
+// QuestionTemplatesModal renders the modal content with available templates grouped by category.
+// This is returned by the /lobbies/{code}/question-templates endpoint.
+templ QuestionTemplatesModal(grouped map[string][]questions.Template, categories []string) {
+	<div id="templates-content">
+		if len(grouped) == 0 {
+			<div class="text-center py-8">
+				<p class="text-text-muted">All templates have been used in this game!</p>
+				<p class="text-text-muted text-sm mt-2">Try writing your own question.</p>
+			</div>
+		} else {
+			<div class="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+				for _, category := range categories {
+					if templates, ok := grouped[category]; ok && len(templates) > 0 {
+						<div>
+							<h3 class="font-mono text-xs tracking-widest uppercase text-cyan mb-3">{ category }</h3>
+							<div class="space-y-2">
+								for _, t := range templates {
+									<button
+										type="button"
+										class="w-full text-left bg-base border border-border rounded px-4 py-3 hover:border-cyan transition-colors group"
+										onclick={ fillTemplate(t) }
+									>
+										<p class="text-text group-hover:text-cyan transition-colors">{ t.QuestionText }</p>
+										if isPersonalCategory(category) {
+											<p class="text-xs text-text-muted mt-1">Fill in your own answers</p>
+										}
+									</button>
+								}
+							</div>
+						</div>
+					}
+				}
+			</div>
+		}
+	</div>
+}
+
+// Helper to check if a category is personal (requires custom answers)
+func isPersonalCategory(category string) bool {
+	return category == questions.CategoryPersonal || category == questions.CategoryPreferences
+}
+
+// fillTemplate generates JavaScript to populate the form fields
+
+script fillTemplate(t questions.Template) {
+	document.getElementById('question_text').value = t.QuestionText;
+	document.getElementById('correct_answer').value = t.CorrectAnswer;
+	document.getElementById('wrong_answer_1').value = t.WrongAnswer1;
+	document.getElementById('wrong_answer_2').value = t.WrongAnswer2;
+	document.getElementById('wrong_answer_3').value = t.WrongAnswer3;
+	document.getElementById('template_id').value = t.ID;
+	// Close the modal
+	document.getElementById('templates-modal').classList.add('hidden');
+}

@@ -29,6 +29,7 @@ func (s *Server) routes() {
 
 	// Game actions
 	s.router.Post("/lobbies/{code}/start", s.handleStartGame)
+	s.router.Get("/lobbies/{code}/question-templates", s.handleGetQuestionTemplates)
 	s.router.Post("/lobbies/{code}/questions", s.handleSubmitQuestion)
 	s.router.Post("/lobbies/{code}/advance", s.handleAdvanceRound)
 	s.router.Post("/lobbies/{code}/next-question", s.handleNextQuestion)
