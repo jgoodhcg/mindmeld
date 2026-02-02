@@ -1,6 +1,16 @@
-# Vector Golf (Working Title)
+---
+title: "Vector Golf (Working Title)"
+status: planned
+description: "Daily semantic golf game using word embeddings and pgvector."
+tags: [area/game, type/feature, tech/pgvector]
+priority: low
+created: 2026-01-19
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
 
-**Status:** Planned / Specs Phase
+# Vector Golf (Working Title)
 
 **Concept:** A daily semantic search game where players try to find the "Perfect Trio" of words with the minimum "Semantic Gap" score.
 

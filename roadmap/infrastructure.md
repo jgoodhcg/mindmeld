@@ -1,8 +1,18 @@
+---
+title: "Infrastructure & Scaling"
+status: idea
+description: "Scale WebSocket and event infrastructure beyond a single server."
+tags: [area/backend, type/infra]
+priority: low
+created: 2026-01-30
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
+
 # Infrastructure & Scaling
 
 ## Work Unit Summary
-
-**Status:** future
 
 **Problem/Intent:**
 Current architecture assumes single-server deployment. WebSocket connections are managed in-memory via `internal/ws/Hub`. This works for MVP but blocks horizontal scaling.
@@ -57,7 +67,3 @@ The Hub tracks `map[lobbyCode]map[*websocket.Conn]playerID`. If a second server 
 ---
 
 ## Open Questions
-
-- What scale triggers the need for this? (concurrent lobbies, concurrent connections)
-- Is Digital Ocean App Platform's routing sticky enough for a simpler solution?
-- Should we measure current single-instance capacity first?

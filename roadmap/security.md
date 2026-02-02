@@ -1,8 +1,18 @@
+---
+title: "Application Security Hardening"
+status: planned
+description: "Harden headers, CSP, CSRF, and WebSocket authorization."
+tags: [area/backend, type/security]
+priority: medium
+created: 2026-01-05
+updated: 2026-02-02
+effort: M
+depends-on: []
+---
+
 # Application Security Hardening
 
 ## Work Unit Summary
-
-**Status:** planned
 
 **Problem/Intent:**
 As the application moves towards production, we need to ensure it is resilient against common web vulnerabilities. Specifically, we want to prevent Cross-Site Scripting (XSS) and ensure user sessions are secure.

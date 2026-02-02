@@ -1,8 +1,18 @@
+---
+title: "CSS Cache Busting"
+status: done
+description: "Invalidate cached CSS using hashed filenames or versioning."
+tags: [area/frontend, type/infra]
+priority: medium
+created: 2026-01-16
+updated: 2026-02-02
+effort: S
+depends-on: []
+---
+
 # CSS Cache Busting
 
 ## Work Unit Summary
-
-**Status:** done
 
 **Problem/Intent:**
 After deployments, users may have stale CSS cached in their browsers, causing visual bugs or broken layouts until they hard-refresh. We need a way to invalidate old CSS automatically when deploying new versions.
@@ -57,14 +67,3 @@ Compute the hash when the Go server starts and expose it to templates.
 
 **Cons:**
 - Slightly more complex template integration
-
----
-
-## Implementation Sketch (Option C)
-
-1. In Go, compute MD5/SHA hash of `static/css/output.css` at startup
-2. Store hash in a variable accessible to template rendering
-3. In `layout.templ`, reference CSS as `/static/css/output.css?v={hash}`
-4. Set appropriate cache headers (long cache with hash invalidation)
-
-This approach requires minimal build changes and works well with the current architecture.

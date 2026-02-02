@@ -1,3 +1,15 @@
+---
+title: "Idea Backlog"
+status: idea
+description: "Raw game concepts awaiting promotion to work units."
+tags: [area/product, type/idea]
+priority: low
+created: 2026-01-11
+updated: 2026-02-02
+effort: XS
+depends-on: []
+---
+
 # Ruminating Idea List
 
 A holding pen for game concepts. These are not fully specced work units yet.

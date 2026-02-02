@@ -1,8 +1,18 @@
+---
+title: "Chronology (Timeline Game)"
+status: planned
+description: "Daily timeline sorting game using historical events."
+tags: [area/game, type/feature]
+priority: low
+created: 2026-01-19
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
+
 # Chronology (Timeline Game)
 
 > **NOTE:** This game is scheduled for implementation as **[Work Party Prep Phase 3](./work-party-prep.md)**.
-
-**Status:** Planned / Idea Phase
 
 **Goal:** A daily single-player game where users place historical events on a timeline.
 

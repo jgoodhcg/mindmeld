@@ -1,23 +1,33 @@
-# [Work Unit Title]
-
-## Work Unit Summary
-
-**Status:** idea
-
-**Problem/Intent:**
-What problem does this solve? What are we trying to achieve?
-
-**Constraints:**
-Known limitations, requirements, or boundaries.
-
-**Proposed Approach:**
-High-level strategy for implementation.
-
-**Open Questions:**
-- Unresolved decisions or unknowns
-
 ---
+title: "Work Unit Title"
+status: idea
+description: "One-line summary of what this accomplishes."
+tags: []
+priority: medium
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+effort: M
+depends-on: []
+---
+
+# Work Unit Title
+
+## Problem / Intent
+
+[Why this exists. What problem it solves.]
+
+## Constraints
+
+[Hard requirements or limitations.]
+
+## Proposed Approach
+
+[High-level solution direction.]
+
+## Open Questions
+
+[Unresolved decisions or unknowns.]
 
 ## Notes
 
-Additional context, design details, data models, or narrative documentation goes here.
+[Design details, context, implementation notes as work progresses.]

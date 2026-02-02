@@ -1,4 +1,9 @@
-# Mindmeld Roadmap
+---
+title: "Mindmeld Roadmap"
+goal: "Multiplayer party games that bring people together through shared thinking and conversation."
+---
+
+# Roadmap
 
 ## North Star
 
@@ -14,13 +19,37 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 
 ---
 
-## Goal
-
-A platform for multiplayer party games that bring people together through shared thinking. Primary goal is social connection; secondary is stats tracking and visualization.
-
 ## Current Focus
 
-**[Work Party Prep](./work-party-prep.md)** - Getting the platform polished and ready for a company social event.
+- **[Work Party Prep](./work-party-prep.md)** - Getting the platform polished and ready for a company social event.
+
+---
+
+## Work Units
+
+### Active
+- [work-party-prep.md](./work-party-prep.md) - Launch readiness polish and stability
+- [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
+
+### Planned
+- [game-isolation-refactor.md](./game-isolation-refactor.md) - Isolate game logic for future games
+- [security.md](./security.md) - App security hardening
+- [chronology.md](./chronology.md) - Daily timeline sorting game
+- [vector-golf.md](./vector-golf.md) - Semantic golf daily game
+
+### Ideas
+- [visual-redesign.md](./visual-redesign.md) - 1970s cerebral sci-fi UI theme
+- [question-system.md](./question-system.md) - Question types, pools, AI generation
+- [analytics.md](./analytics.md) - Gameplay analytics + stats
+- [codebase-map.md](./codebase-map.md) - Auto-generated docs & touchpoints
+- [anonymous_match.md](./anonymous_match.md) - Anonymous Match social game
+- [coordinates.md](./coordinates.md) - Coordinates social alignment game
+- [infrastructure.md](./infrastructure.md) - Scaling for WebSockets and events
+- [ideas.md](./ideas.md) - Raw concept backlog
+
+### Archived
+- [archived/housekeeping.md](./archived/housekeeping.md) - Build cleanup & project structure
+- [archived/css-cache-busting.md](./archived/css-cache-busting.md) - CSS cache invalidation
 
 ---
 
@@ -43,20 +72,12 @@ A platform for multiplayer party games that bring people together through shared
 
 ---
 
-## Active Work Units
+## Quick Ideas
 
-- [work-party-prep.md](./work-party-prep.md) - **HIGHEST PRIORITY** - Stability & Polish
-- [trivia.md](./trivia.md) - Trivia MVP implementation (core complete, polish remaining)
-- [visual-redesign.md](./visual-redesign.md) - 1970s cerebral sci-fi UI theme
-- [question-system.md](./question-system.md) - Question types, sources, AI generation, pools
-- [housekeeping.md](./housekeeping.md) - Build cleanup & project structure
-- [game-isolation-refactor.md](./game-isolation-refactor.md) - Refactor to isolate game logic (Trivia vs Platform)
-- [security.md](./security.md) - App Security Hardening
-- [analytics.md](./analytics.md) - Plausible analytics for gameplay + stats
-- [codebase-map.md](./codebase-map.md) - Auto-generated docs & key touchpoints
-- [chronology.md](./chronology.md) - Daily timeline sorting game (planned)
-- [vector-golf.md](./vector-golf.md) - Vector-based semantic golf game (planned)
-- [anonymous_match.md](./anonymous_match.md) - Anonymous Match social game (future)
+- Hive Mind (cooperative convergence)
+- Polarity (spectrum game)
+- Pecking Order (ranking/sorting)
+- See [ideas.md](./ideas.md) for the full backlog
 
 ## Key Links
 

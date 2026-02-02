@@ -1,3 +1,15 @@
+---
+title: "Work Party Prep (Launch Readiness)"
+status: active
+description: "Polish stability and reduce friction for a work social event launch."
+tags: [area/product, type/polish]
+priority: high
+created: 2026-01-23
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
+
 # Work Party Prep (Launch Readiness)
 
 **Goal:** Polish the experience for a work social event. Prioritize stability and low friction over new game mechanics.

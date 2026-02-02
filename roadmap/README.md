@@ -1,64 +1,54 @@
 # Roadmap Structure
 
-This directory contains project management documentation for Mindmeld.
+This directory follows the AGENT_BLUEPRINT roadmap format.
 
-## Files
+## Structure
 
-| File | Purpose |
-|------|---------|
-| `index.md` | Canonical state: goal, current focus, active work units, key links. Keep short; no tasks. |
-| `README.md` | This file. Structure and rules for the roadmap. |
-| `_template.md` | Starter template for new work units. |
-| `log.md` | (Optional) Append-only notes; no retroactive edits. |
-| `*.md` | Work units. Each describes a discrete piece of work. |
-| `archived/` | Completed or dropped work units moved here. |
-
-## Work Unit Format
-
-Each work unit file starts with a summary section:
-
-```markdown
-# [Title]
-
-## Work Unit Summary
-
-**Status:** idea | active | paused | done | dropped
-
-**Problem/Intent:** What problem this solves or what we're trying to achieve.
-
-**Constraints:** Known limitations, requirements, or boundaries.
-
-**Proposed Approach:** High-level strategy for implementation.
-
-**Open Questions:** Unresolved decisions or unknowns.
+```
+roadmap/
+├── index.md       # Project overview and directory of work units
+├── _template.md   # Starting point for new work units
+├── *.md           # Individual work unit files (with frontmatter)
+└── archived/      # Completed or dropped work units
 ```
 
-The rest of the file contains narrative detail about the work - design notes, data models, context, etc. Avoid checklists.
+## Work Unit Frontmatter
+
+Every work unit file must begin with YAML frontmatter:
+
+```yaml
+---
+title: "Feature Name"
+status: idea | planned | active | paused | done | dropped
+description: "One-line summary of what this work unit accomplishes"
+tags: [area/frontend, type/feature]
+priority: high | medium | low
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+effort: XS | S | M | L | XL
+depends-on: []
+---
+```
+
+Required fields: `title`, `status`, `description`.
+
+Recommended fields: `tags`, `priority`, `created`, `updated`.
+
+## Status Definitions
+
+| Status | Meaning |
+|--------|---------|
+| `idea` | Captured but not yet scoped |
+| `planned` | Scoped and ready to start |
+| `active` | Currently being worked on |
+| `paused` | Started but blocked or deprioritized |
+| `done` | Shipped and working |
+| `dropped` | Decided not to pursue |
 
 ## Rules
 
-1. **Status lives in work units.** Each work unit declares its own status. The index only links to active units.
-
-2. **Avoid subtasks and checklists.** Keep detail as narrative notes. Checklists fragment context and become stale.
-
-3. **One work unit at a time.** LLMs operate on a single work unit per session. Keep units focused enough to work on in isolation.
-
-4. **Scope splits create new units.** When a work unit grows too large or spawns distinct subprojects, create new work unit files.
-
-5. **Never delete, only archive.** When work is done or dropped, move the file to `archived/`. Keep the history.
-
-## Catalog of Work Units
-
-### Active
-
-- [trivia.md](./trivia.md) - Trivia MVP
-
-### Ideas
-
-- [visual-redesign.md](./visual-redesign.md) - 1970s cerebral sci-fi UI redesign
-- [css-cache-busting.md](./css-cache-busting.md) - Invalidate stale CSS on deployments
-- [infrastructure.md](./infrastructure.md) - Horizontal scaling for WebSockets
-
-### Archived
-
-(none yet)
+- `roadmap/index.md` is the canonical overview and directory of work units.
+- Status lives in frontmatter, not in prose.
+- Update the `updated` field whenever you modify a work unit.
+- Move `done` or `dropped` work units to `archived/`.
+- Use consistent tag prefixes: `area/`, `type/`, `tech/`.

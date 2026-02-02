@@ -1,8 +1,18 @@
+---
+title: "Analytics System"
+status: idea
+description: "Add lightweight analytics and game stats with Plausible and Postgres."
+tags: [area/backend, type/feature, tech/analytics]
+priority: low
+created: 2026-01-10
+updated: 2026-02-02
+effort: M
+depends-on: []
+---
+
 # Analytics System
 
 ## Work Unit Summary
-
-**Status:** idea
 
 **Problem/Intent:**
 Add analytics to understand gameplay usage patterns and power player-facing stats.

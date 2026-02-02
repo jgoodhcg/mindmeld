@@ -1,10 +1,20 @@
+---
+title: "Question System Enhancements"
+status: idea
+description: "Expand question types, pools, and AI-assisted creation for trivia."
+tags: [area/game, type/feature, tech/ai]
+priority: medium
+created: 2026-01-19
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
+
 # Question System Enhancements
 
 > **NOTE:** AI Question Assistance (MVP) is currently being implemented as part of **[Work Party Prep Phase 2](./work-party-prep.md)**.
 
 ## Work Unit Summary
-
-**Status:** idea
 
 **Problem/Intent:**
 Expand beyond "each player writes one multiple-choice question" to support varied question types, reusable question pools, and AI-generated content. Goal: reduce friction for quick games while keeping the personal touch that makes Mindmeld social.

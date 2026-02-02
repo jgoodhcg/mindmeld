@@ -1,8 +1,18 @@
+---
+title: "Codebase Map / Auto-Generated Documentation"
+status: idea
+description: "Auto-generated documentation to map routes, events, and schema."
+tags: [area/docs, type/tooling]
+priority: low
+created: 2026-01-19
+updated: 2026-02-02
+effort: S
+depends-on: []
+---
+
 # Codebase Map / Auto-Generated Documentation
 
 ## Work Unit Summary
-
-**Status:** idea
 
 **Problem/Intent:**
 This is a "vibe coded" app where deep code reading isn't the norm. We need key touchpoints - auto-generated or easily maintained docs that give a quick mental model of the system without diving into implementation details.

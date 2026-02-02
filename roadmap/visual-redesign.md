@@ -1,8 +1,18 @@
+---
+title: "Visual Redesign: 1970s Cerebral Sci-Fi"
+status: idea
+description: "Redesign the UI to a 1970s cerebral sci-fi visual system."
+tags: [area/frontend, type/design]
+priority: low
+created: 2026-01-16
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
+
 # Visual Redesign: 1970s Cerebral Sci-Fi
 
 ## Work Unit Summary
-
-**Status:** idea
 
 **Problem/Intent:**
 Shift the UI from its current gaming aesthetic (purple gradients, glass-morphism) to a 1970s cerebral science fiction vibe. The interface should feel like making a careful decision in a dimly lit research institute at 2 a.m., knowing it matters.

@@ -1,8 +1,18 @@
+---
+title: "Housekeeping"
+status: done
+description: "Build artifact cleanup and project structure housekeeping."
+tags: [area/devex, type/maintenance]
+priority: low
+created: 2026-01-11
+updated: 2026-02-02
+effort: S
+depends-on: []
+---
+
 # Housekeeping
 
 ## Work Unit Summary
-
-**Status:** completed
 
 **Problem/Intent:**
 Clean up build artifacts and project structure to prevent staleness issues and improve developer experience.

@@ -1,10 +1,20 @@
+---
+title: "Trivia MVP"
+status: active
+description: "Core trivia game MVP with real-time play and polish tasks."
+tags: [area/game, type/feature, tech/websocket]
+priority: medium
+created: 2025-12-14
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
+
 # Trivia MVP
 
 > **NOTE:** Immediate polish and stability tasks (flicker refactor, AI assist) are currently tracked in **[Work Party Prep](./work-party-prep.md)**. Please refer to that file for the active prioritized list.
 
 ## Work Unit Summary
-
-**Status:** active (core complete, polish remaining)
 
 **Problem/Intent:**
 Build the first playable game on the Mindmeld platform. Players submit questions for each other, answer them, and see how well they know each other and the world. This establishes the core lobby/player infrastructure that future games will reuse.

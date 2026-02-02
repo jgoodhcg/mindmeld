@@ -1,6 +1,17 @@
+---
+title: "Codebase Refactor: Game Isolation"
+status: planned
+description: "Refactor to isolate game-specific logic and enable new games."
+tags: [area/backend, type/refactor]
+priority: high
+created: 2026-01-19
+updated: 2026-02-02
+effort: L
+depends-on: []
+---
+
 # Codebase Refactor: Game Isolation
 
-**Status:** Proposed
 **Goal:** Isolate "Trivia" specific logic into its own namespace/package to facilitate adding future game types (e.g., "Vector Golf", "Imposter").
 
 ## Motivation

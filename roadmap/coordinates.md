@@ -1,8 +1,18 @@
+---
+title: "Coordinates"
+status: idea
+description: "2D social alignment game mapping group opinions on prompts."
+tags: [area/game, type/feature]
+priority: low
+created: 2026-01-11
+updated: 2026-02-02
+effort: M
+depends-on: []
+---
+
 # Coordinates
 
 ## Work Unit Summary
-
-**Status:** idea
 
 **Problem/Intent:**
 Build a "social alignment" game that uses a 2D coordinate system to map the group's mental models on complex topics. Unlike linear spectrum games, this allows for nuance (e.g., something can be "Smart" but "Evil"). The screen acts as the map, players plot their position, and the fun comes from seeing the "Cluster" vs. the "Outlier."
