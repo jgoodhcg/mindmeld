@@ -1,11 +1,11 @@
 ---
 title: "Codebase Map / Auto-Generated Documentation"
-status: idea
+status: draft
 description: "Auto-generated documentation to map routes, events, and schema."
 tags: [area/docs, type/tooling]
 priority: low
 created: 2026-01-19
-updated: 2026-02-02
+updated: 2026-02-07
 effort: S
 depends-on: []
 ---

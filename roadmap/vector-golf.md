@@ -1,11 +1,11 @@
 ---
 title: "Vector Golf (Working Title)"
-status: planned
+status: draft
 description: "Daily semantic golf game using word embeddings and pgvector."
 tags: [area/game, type/feature, tech/pgvector]
 priority: low
 created: 2026-01-19
-updated: 2026-02-02
+updated: 2026-02-07
 effort: L
 depends-on: []
 ---

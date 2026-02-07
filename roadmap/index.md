@@ -31,14 +31,15 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [work-party-prep.md](./work-party-prep.md) - Launch readiness polish and stability
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
 
-### Planned
-- [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
+### Ready
 - [game-isolation-refactor.md](./game-isolation-refactor.md) - Isolate game logic for future games
+
+### Draft
+- [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
 - [security.md](./security.md) - App security hardening
 - [chronology.md](./chronology.md) - Daily timeline sorting game
 - [vector-golf.md](./vector-golf.md) - Semantic golf daily game
 
-### Ideas
 - [visual-redesign.md](./visual-redesign.md) - 1970s cerebral sci-fi UI theme
 - [question-system.md](./question-system.md) - Question types, pools, AI generation
 - [analytics.md](./analytics.md) - Gameplay analytics + stats

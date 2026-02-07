@@ -1,11 +1,11 @@
 ---
 title: "Visual Redesign: 1970s Cerebral Sci-Fi"
-status: idea
+status: draft
 description: "Redesign the UI to a 1970s cerebral sci-fi visual system."
 tags: [area/frontend, type/design]
 priority: low
 created: 2026-01-16
-updated: 2026-02-02
+updated: 2026-02-07
 effort: L
 depends-on: []
 ---

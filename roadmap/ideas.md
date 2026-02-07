@@ -1,11 +1,11 @@
 ---
 title: "Idea Backlog"
-status: idea
+status: draft
 description: "Raw game concepts awaiting promotion to work units."
 tags: [area/product, type/idea]
 priority: low
 created: 2026-01-11
-updated: 2026-02-02
+updated: 2026-02-07
 effort: XS
 depends-on: []
 ---

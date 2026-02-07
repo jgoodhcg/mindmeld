@@ -1,11 +1,11 @@
 ---
 title: "Coordinates"
-status: idea
+status: draft
 description: "2D social alignment game mapping group opinions on prompts."
 tags: [area/game, type/feature]
 priority: low
 created: 2026-01-11
-updated: 2026-02-02
+updated: 2026-02-07
 effort: M
 depends-on: []
 ---

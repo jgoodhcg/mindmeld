@@ -1,11 +1,11 @@
 ---
 title: "Chronology (Timeline Game)"
-status: planned
+status: draft
 description: "Daily timeline sorting game using historical events."
 tags: [area/game, type/feature]
 priority: low
 created: 2026-01-19
-updated: 2026-02-02
+updated: 2026-02-07
 effort: L
 depends-on: []
 ---

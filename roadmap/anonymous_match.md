@@ -1,11 +1,11 @@
 ---
 title: "Anonymous Match"
-status: idea
+status: draft
 description: "Social game where players match anonymous responses to authors."
 tags: [area/game, type/feature]
 priority: low
 created: 2026-01-11
-updated: 2026-02-02
+updated: 2026-02-07
 effort: M
 depends-on: []
 ---

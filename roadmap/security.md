@@ -1,11 +1,11 @@
 ---
 title: "Application Security Hardening"
-status: planned
+status: draft
 description: "Harden headers, CSP, CSRF, and WebSocket authorization."
 tags: [area/backend, type/security]
 priority: medium
 created: 2026-01-05
-updated: 2026-02-02
+updated: 2026-02-07
 effort: M
 depends-on: []
 ---

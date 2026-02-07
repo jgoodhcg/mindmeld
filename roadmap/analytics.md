@@ -1,11 +1,11 @@
 ---
 title: "Analytics System"
-status: idea
+status: draft
 description: "Add lightweight analytics and game stats with Plausible and Postgres."
 tags: [area/backend, type/feature, tech/analytics]
 priority: low
 created: 2026-01-10
-updated: 2026-02-02
+updated: 2026-02-07
 effort: M
 depends-on: []
 ---

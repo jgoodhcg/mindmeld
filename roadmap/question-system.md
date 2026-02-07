@@ -1,11 +1,11 @@
 ---
 title: "Question System Enhancements"
-status: idea
+status: draft
 description: "Expand question types, pools, and AI-assisted creation for trivia."
 tags: [area/game, type/feature, tech/ai]
 priority: medium
 created: 2026-01-19
-updated: 2026-02-02
+updated: 2026-02-07
 effort: L
 depends-on: []
 ---

@@ -1,11 +1,11 @@
 ---
 title: "Infrastructure & Scaling"
-status: idea
+status: draft
 description: "Scale WebSocket and event infrastructure beyond a single server."
 tags: [area/backend, type/infra]
 priority: low
 created: 2026-01-30
-updated: 2026-02-02
+updated: 2026-02-07
 effort: L
 depends-on: []
 ---

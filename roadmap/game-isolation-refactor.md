@@ -1,11 +1,11 @@
 ---
 title: "Codebase Refactor: Game Isolation"
-status: planned
+status: ready
 description: "Refactor to isolate game-specific logic and enable new games."
 tags: [area/backend, type/refactor]
 priority: high
 created: 2026-01-19
-updated: 2026-02-02
+updated: 2026-02-07
 effort: L
 depends-on: []
 ---
@@ -13,6 +13,38 @@ depends-on: []
 # Codebase Refactor: Game Isolation
 
 **Goal:** Isolate "Trivia" specific logic into its own namespace/package to facilitate adding future game types (e.g., "Vector Golf", "Imposter").
+
+## Intent
+
+Decouple Trivia-specific handlers, models, and runtime behavior from generic server and lobby code so new game types can be added without increasing conditional complexity in shared paths.
+
+## Specification
+
+- Introduce an `internal/games/trivia` package boundary for trivia game logic.
+- Keep core server responsibilities in `internal/server` (auth/session/lobby plumbing).
+- Extract a game interface the server can delegate to for lifecycle/actions/state.
+- Refactor routing/handler wiring so game-specific code is not concentrated in shared handlers.
+- Preserve current Trivia behavior while isolating responsibilities.
+
+## Validation
+
+- [ ] `make fmt`
+- [ ] `make lint`
+- [ ] `go build -o bin/server ./cmd/server`
+- [ ] Run targeted gameplay verification for Trivia flows after refactor (E2E if UI/flow changes)
+
+## Scope
+
+- Includes code organization and interface boundaries for existing Trivia logic.
+- Excludes building a second game implementation in this work unit.
+- Excludes unrelated feature work or gameplay changes.
+
+## Context
+
+- `internal/server/handlers_game.go`
+- `internal/server/routes.go`
+- `internal/server/handlers_ws.go`
+- Trivia-related models/events currently under `internal/server` and generated DB access in `internal/db`
 
 ## Motivation
 Currently, game logic (handlers, models, events) is intermingled in `internal/server` and the global `db` package. Adding a second game type would clutter `handlers_game.go` and potentially require complex switch statements or tight coupling.

@@ -1,6 +1,6 @@
 ---
 title: "Multi-Agent Local Environment Isolation"
-status: planned
+status: draft
 description: "Run many local Mindmeld instances in parallel with isolated state and Postgres-faithful behavior."
 tags: [area/devex, area/backend, type/infra, tech/postgres]
 priority: high

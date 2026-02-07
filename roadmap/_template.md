@@ -1,33 +1,38 @@
 ---
 title: "Work Unit Title"
-status: idea
-description: "One-line summary of what this accomplishes."
-tags: []
-priority: medium
+status: draft | ready | active | done | dropped
+description: "One line"
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-effort: M
-depends-on: []
+tags: []
+priority: high | medium | low
 ---
 
 # Work Unit Title
 
-## Problem / Intent
+## Intent
 
-[Why this exists. What problem it solves.]
+[What this accomplishes and why it matters.]
 
-## Constraints
+## Specification
 
-[Hard requirements or limitations.]
+[Concrete description of the change. What exists after this is done.]
 
-## Proposed Approach
+## Validation
 
-[High-level solution direction.]
+[How to know it's done:]
+- [ ] Tests to create/pass
+- [ ] E2E flows to run
+- [ ] Visual criteria (reference style guide if applicable)
 
-## Open Questions
+## Scope
 
-[Unresolved decisions or unknowns.]
+[What's not included. Boundaries to prevent drift.]
 
-## Notes
+## Context
 
-[Design details, context, implementation notes as work progresses.]
+[Pointers to relevant files, prior decisions, or constraints.]
+
+## Open Questions (draft only)
+
+[Unresolved items. Clear this section before moving to ready.]
