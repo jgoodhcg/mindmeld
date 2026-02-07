@@ -248,6 +248,70 @@ async function main() {
     const trophyCount = await hostPage.locator('text=🏆').count();
     console.log(`  ✓ Trophy emoji visible: ${trophyCount > 0} (count: ${trophyCount})`);
 
+    // ========== PHASE 8: Play Again ==========
+    console.log('\n--- Phase 8: Play Again ---');
+
+    const playAgainButton = hostPage.locator('button:has-text("PLAY AGAIN")');
+    const playAgainVisible = await playAgainButton.isVisible({ timeout: 2000 }).catch(() => false);
+    console.log(`  ✓ "PLAY AGAIN" button visible (host): ${playAgainVisible}`);
+
+    if (playAgainVisible) {
+      await playAgainButton.click();
+      await hostPage.waitForLoadState('networkidle');
+
+      // Wait for WebSocket to update player page
+      await hostPage.waitForTimeout(1500);
+      await playerPage.waitForTimeout(1500);
+
+      await capture(hostPage, 'host', 'round2-submit-form');
+      await capture(playerPage, 'player', 'round2-submit-form');
+
+      // KEY VALIDATION: Both players should see "ROUND 2" in the submission form
+      const hostRound2 = await hostPage.locator('text=ROUND 2').isVisible();
+      const playerRound2 = await playerPage.locator('text=ROUND 2').isVisible();
+      console.log(`  ✓ "ROUND 2" visible (host): ${hostRound2}`);
+      console.log(`  ✓ "ROUND 2" visible (player): ${playerRound2}`);
+
+      // KEY VALIDATION: Both should see the question submission form
+      const hostSubmitForm = await hostPage.locator('textarea[name="question_text"]').isVisible();
+      const playerSubmitForm = await playerPage.locator('textarea[name="question_text"]').isVisible();
+      console.log(`  ✓ Question form visible (host): ${hostSubmitForm}`);
+      console.log(`  ✓ Question form visible (player): ${playerSubmitForm}`);
+
+      // Both submit questions for Round 2
+      await hostPage.fill('textarea[name="question_text"]', 'What is the largest planet?');
+      await hostPage.fill('input[name="correct_answer"]', 'Jupiter');
+      await hostPage.fill('input[name="wrong_answer_1"]', 'Saturn');
+      await hostPage.fill('input[name="wrong_answer_2"]', 'Neptune');
+      await hostPage.fill('input[name="wrong_answer_3"]', 'Mars');
+      await hostPage.click('button:has-text("SUBMIT QUESTION")');
+      await hostPage.waitForLoadState('networkidle');
+      console.log('  Host submitted Round 2 question');
+
+      await capture(hostPage, 'host', 'round2-question-submitted');
+
+      await playerPage.fill('textarea[name="question_text"]', 'What is the speed of light?');
+      await playerPage.fill('input[name="correct_answer"]', '299,792 km/s');
+      await playerPage.fill('input[name="wrong_answer_1"]', '150,000 km/s');
+      await playerPage.fill('input[name="wrong_answer_2"]', '500,000 km/s');
+      await playerPage.fill('input[name="wrong_answer_3"]', '1,000,000 km/s');
+      await playerPage.click('button:has-text("SUBMIT QUESTION")');
+      await playerPage.waitForLoadState('networkidle');
+      console.log('  Player submitted Round 2 question');
+
+      await capture(playerPage, 'player', 'round2-question-submitted');
+
+      // Verify host can start Round 2
+      await hostPage.waitForTimeout(1000);
+      const startRound2Button = hostPage.locator('button:has-text("START ROUND")');
+      const startRound2Visible = await startRound2Button.isVisible({ timeout: 2000 }).catch(() => false);
+      console.log(`  ✓ "START ROUND" button visible for Round 2 (host): ${startRound2Visible}`);
+
+      await capture(hostPage, 'host', 'round2-ready-to-start');
+    } else {
+      console.log('  ⚠ PLAY AGAIN button not found - skipping Phase 8');
+    }
+
     console.log('\n=== Flow Complete ===');
     console.log(`Screenshots saved to: ${SCREENSHOTS_DIR}`);
     console.log(`Total screenshots: ${screenshotIndex}`);
