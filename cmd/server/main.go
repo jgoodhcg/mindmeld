@@ -14,7 +14,6 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/jgoodhcg/mindmeld/internal/assets"
-	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/server"
 	"github.com/jgoodhcg/mindmeld/templates"
 )

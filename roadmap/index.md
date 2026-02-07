@@ -32,6 +32,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
 
 ### Planned
+- [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
 - [game-isolation-refactor.md](./game-isolation-refactor.md) - Isolate game logic for future games
 - [security.md](./security.md) - App security hardening
 - [chronology.md](./chronology.md) - Daily timeline sorting game

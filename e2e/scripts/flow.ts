@@ -8,6 +8,7 @@
  *   npm run flow                     # Run default flow (create lobby)
  *   npm run flow -- join ABC123      # Run join lobby flow
  *   npm run flow -- trivia ABC123    # Run trivia game flow
+ *   npm run flow -- templates        # Open templates modal flow
  */
 
 import { chromium, Page } from '@playwright/test';
@@ -32,7 +33,7 @@ async function createLobbyFlow(page: Page) {
   flowName = 'create-lobby';
   console.log('\n=== Create Lobby Flow ===\n');
 
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/trivia`, { waitUntil: 'networkidle' });
   await capture(page, 'homepage');
 
   // Look for create lobby button/link
@@ -107,6 +108,64 @@ async function triviaFlow(page: Page, lobbyCode: string) {
   console.log(`\nFinal URL: ${page.url()}`);
 }
 
+async function templatesFlow(page: Page) {
+  flowName = 'templates';
+  console.log('\n=== Templates Modal Flow ===\n');
+
+  await page.goto(`${BASE_URL}/trivia`, { waitUntil: 'networkidle' });
+  await capture(page, 'homepage');
+
+  const createForm = page.locator('form[action="/lobbies"]').first();
+  if (!(await createForm.isVisible())) {
+    const triviaLink = page.locator('a[href="/trivia"], a:has-text("TRIVIA")').first();
+    if (await triviaLink.isVisible()) {
+      await triviaLink.click();
+      await page.waitForLoadState('networkidle');
+    }
+  }
+  await createForm.waitFor({ state: 'visible', timeout: 5000 });
+
+  await createForm.locator('input[name="name"]').fill('Template Session');
+  await createForm.locator('input[name="nickname"]').fill('TemplateHost');
+  await capture(page, 'create-form-filled');
+
+  const createSubmit = createForm.locator('button[type="submit"]').first();
+  await Promise.all([
+    page.waitForURL(/\/lobbies\//, { timeout: 10000 }),
+    createSubmit.click(),
+  ]);
+  await capture(page, 'lobby-created');
+
+  const startButton = page.locator('button', { hasText: 'START GAME' }).first();
+  if (await startButton.isVisible()) {
+    await Promise.all([
+      page.waitForLoadState('networkidle'),
+      startButton.click(),
+    ]);
+  }
+
+  const submitForm = page.locator('form[action$="/questions"]').first();
+  await submitForm.waitFor({ state: 'visible', timeout: 10000 });
+
+  const templatesButton = page.locator('button', { hasText: 'Need help? Use a template' }).first();
+  await templatesButton.click();
+
+  const templatesModal = page.locator('#templates-modal');
+  await templatesModal.waitFor({ state: 'visible', timeout: 5000 });
+  await page.locator('#templates-content').waitFor({ state: 'visible', timeout: 10000 });
+
+  const categoryHeaders = await page.locator('#templates-content h3').allTextContents();
+  if (categoryHeaders.length > 0) {
+    console.log(`  Categories: ${categoryHeaders.join(' | ')}`);
+  }
+
+  const namePlaceholderCount = await page.locator('#templates-content button p', { hasText: '[my name]' }).count();
+  console.log(`  "[my name]" placeholders: ${namePlaceholderCount}`);
+
+  await capture(page, 'templates-modal');
+  console.log(`\nFinal URL: ${page.url()}`);
+}
+
 async function main() {
   await mkdir(SCREENSHOTS_DIR, { recursive: true });
 
@@ -130,9 +189,12 @@ async function main() {
         if (!param) throw new Error('trivia requires a lobby code');
         await triviaFlow(page, param);
         break;
+      case 'templates':
+        await templatesFlow(page);
+        break;
       default:
         console.error(`Unknown flow: ${command}`);
-        console.error('Available: create, join <code>, trivia <code>');
+        console.error('Available: create, join <code>, trivia <code>, templates');
         process.exit(1);
     }
   } catch (e) {

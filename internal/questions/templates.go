@@ -18,7 +18,7 @@ const (
 	CategoryScience     = "Science & Nature"
 	CategoryGeography   = "Geography"
 	CategoryPersonal    = "Personal"
-	CategoryPreferences = "Preferences"
+	CategoryPreferences = "About Me"
 )
 
 // AllTemplates contains all available question templates
@@ -251,7 +251,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "personal-001",
 		Category:      CategoryPersonal,
-		QuestionText:  "What is my favorite movie of all time?",
+		QuestionText:  "What is [my name]'s favorite movie of all time?",
 		CorrectAnswer: "[Your favorite movie]",
 		WrongAnswer1:  "[Wrong option 1]",
 		WrongAnswer2:  "[Wrong option 2]",
@@ -260,7 +260,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "personal-002",
 		Category:      CategoryPersonal,
-		QuestionText:  "What city was I born in?",
+		QuestionText:  "What city was [my name] born in?",
 		CorrectAnswer: "[Your birth city]",
 		WrongAnswer1:  "[Wrong city 1]",
 		WrongAnswer2:  "[Wrong city 2]",
@@ -269,7 +269,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "personal-003",
 		Category:      CategoryPersonal,
-		QuestionText:  "How many siblings do I have?",
+		QuestionText:  "How many siblings does [my name] have?",
 		CorrectAnswer: "[Your answer]",
 		WrongAnswer1:  "[Wrong number 1]",
 		WrongAnswer2:  "[Wrong number 2]",
@@ -278,7 +278,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "personal-004",
 		Category:      CategoryPersonal,
-		QuestionText:  "What was my first job?",
+		QuestionText:  "What was [my name]'s first job?",
 		CorrectAnswer: "[Your first job]",
 		WrongAnswer1:  "[Wrong job 1]",
 		WrongAnswer2:  "[Wrong job 2]",
@@ -287,7 +287,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "personal-005",
 		Category:      CategoryPersonal,
-		QuestionText:  "What is my dream vacation destination?",
+		QuestionText:  "What is [my name]'s dream vacation destination?",
 		CorrectAnswer: "[Your dream destination]",
 		WrongAnswer1:  "[Wrong destination 1]",
 		WrongAnswer2:  "[Wrong destination 2]",
@@ -296,18 +296,18 @@ var AllTemplates = []Template{
 	{
 		ID:            "personal-006",
 		Category:      CategoryPersonal,
-		QuestionText:  "What is my hidden talent?",
+		QuestionText:  "What is [my name]'s hidden talent?",
 		CorrectAnswer: "[Your hidden talent]",
 		WrongAnswer1:  "[Wrong talent 1]",
 		WrongAnswer2:  "[Wrong talent 2]",
 		WrongAnswer3:  "[Wrong talent 3]",
 	},
 
-	// Preferences
+	// About Me
 	{
 		ID:            "pref-001",
 		Category:      CategoryPreferences,
-		QuestionText:  "What is my favorite cuisine?",
+		QuestionText:  "What is [my name]'s favorite cuisine?",
 		CorrectAnswer: "[Your favorite cuisine]",
 		WrongAnswer1:  "[Wrong cuisine 1]",
 		WrongAnswer2:  "[Wrong cuisine 2]",
@@ -316,7 +316,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "pref-002",
 		Category:      CategoryPreferences,
-		QuestionText:  "What is my go-to comfort food?",
+		QuestionText:  "What is [my name]'s go-to comfort food?",
 		CorrectAnswer: "[Your comfort food]",
 		WrongAnswer1:  "[Wrong food 1]",
 		WrongAnswer2:  "[Wrong food 2]",
@@ -325,7 +325,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "pref-003",
 		Category:      CategoryPreferences,
-		QuestionText:  "What music genre do I listen to most?",
+		QuestionText:  "What music genre does [my name] listen to most?",
 		CorrectAnswer: "[Your favorite genre]",
 		WrongAnswer1:  "[Wrong genre 1]",
 		WrongAnswer2:  "[Wrong genre 2]",
@@ -334,7 +334,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "pref-004",
 		Category:      CategoryPreferences,
-		QuestionText:  "What is my favorite season?",
+		QuestionText:  "What is [my name]'s favorite season?",
 		CorrectAnswer: "[Your favorite season]",
 		WrongAnswer1:  "[Wrong season 1]",
 		WrongAnswer2:  "[Wrong season 2]",
@@ -343,7 +343,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "pref-005",
 		Category:      CategoryPreferences,
-		QuestionText:  "Am I a morning person or night owl?",
+		QuestionText:  "Is [my name] a morning person or night owl?",
 		CorrectAnswer: "[Morning person/Night owl]",
 		WrongAnswer1:  "[The opposite]",
 		WrongAnswer2:  "Neither",
@@ -352,7 +352,7 @@ var AllTemplates = []Template{
 	{
 		ID:            "pref-006",
 		Category:      CategoryPreferences,
-		QuestionText:  "What is my favorite holiday?",
+		QuestionText:  "What is [my name]'s favorite holiday?",
 		CorrectAnswer: "[Your favorite holiday]",
 		WrongAnswer1:  "[Wrong holiday 1]",
 		WrongAnswer2:  "[Wrong holiday 2]",
@@ -389,12 +389,12 @@ func GetAvailableTemplates(usedIDs []string) []Template {
 // GetCategories returns all unique categories
 func GetCategories() []string {
 	return []string{
+		CategoryPreferences,
+		CategoryPersonal,
 		CategoryPopCulture,
 		CategoryHistory,
 		CategoryScience,
 		CategoryGeography,
-		CategoryPersonal,
-		CategoryPreferences,
 	}
 }
 
