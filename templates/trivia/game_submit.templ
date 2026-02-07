@@ -1,4 +1,4 @@
-package templates
+package trivia
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 			</div>
 			<p class="text-text-muted text-sm">Write a question to challenge the group</p>
 		</div>
-		<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/questions") } method="POST" class="space-y-5">
+		<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/questions") } method="POST" class="space-y-5">
 			<input type="hidden" name="template_id" id="template_id" value=""/>
 			<div>
 				<label class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">Question</label>
@@ -107,7 +107,7 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 			</div>
 			<div
 				id="templates-container"
-				hx-get={ "/lobbies/" + lobby.Code + "/question-templates" }
+				hx-get={ "/lobbies/" + lobby.Code + "/trivia/question-templates" }
 				hx-trigger="load"
 				hx-swap="innerHTML"
 			>

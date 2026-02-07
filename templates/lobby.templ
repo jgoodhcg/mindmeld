@@ -1,11 +1,8 @@
 package templates
 
-import (
-	"github.com/jgoodhcg/mindmeld/internal/db"
-	"github.com/jgoodhcg/mindmeld/internal/events"
-)
+import "github.com/jgoodhcg/mindmeld/internal/db"
 
-templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, roundScoreboard []db.GetRoundScoreboardRow, distribution []events.AnswerStat, totalAnswers int) {
+templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, isHost bool, gameContent templ.Component) {
 	@Layout("Trivia - " + lobby.Name) {
 		<div class="max-w-4xl mx-auto space-y-6">
 			<!-- Platform brand -->
@@ -33,30 +30,11 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.
 				</div>
 			</div>
 			<!-- Game content area - updates via WebSocket OOB swap -->
-			@GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers)
+			@gameContent
 			<div id="game-updater" class="hidden"></div>
 			<div hx-ext="ws" ws-connect={ "/lobbies/" + lobby.Code + "/ws" } class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 				<!-- Players List (updates via WebSocket) -->
 				@PlayerList(players, false)
-				<!-- Game Info / Actions -->
-				<div class="bg-elevated border border-border rounded p-5 sm:p-6">
-					if lobby.Phase == "waiting" {
-						<div class="space-y-4">
-							<div class="text-center py-6">
-								<p class="text-text-muted">Waiting for players to join...</p>
-							</div>
-							if isHost {
-								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/start") } method="POST">
-									<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">
-										START GAME
-									</button>
-								</form>
-							} else {
-								<p class="text-center text-text-muted py-4">Waiting for host to start...</p>
-							}
-						</div>
-					}
-				</div>
 			</div>
 		</div>
 	}

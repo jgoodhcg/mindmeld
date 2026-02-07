@@ -40,6 +40,7 @@ templ Home(totalLobbies int64, totalAnswers int64, totalRounds int64, liveLobbie
 			<section class="bg-elevated border border-border rounded p-6 sm:p-8">
 				<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-6">Initialize Session</h2>
 				<form action="/lobbies" method="POST" class="space-y-4">
+					<input type="hidden" name="game_type" value="trivia"/>
 					<input
 						type="text"
 						name="name"

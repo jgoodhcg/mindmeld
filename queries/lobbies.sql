@@ -1,6 +1,6 @@
 -- name: CreateLobby :one
-INSERT INTO lobbies (code, name)
-VALUES ($1, $2)
+INSERT INTO lobbies (code, name, game_type)
+VALUES ($1, $2, $3)
 RETURNING *;
 
 -- name: GetLobbyByCode :one

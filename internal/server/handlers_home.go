@@ -9,7 +9,17 @@ import (
 )
 
 func (s *Server) handlePlatform(w http.ResponseWriter, r *http.Request) {
-	templates.Platform().Render(r.Context(), w)
+	allInfo := s.games.AllInfo()
+	gameInfos := make([]templates.PlatformGameInfo, len(allInfo))
+	for i, g := range allInfo {
+		gameInfos[i] = templates.PlatformGameInfo{
+			Slug:        g.Slug,
+			Name:        g.Name,
+			Description: g.Description,
+			Ready:       g.Ready,
+		}
+	}
+	templates.Platform(gameInfos).Render(r.Context(), w)
 }
 
 func (s *Server) handleTriviaHome(w http.ResponseWriter, r *http.Request) {

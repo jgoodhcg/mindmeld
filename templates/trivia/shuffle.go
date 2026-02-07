@@ -1,4 +1,4 @@
-package templates
+package trivia
 
 import (
 	"encoding/binary"

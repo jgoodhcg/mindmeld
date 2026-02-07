@@ -1,4 +1,4 @@
-package templates
+package trivia
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool, 
 			</div>
 		} else {
 			{{ shuffled := ShuffleAnswers(question) }}
-			<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/answers") } method="POST" class="space-y-3">
+			<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/answers") } method="POST" class="space-y-3">
 				<input type="hidden" name="question_id" value={ fmt.Sprintf("%x", question.ID.Bytes) }/>
 				for _, ans := range shuffled {
 					<button type="submit" name="answer" value={ ans.Value } class="w-full bg-base hover:bg-cyan hover:text-base p-4 sm:p-5 rounded text-left transition-colors border border-border hover:border-cyan group">

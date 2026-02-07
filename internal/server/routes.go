@@ -3,7 +3,9 @@ package server
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jgoodhcg/mindmeld/internal/games"
 )
 
 func (s *Server) routes() {
@@ -27,14 +29,13 @@ func (s *Server) routes() {
 	// WebSocket for real-time updates
 	s.router.Get("/lobbies/{code}/ws", s.handleWebSocket)
 
-	// Game actions
-	s.router.Post("/lobbies/{code}/start", s.handleStartGame)
-	s.router.Get("/lobbies/{code}/question-templates", s.handleGetQuestionTemplates)
-	s.router.Post("/lobbies/{code}/questions", s.handleSubmitQuestion)
-	s.router.Post("/lobbies/{code}/advance", s.handleAdvanceRound)
-	s.router.Post("/lobbies/{code}/next-question", s.handleNextQuestion)
-	s.router.Post("/lobbies/{code}/play-again", s.handlePlayAgain)
-	s.router.Post("/lobbies/{code}/answers", s.handleSubmitAnswer)
+	// Dynamic game routes: /lobbies/{code}/{game_slug}/...
+	s.games.Each(func(_ string, game games.Game) {
+		slug := game.Info().Slug
+		s.router.Route("/lobbies/{code}/"+slug, func(r chi.Router) {
+			game.RegisterRoutes(r)
+		})
+	})
 
 	// Health check
 	s.router.Get("/health", func(w http.ResponseWriter, r *http.Request) {

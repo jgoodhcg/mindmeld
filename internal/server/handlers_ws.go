@@ -6,6 +6,7 @@ import (
 
 	"github.com/coder/websocket"
 	"github.com/go-chi/chi/v5"
+	"github.com/jgoodhcg/mindmeld/internal/auth"
 )
 
 // handleWebSocket upgrades the HTTP connection to a WebSocket
@@ -21,7 +22,7 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the player from context (set by middleware)
-	player := GetPlayer(r.Context())
+	player := auth.GetPlayer(r.Context())
 	if !player.ID.Valid {
 		http.Error(w, "Player identity required", http.StatusUnauthorized)
 		return

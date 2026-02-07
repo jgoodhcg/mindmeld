@@ -1,9 +1,9 @@
-package templates
+package trivia
 
 import "github.com/jgoodhcg/mindmeld/internal/questions"
 
 // QuestionTemplatesModal renders the modal content with available templates grouped by category.
-// This is returned by the /lobbies/{code}/question-templates endpoint.
+// This is returned by the /lobbies/{code}/trivia/question-templates endpoint.
 templ QuestionTemplatesModal(grouped map[string][]questions.Template, categories []string) {
 	<div id="templates-content">
 		if len(grouped) == 0 {

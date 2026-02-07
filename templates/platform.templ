@@ -1,6 +1,14 @@
 package templates
 
-templ Platform() {
+// PlatformGameInfo describes a game for display on the platform page.
+type PlatformGameInfo struct {
+	Slug        string
+	Name        string
+	Description string
+	Ready       bool
+}
+
+templ Platform(gameInfos []PlatformGameInfo) {
 	@Layout("Mindmeld") {
 		<div class="max-w-2xl mx-auto space-y-12 py-12 sm:py-20">
 			<!-- Platform header -->
@@ -16,46 +24,29 @@ templ Platform() {
 			<section class="space-y-6">
 				<h2 class="font-mono text-xs tracking-widest uppercase text-text-muted text-center">Select Protocol</h2>
 				<div class="grid gap-4">
-					<!-- Trivia - Active -->
-					<a href="/trivia" class="block bg-elevated border border-border hover:border-cyan rounded p-6 transition-colors group">
-						<div class="flex items-center justify-between">
-							<div>
-								<h3 class="font-mono text-xl font-bold text-text group-hover:text-cyan transition-colors">TRIVIA</h3>
-								<p class="text-text-muted text-sm mt-1">Questions from minds you know</p>
+					for _, g := range gameInfos {
+						if g.Ready {
+							<a href={ templ.SafeURL("/" + g.Slug) } class="block bg-elevated border border-border hover:border-cyan rounded p-6 transition-colors group">
+								<div class="flex items-center justify-between">
+									<div>
+										<h3 class="font-mono text-xl font-bold text-text group-hover:text-cyan transition-colors">{ g.Name }</h3>
+										<p class="text-text-muted text-sm mt-1">{ g.Description }</p>
+									</div>
+									<div class="text-cyan font-mono text-xs tracking-wide">READY</div>
+								</div>
+							</a>
+						} else {
+							<div class="block bg-elevated border border-border rounded p-6 opacity-40 cursor-not-allowed">
+								<div class="flex items-center justify-between">
+									<div>
+										<h3 class="font-mono text-xl font-bold text-text">{ g.Name }</h3>
+										<p class="text-text-muted text-sm mt-1">{ g.Description }</p>
+									</div>
+									<div class="text-text-muted font-mono text-xs tracking-wide">PENDING</div>
+								</div>
 							</div>
-							<div class="text-cyan font-mono text-xs tracking-wide">READY</div>
-						</div>
-					</a>
-					<!-- Wavelength - Coming Soon -->
-					<div class="block bg-elevated border border-border rounded p-6 opacity-40 cursor-not-allowed">
-						<div class="flex items-center justify-between">
-							<div>
-								<h3 class="font-mono text-xl font-bold text-text">WAVELENGTH</h3>
-								<p class="text-text-muted text-sm mt-1">Find the spectrum between extremes</p>
-							</div>
-							<div class="text-text-muted font-mono text-xs tracking-wide">PENDING</div>
-						</div>
-					</div>
-					<!-- Sync - Coming Soon -->
-					<div class="block bg-elevated border border-border rounded p-6 opacity-40 cursor-not-allowed">
-						<div class="flex items-center justify-between">
-							<div>
-								<h3 class="font-mono text-xl font-bold text-text">SYNC</h3>
-								<p class="text-text-muted text-sm mt-1">Answer simultaneously, match to score</p>
-							</div>
-							<div class="text-text-muted font-mono text-xs tracking-wide">PENDING</div>
-						</div>
-					</div>
-					<!-- Cipher - Coming Soon -->
-					<div class="block bg-elevated border border-border rounded p-6 opacity-40 cursor-not-allowed">
-						<div class="flex items-center justify-between">
-							<div>
-								<h3 class="font-mono text-xl font-bold text-text">CIPHER</h3>
-								<p class="text-text-muted text-sm mt-1">One word clues, shared understanding</p>
-							</div>
-							<div class="text-text-muted font-mono text-xs tracking-wide">PENDING</div>
-						</div>
-					</div>
+						}
+					}
 				</div>
 			</section>
 		</div>

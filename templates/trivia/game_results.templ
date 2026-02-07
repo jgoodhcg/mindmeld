@@ -1,4 +1,4 @@
-package templates
+package trivia
 
 import (
 	"fmt"
@@ -59,7 +59,7 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 		</div>
 		<div class="h-24 flex items-center justify-center">
 			if isHost && isRevealed {
-				<form action={ templ.SafeURL("/lobbies/" + lobbyCode + "/next-question") } method="POST">
+				<form action={ templ.SafeURL("/lobbies/" + lobbyCode + "/trivia/next-question") } method="POST">
 					<button type="submit" class="bg-amber hover:bg-amber/80 text-base px-10 py-4 rounded font-mono font-bold tracking-wide transition-all transform hover:scale-105 shadow-lg">
 						NEXT QUESTION →
 					</button>

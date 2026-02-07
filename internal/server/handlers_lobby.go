@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jgoodhcg/mindmeld/internal/auth"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/templates"
@@ -20,19 +20,25 @@ func (s *Server) handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 
 	lobbyName := strings.TrimSpace(r.FormValue("name"))
 	nickname := strings.TrimSpace(r.FormValue("nickname"))
+	gameType := strings.TrimSpace(r.FormValue("game_type"))
 
 	if lobbyName == "" || nickname == "" {
 		http.Error(w, "Lobby name and nickname are required", http.StatusBadRequest)
 		return
 	}
 
-	player := GetPlayer(r.Context())
+	if gameType == "" {
+		gameType = "trivia"
+	}
+
+	player := auth.GetPlayer(r.Context())
 	code := generateCode()
 
 	// Create Lobby
 	lobby, err := s.queries.CreateLobby(r.Context(), db.CreateLobbyParams{
-		Code: code,
-		Name: lobbyName,
+		Code:     code,
+		Name:     lobbyName,
+		GameType: gameType,
 	})
 	if err != nil {
 		log.Printf("Error creating lobby: %v", err)
@@ -68,7 +74,7 @@ func (s *Server) handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
-	player := GetPlayer(r.Context())
+	player := auth.GetPlayer(r.Context())
 
 	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
 	if err != nil {
@@ -96,102 +102,16 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If Playing, get active round
-	var activeRound db.TriviaRound
-	var hasSubmitted bool
-	var currentQuestion db.TriviaQuestion
-	var questionActive bool
-	var isAuthor bool
-	var hasAnswered bool
-	var submittedCount int
-	var scoreboard []db.GetLobbyScoreboardRow
-	var roundScoreboard []db.GetRoundScoreboardRow
-	var distribution []events.AnswerStat
-	var totalAnswers int
-
-	if lobby.Phase == "playing" {
-		activeRound, err = s.queries.GetActiveRound(r.Context(), lobby.ID)
-		if err != nil {
-			log.Printf("Error fetching active round: %v", err)
-		} else {
-			if activeRound.Phase == "submitting" {
-				// ... (existing submitting logic) ...
-				// Check if player submitted AND count total submissions
-				questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
-				if err == nil {
-					submittedCount = len(questions)
-					for _, q := range questions {
-						if q.Author == player.ID {
-							hasSubmitted = true
-						}
-					}
-				}
-			} else if activeRound.Phase == "playing" {
-				// Use Explicit State
-				if activeRound.CurrentQuestionID.Valid {
-					// Get the current question
-					var qID pgtype.UUID = activeRound.CurrentQuestionID
-					questions, err := s.queries.GetQuestionsForRound(r.Context(), activeRound.ID)
-					if err == nil {
-						for _, q := range questions {
-							if q.ID == qID {
-								currentQuestion = q
-								questionActive = true
-								break
-							}
-						}
-					}
-
-					if questionActive {
-						// Check if Author
-						if currentQuestion.Author == player.ID {
-							isAuthor = true
-						}
-
-						// Check if Answered
-						answers, err := s.queries.GetAnswersForQuestion(r.Context(), currentQuestion.ID)
-						if err == nil {
-							totalAnswers = len(answers)
-							for _, a := range answers {
-								if a.PlayerID == player.ID {
-									hasAnswered = true
-								}
-								// Build Stats
-								found := false
-								for i, stat := range distribution {
-									if stat.Answer == a.SelectedAnswer {
-										distribution[i].Count++
-										found = true
-										break
-									}
-								}
-								if !found {
-									distribution = append(distribution, events.AnswerStat{
-										Answer: a.SelectedAnswer,
-										Count:  1,
-									})
-								}
-							}
-						}
-					}
-				}
-			} else if activeRound.Phase == "finished" {
-				// Cumulative Score
-				scoreboard, err = s.queries.GetLobbyScoreboard(r.Context(), lobby.ID)
-				if err != nil {
-					log.Printf("Error fetching scoreboard: %v", err)
-				}
-
-				// Round Score
-				roundScoreboard, err = s.queries.GetRoundScoreboard(r.Context(), activeRound.ID)
-				if err != nil {
-					log.Printf("Error fetching round scoreboard: %v", err)
-				}
-			}
-		}
+	// Look up game by lobby's game_type and render content
+	game, ok := s.games.Get(lobby.GameType)
+	if !ok {
+		log.Printf("Unknown game type: %s", lobby.GameType)
+		http.Error(w, "Unknown game type", http.StatusInternalServerError)
+		return
 	}
 
-	templates.LobbyRoom(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, participation.IsHost, scoreboard, roundScoreboard, distribution, totalAnswers).Render(r.Context(), w)
+	gameContent := game.RenderContent(r.Context(), lobby, players, player, participation.IsHost)
+	templates.LobbyRoom(lobby, players, participation.IsHost, gameContent).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {
@@ -209,7 +129,7 @@ func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	player := GetPlayer(r.Context())
+	player := auth.GetPlayer(r.Context())
 
 	// Add player to lobby
 	_, err = s.queries.AddPlayerToLobby(r.Context(), db.AddPlayerToLobbyParams{

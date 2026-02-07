@@ -1,0 +1,53 @@
+package trivia
+
+import (
+	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/events"
+)
+
+// GameContent renders the main game content area.
+// This partial is used both in the initial page render and for WebSocket updates.
+// The id="game-content" is required for HTMX WebSocket OOB swaps.
+templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, roundScoreboard []db.GetRoundScoreboardRow, distribution []events.AnswerStat, totalAnswers int) {
+	<div id="game-content">
+		if lobby.Phase == "waiting" {
+			<div class="bg-elevated border border-border rounded p-5 sm:p-6">
+				<div class="space-y-4">
+					<div class="text-center py-6">
+						<p class="text-text-muted">Waiting for players to join...</p>
+					</div>
+					if isHost {
+						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/start") } method="POST">
+							<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">
+								START GAME
+							</button>
+						</form>
+					} else {
+						<p class="text-center text-text-muted py-4">Waiting for host to start...</p>
+					}
+				</div>
+			</div>
+		} else if lobby.Phase == "playing" {
+			if activeRound.Phase == "submitting" {
+				if hasSubmitted {
+					<div class="bg-elevated border border-success rounded p-6 sm:p-8 text-center">
+						<h2 class="font-mono text-xl sm:text-2xl font-bold text-text mb-2">QUESTION SUBMITTED</h2>
+						@SubmitStatus(submittedCount, len(players), lobby.Code, isHost, false)
+					</div>
+				} else {
+					@SubmitQuestion(lobby, activeRound)
+				}
+			} else if activeRound.Phase == "playing" && questionActive {
+				if activeRound.QuestionState == "revealed" {
+					@QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, true, isHost)
+				} else if hasAnswered {
+					@QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, false, isHost)
+				} else {
+					@AnswerQuestion(lobby, currentQuestion, isAuthor, totalAnswers, len(players)-1)
+				}
+			} else if activeRound.Phase == "finished" {
+				@Scoreboard(scoreboard, roundScoreboard, lobby.Code, isHost)
+			}
+		}
+	</div>
+}

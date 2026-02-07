@@ -1,4 +1,4 @@
-package templates
+package trivia
 
 import (
 	"fmt"
@@ -138,7 +138,7 @@ templ Scoreboard(scores []db.GetLobbyScoreboardRow, roundScores []db.GetRoundSco
 		<!-- Actions -->
 		<div class="flex flex-col items-center gap-4">
 			if isHost {
-				<form action={ templ.SafeURL("/lobbies/" + lobbyCode + "/play-again") } method="POST" class="w-full max-w-md">
+				<form action={ templ.SafeURL("/lobbies/" + lobbyCode + "/trivia/play-again") } method="POST" class="w-full max-w-md">
 					<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base px-8 py-3 rounded font-mono font-bold tracking-wide transition-colors">
 						PLAY AGAIN
 					</button>

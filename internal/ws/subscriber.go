@@ -11,17 +11,30 @@ import (
 	"github.com/jgoodhcg/mindmeld/templates"
 )
 
+// GameHandler is the interface that game types implement for event handling.
+// This avoids an import cycle with the games package.
+type GameHandler interface {
+	HandleEvent(ctx context.Context, event events.Event, hub *Hub, queries *db.Queries) bool
+}
+
+// GameRegistry provides game lookup by slug.
+type GameRegistry interface {
+	GetHandler(gameType string) (GameHandler, bool)
+}
+
 // Subscriber listens to events and broadcasts updates to WebSocket clients.
 type Subscriber struct {
-	hub     *Hub
-	queries *db.Queries
+	hub      *Hub
+	queries  *db.Queries
+	registry GameRegistry
 }
 
 // NewSubscriber creates a new event subscriber.
-func NewSubscriber(hub *Hub, queries *db.Queries) *Subscriber {
+func NewSubscriber(hub *Hub, queries *db.Queries, registry GameRegistry) *Subscriber {
 	return &Subscriber{
-		hub:     hub,
-		queries: queries,
+		hub:      hub,
+		queries:  queries,
+		registry: registry,
 	}
 }
 
@@ -30,47 +43,47 @@ func (s *Subscriber) HandleEvent(ctx context.Context, event events.Event) {
 	switch event.Type {
 	case events.EventPlayerJoined, events.EventPlayerLeft:
 		s.broadcastPlayerList(ctx, event.LobbyCode)
-	case events.EventGameStarted:
-		s.broadcastGameStarted(ctx, event.LobbyCode, event.Payload.(events.GameStartedPayload))
-	case events.EventQuestionSubmitted:
-		s.broadcastQuestionSubmitted(ctx, event.LobbyCode, event.Payload.(events.QuestionSubmittedPayload))
-	case events.EventRoundAdvanced:
-		s.broadcastRoundAdvanced(ctx, event.LobbyCode, event.Payload.(events.RoundAdvancedPayload))
-	case events.EventQuestionRevealed:
-		s.broadcastQuestionRevealed(ctx, event.LobbyCode, event.Payload.(events.QuestionRevealedPayload))
-	case events.EventAnswerSubmitted:
-		s.broadcastAnswerSubmitted(ctx, event.LobbyCode, event.Payload.(events.AnswerSubmittedPayload))
-	case events.EventNewRoundCreated:
-		s.broadcastNewRoundCreated(ctx, event.LobbyCode, event.Payload.(events.NewRoundCreatedPayload))
 	default:
-		log.Printf("[ws-subscriber] Unhandled event type: %s", event.Type)
+		// Look up the lobby's game type and delegate to the game handler
+		lobby, err := s.queries.GetLobbyByCode(ctx, event.LobbyCode)
+		if err != nil {
+			log.Printf("[ws-subscriber] Failed to get lobby %s: %v", event.LobbyCode, err)
+			return
+		}
+
+		handler, ok := s.registry.GetHandler(lobby.GameType)
+		if !ok {
+			log.Printf("[ws-subscriber] No handler for game type: %s", lobby.GameType)
+			return
+		}
+
+		if !handler.HandleEvent(ctx, event, s.hub, s.queries) {
+			log.Printf("[ws-subscriber] Unhandled event type: %s", event.Type)
+		}
 	}
 }
 
-// broadcastUpdateTrigger sends an OOB swap that triggers the client to fetch updated game content.
-// This replaces full page reloads with smooth HTMX updates.
-func (s *Subscriber) broadcastUpdateTrigger(ctx context.Context, lobbyCode string) {
+// BroadcastUpdateTrigger sends an OOB swap that triggers the client to fetch updated game content.
+// Exported for use by game packages.
+func BroadcastUpdateTrigger(ctx context.Context, lobbyCode string, hub *Hub) {
 	html := fmt.Sprintf(`<div id="game-updater" hx-swap-oob="true" hx-get="/lobbies/%s/content" hx-target="#game-content" hx-swap="outerHTML" hx-trigger="load" class="hidden"></div>`, lobbyCode)
-	s.hub.Broadcast(ctx, lobbyCode, []byte(html))
+	hub.Broadcast(ctx, lobbyCode, []byte(html))
 }
 
 // broadcastPlayerList fetches the current player list and broadcasts it.
 func (s *Subscriber) broadcastPlayerList(ctx context.Context, lobbyCode string) {
-	// Get the lobby to find its ID
 	lobby, err := s.queries.GetLobbyByCode(ctx, lobbyCode)
 	if err != nil {
 		log.Printf("[ws-subscriber] Failed to get lobby %s: %v", lobbyCode, err)
 		return
 	}
 
-	// Fetch current players
 	players, err := s.queries.GetLobbyPlayers(ctx, lobby.ID)
 	if err != nil {
 		log.Printf("[ws-subscriber] Failed to get players for lobby %s: %v", lobbyCode, err)
 		return
 	}
 
-	// Render the player list partial to HTML
 	var buf bytes.Buffer
 	err = templates.PlayerList(players, true).Render(ctx, &buf)
 	if err != nil {
@@ -78,189 +91,5 @@ func (s *Subscriber) broadcastPlayerList(ctx context.Context, lobbyCode string) 
 		return
 	}
 
-	// Broadcast to all connected clients in this lobby
 	s.hub.Broadcast(ctx, lobbyCode, buf.Bytes())
-}
-
-// broadcastGameStarted broadcasts the game content when the game starts.
-// All players see the SubmitQuestion form since no one has submitted yet.
-func (s *Subscriber) broadcastGameStarted(ctx context.Context, lobbyCode string, payload events.GameStartedPayload) {
-	lobby, err := s.queries.GetLobbyByCode(ctx, lobbyCode)
-	if err != nil {
-		log.Printf("[ws-subscriber] Failed to get lobby %s: %v", lobbyCode, err)
-		return
-	}
-
-	// Get the active round
-	round, err := s.queries.GetActiveRound(ctx, lobby.ID)
-	if err != nil {
-		log.Printf("[ws-subscriber] Failed to get active round for lobby %s: %v", lobbyCode, err)
-		return
-	}
-
-	// Get players for the player count
-	players, err := s.queries.GetLobbyPlayers(ctx, lobby.ID)
-	if err != nil {
-		log.Printf("[ws-subscriber] Failed to get players for lobby %s: %v", lobbyCode, err)
-		return
-	}
-
-	// Render the GameContent partial with initial state (no one has submitted)
-	// Using zero values for question-related params since we're in submitting phase
-	var buf bytes.Buffer
-	var emptyQuestion db.TriviaQuestion
-	var emptyScoreboard []db.GetLobbyScoreboardRow
-	var emptyRoundScoreboard []db.GetRoundScoreboardRow
-	var emptyDistribution []events.AnswerStat
-	err = templates.GameContent(
-		lobby,
-		players,
-		round,
-		false, // hasSubmitted - no one has submitted yet
-		emptyQuestion,
-		false, // questionActive
-		false, // isAuthor
-		false, // hasAnswered
-		0,     // submittedCount
-		false, // isHost - this is tricky, but the form doesn't need it in submitting state
-		emptyScoreboard,
-		emptyRoundScoreboard,
-		emptyDistribution,
-		0,
-	).Render(ctx, &buf)
-	if err != nil {
-		log.Printf("[ws-subscriber] Failed to render game content: %v", err)
-		return
-	}
-
-	s.hub.Broadcast(ctx, lobbyCode, buf.Bytes())
-}
-
-// broadcastQuestionSubmitted broadcasts the updated submit status counter.
-// Uses personalized broadcasting so the host sees the start button.
-func (s *Subscriber) broadcastQuestionSubmitted(ctx context.Context, lobbyCode string, payload events.QuestionSubmittedPayload) {
-	s.hub.BroadcastPersonalized(ctx, lobbyCode, func(playerID string) []byte {
-		isHost := playerID == payload.HostPlayerID
-
-		var buf bytes.Buffer
-		err := templates.SubmitStatus(
-			payload.SubmittedCount,
-			payload.TotalPlayers,
-			lobbyCode,
-			isHost,
-			true,
-		).Render(ctx, &buf)
-		if err != nil {
-			log.Printf("[ws-subscriber] Failed to render submit status for player %s: %v", playerID, err)
-			return nil
-		}
-		return buf.Bytes()
-	})
-}
-
-// broadcastRoundAdvanced broadcasts when the round advances to playing phase.
-// We trigger a smooth content update via HTMX instead of a full reload.
-func (s *Subscriber) broadcastRoundAdvanced(ctx context.Context, lobbyCode string, payload events.RoundAdvancedPayload) {
-	log.Printf("[ws-subscriber] Round advanced for lobby %s, round %d", lobbyCode, payload.RoundNumber)
-	s.broadcastUpdateTrigger(ctx, lobbyCode)
-}
-
-// broadcastQuestionRevealed broadcasts when everyone has answered.
-// We trigger a smooth content update via HTMX instead of a full reload.
-func (s *Subscriber) broadcastQuestionRevealed(ctx context.Context, lobbyCode string, payload events.QuestionRevealedPayload) {
-	log.Printf("[ws-subscriber] Question revealed for lobby %s", lobbyCode)
-	s.broadcastUpdateTrigger(ctx, lobbyCode)
-}
-
-// broadcastAnswerSubmitted broadcasts answer progress updates.
-// If question is complete, handled by broadcastQuestionRevealed.
-// Otherwise, sends Live Graph to players who have already answered.
-func (s *Subscriber) broadcastAnswerSubmitted(ctx context.Context, lobbyCode string, payload events.AnswerSubmittedPayload) {
-	if payload.QuestionComplete {
-		// Do nothing, QuestionRevealed event will handle the reload
-		return
-	}
-
-	// Fetch necessary data to render the graph
-	lobby, err := s.queries.GetLobbyByCode(ctx, lobbyCode)
-	if err != nil {
-		log.Printf("[ws-subscriber] Error fetching lobby: %v", err)
-		return
-	}
-
-	activeRound, err := s.queries.GetActiveRound(ctx, lobby.ID)
-	if err != nil || !activeRound.CurrentQuestionID.Valid {
-		log.Printf("[ws-subscriber] Error fetching active round/question: %v", err)
-		return
-	}
-
-	// Fetch Current Question
-	questions, err := s.queries.GetQuestionsForRound(ctx, activeRound.ID)
-	var currentQuestion db.TriviaQuestion
-	found := false
-	if err == nil {
-		for _, q := range questions {
-			if q.ID == activeRound.CurrentQuestionID {
-				currentQuestion = q
-				found = true
-				break
-			}
-		}
-	}
-	if !found {
-		return
-	}
-
-	// Fetch who has answered
-	answers, err := s.queries.GetAnswersForQuestion(ctx, currentQuestion.ID)
-	if err != nil {
-		return
-	}
-	answeredMap := make(map[string]bool)
-	totalAnswers := len(answers)
-	for _, a := range answers {
-		answeredMap[a.PlayerID.String()] = true
-	}
-
-	// Broadcast Personalized
-	s.hub.BroadcastPersonalized(ctx, lobbyCode, func(playerID string) []byte {
-		// Only send update if player has answered OR is the author
-		hasAnswered := answeredMap[playerID]
-		isAuthor := currentQuestion.Author.String() == playerID
-
-		if hasAnswered || isAuthor {
-			var buf bytes.Buffer
-			// QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, isRevealed bool, isHost bool)
-			err := templates.QuestionResults(
-				lobbyCode,
-				currentQuestion,
-				payload.Distribution,
-				totalAnswers,
-				false, // Not revealed yet
-				false, // Host button hidden anyway
-			).Render(ctx, &buf)
-
-			if err != nil {
-				log.Printf("[ws-subscriber] Error rendering live graph: %v", err)
-				return nil
-			}
-			return buf.Bytes()
-		}
-
-		// Send answer status to players still answering
-		var buf2 bytes.Buffer
-		err := templates.AnswerStatus(payload.AnsweredCount, payload.TotalExpected, true).Render(ctx, &buf2)
-		if err != nil {
-			log.Printf("[ws-subscriber] Error rendering answer status: %v", err)
-			return nil
-		}
-		return buf2.Bytes()
-	})
-}
-
-// broadcastNewRoundCreated broadcasts when a new round is created (Play Again).
-// We trigger a smooth content update via HTMX instead of a full reload.
-func (s *Subscriber) broadcastNewRoundCreated(ctx context.Context, lobbyCode string, payload events.NewRoundCreatedPayload) {
-	log.Printf("[ws-subscriber] New round created for lobby %s, round %d", lobbyCode, payload.RoundNumber)
-	s.broadcastUpdateTrigger(ctx, lobbyCode)
 }
