@@ -24,12 +24,12 @@ test.describe('Smoke Tests', () => {
       await page.waitForLoadState('networkidle');
 
       // Should be on a lobby creation or lobby page
-      expect(page.url()).toMatch(/lobby|create/i);
+      expect(page.url()).toMatch(/lobbies|create/i);
     }
   });
 
   test('invalid lobby shows error or redirect', async ({ page }) => {
-    const response = await page.goto('/lobby/INVALID123');
+    const response = await page.goto('/lobbies/INVALID123');
 
     // Should either show an error page or redirect
     const is404 = response?.status() === 404;

@@ -1,6 +1,6 @@
 ---
 title: "Codebase Refactor: Game Isolation"
-status: ready
+status: done
 description: "Refactor to isolate game-specific logic and enable new games."
 tags: [area/backend, type/refactor]
 priority: high
@@ -28,10 +28,17 @@ Decouple Trivia-specific handlers, models, and runtime behavior from generic ser
 
 ## Validation
 
-- [ ] `make fmt`
-- [ ] `make lint`
-- [ ] `go build -o bin/server ./cmd/server`
-- [ ] Run targeted gameplay verification for Trivia flows after refactor (E2E if UI/flow changes)
+- [x] `make fmt`
+- [x] `make lint`
+- [x] `go build -o bin/server ./cmd/server`
+- [x] Run targeted gameplay verification for Trivia flows after refactor (E2E if UI/flow changes)
+
+Validation run on 2026-02-07:
+- `make fmt` passed.
+- `make lint` passed.
+- `go build -o bin/server ./cmd/server` passed.
+- `make e2e-test` passed (3/3 smoke tests).
+- Targeted UI flow passed via `make e2e-flow ARGS="templates"` and screenshots reviewed in `e2e/screenshots/templates-00-homepage.png`, `e2e/screenshots/templates-01-create-form-filled.png`, `e2e/screenshots/templates-02-lobby-created.png`, and `e2e/screenshots/templates-03-templates-modal.png`.
 
 ## Scope
 

@@ -32,7 +32,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
 
 ### Ready
-- [game-isolation-refactor.md](./game-isolation-refactor.md) - Isolate game logic for future games
+- (none)
 
 ### Draft
 - [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
@@ -52,6 +52,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ### Archived
 - [archived/housekeeping.md](./archived/housekeeping.md) - Build cleanup & project structure
 - [archived/css-cache-busting.md](./archived/css-cache-busting.md) - CSS cache invalidation
+- [archived/game-isolation-refactor.md](./archived/game-isolation-refactor.md) - Isolate game logic for future games
 
 ---
 
@@ -62,15 +63,14 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 | # | Item | Why High Priority |
 |---|------|-------------------|
 | 1 | **Refactor Flicker Fix** | Current `reload()` fix is jarring; needs HTMX/WS polish |
-| 2 | **Game isolation refactor** | Enables adding new games without trivia coupling or handler sprawl |
-| 3 | **AI Question Assist** | Reduces friction for players submitting questions |
-| 4 | **Round results screen** | Creates discussion moments between questions |
-| 5 | **Accessibility pass** | Improves contrast, keyboard use, and screen reader flow for everyone |
-| 6 | **Show answer status while waiting** | Reduces "is it frozen?" anxiety |
-| 7 | **Mid-game player join sync** | Prevents confusion when friends arrive late |
-| 8 | **Per-round point analysis** | Fuels friendly banter about who's winning |
-| 9 | **Visual redesign completion** | Polish remaining screens for cohesive feel |
-| 10 | **Enhanced end-of-game stats** | Conversation fuel: "most missed question" etc |
+| 2 | **AI Question Assist** | Reduces friction for players submitting questions |
+| 3 | **Round results screen** | Creates discussion moments between questions |
+| 4 | **Accessibility pass** | Improves contrast, keyboard use, and screen reader flow for everyone |
+| 5 | **Show answer status while waiting** | Reduces "is it frozen?" anxiety |
+| 6 | **Mid-game player join sync** | Prevents confusion when friends arrive late |
+| 7 | **Per-round point analysis** | Fuels friendly banter about who's winning |
+| 8 | **Visual redesign completion** | Polish remaining screens for cohesive feel |
+| 9 | **Enhanced end-of-game stats** | Conversation fuel: "most missed question" etc |
 
 ---
 

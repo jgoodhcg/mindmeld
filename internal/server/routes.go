@@ -30,9 +30,13 @@ func (s *Server) routes() {
 	s.router.Get("/lobbies/{code}/ws", s.handleWebSocket)
 
 	// Dynamic game routes: /lobbies/{code}/{game_slug}/...
+	// These paths are action namespaces, not the canonical lobby URL.
+	// Every game-scoped action is guarded so {game_slug} must match the
+	// lobby's current game_type before the game handler executes.
 	s.games.Each(func(_ string, game games.Game) {
 		slug := game.Info().Slug
 		s.router.Route("/lobbies/{code}/"+slug, func(r chi.Router) {
+			r.Use(s.requireLobbyGameType(slug))
 			game.RegisterRoutes(r)
 		})
 	})

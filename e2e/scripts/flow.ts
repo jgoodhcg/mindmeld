@@ -66,7 +66,7 @@ async function joinLobbyFlow(page: Page, lobbyCode: string) {
   flowName = 'join-lobby';
   console.log(`\n=== Join Lobby Flow (${lobbyCode}) ===\n`);
 
-  await page.goto(`${BASE_URL}/lobby/${lobbyCode}`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/lobbies/${lobbyCode}`, { waitUntil: 'networkidle' });
   await capture(page, 'lobby-page');
 
   const nameInput = page.locator('input[name="name"], input[placeholder*="name" i]').first();
@@ -90,7 +90,7 @@ async function triviaFlow(page: Page, lobbyCode: string) {
   flowName = 'trivia';
   console.log(`\n=== Trivia Flow (${lobbyCode}) ===\n`);
 
-  await page.goto(`${BASE_URL}/lobby/${lobbyCode}/trivia`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/lobbies/${lobbyCode}`, { waitUntil: 'networkidle' });
   await capture(page, 'trivia-page');
 
   // Look for answer buttons or inputs

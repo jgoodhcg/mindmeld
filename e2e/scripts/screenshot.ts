@@ -5,7 +5,7 @@
  *
  * Usage:
  *   npm run screenshot                    # Screenshot homepage
- *   npm run screenshot -- /lobby/ABC123   # Screenshot specific path
+ *   npm run screenshot -- /lobbies/ABC123 # Screenshot specific path
  *   npm run screenshot -- --full          # Full page screenshot
  */
 
