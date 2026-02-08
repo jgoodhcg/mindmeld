@@ -1,0 +1,158 @@
+{
+  "decision": {
+    "statement": "What should Mindmeld build as the next game after Trivia?",
+    "description": "Choose the strongest next game for social conversation, reliable party play, and practical MVP delivery."
+  },
+  "options": [
+    {
+      "label": "Coordinates",
+      "description": "2D social alignment game with centroid and outlier reveals."
+    },
+    {
+      "label": "Anonymous Match",
+      "description": "Players match anonymous responses to authors after conversation."
+    },
+    {
+      "label": "Majority Mind",
+      "description": "Players predict what the group majority will choose on subjective prompts."
+    }
+  ],
+  "criteria": [
+    {
+      "name": "Conversation depth",
+      "cells": {
+        "Coordinates": {
+          "text": "Outlier vs cluster reveals naturally trigger debate",
+          "color": "green"
+        },
+        "Anonymous Match": {
+          "text": "Identity reveals create strong story-driven discussion",
+          "color": "green"
+        },
+        "Majority Mind": {
+          "text": "Good social chatter, but usually shorter and lighter",
+          "color": "yellow"
+        }
+      }
+    },
+    {
+      "name": "Shared-screen reveal energy",
+      "cells": {
+        "Coordinates": {
+          "text": "Simultaneous dot reveal plus centroid is visually strong",
+          "color": "green"
+        },
+        "Anonymous Match": {
+          "text": "One-by-one response reveals land well in groups",
+          "color": "green"
+        },
+        "Majority Mind": {
+          "text": "Distribution reveal is clear but less dramatic",
+          "color": "yellow"
+        }
+      }
+    },
+    {
+      "name": "MVP build complexity",
+      "cells": {
+        "Coordinates": {
+          "text": "Moderate: drag input plus plotting and centroid math",
+          "color": "yellow"
+        },
+        "Anonymous Match": {
+          "text": "High: multi-phase flow, assignment UI, reveal sequencing",
+          "color": "red"
+        },
+        "Majority Mind": {
+          "text": "Low: option selection, prediction, and distribution scoring",
+          "color": "green"
+        }
+      }
+    },
+    {
+      "name": "Moderation and safety overhead",
+      "cells": {
+        "Coordinates": {
+          "text": "Mostly prompt curation; little free-text risk",
+          "color": "green"
+        },
+        "Anonymous Match": {
+          "text": "Free text and attribution can require stronger moderation",
+          "color": "red"
+        },
+        "Majority Mind": {
+          "text": "Low moderation burden with constrained response options",
+          "color": "green"
+        }
+      }
+    },
+    {
+      "name": "Content dependency",
+      "cells": {
+        "Coordinates": {
+          "text": "Needs good prompt and axis pairs to stay fresh",
+          "color": "yellow"
+        },
+        "Anonymous Match": {
+          "text": "Needs a steady stream of strong open-ended prompts",
+          "color": "yellow"
+        },
+        "Majority Mind": {
+          "text": "Easy to generate many short subjective prompts",
+          "color": "green"
+        }
+      }
+    },
+    {
+      "name": "Replayability for recurring events",
+      "cells": {
+        "Coordinates": {
+          "text": "Different prompts and axes keep rounds varied",
+          "color": "green"
+        },
+        "Anonymous Match": {
+          "text": "Still fun, but repeated groups may learn each other quickly",
+          "color": "yellow"
+        },
+        "Majority Mind": {
+          "text": "Can feel repetitive unless prompt quality stays high",
+          "color": "yellow"
+        }
+      }
+    },
+    {
+      "name": "Risk of awkward round failure",
+      "cells": {
+        "Coordinates": {
+          "text": "Main risk is unclear axes; manageable with curation",
+          "color": "yellow"
+        },
+        "Anonymous Match": {
+          "text": "Weak responses or low engagement can flatten a round",
+          "color": "red"
+        },
+        "Majority Mind": {
+          "text": "Simple loop is robust under varied group energy",
+          "color": "green"
+        }
+      }
+    },
+    {
+      "name": "Mindmeld signature feel",
+      "cells": {
+        "Coordinates": {
+          "text": "Distinctive social alignment mechanic that feels native to platform",
+          "color": "green"
+        },
+        "Anonymous Match": {
+          "text": "Very on-brand for conversation-first social play",
+          "color": "green"
+        },
+        "Majority Mind": {
+          "text": "Solid party loop but less unique as a platform identity",
+          "color": "yellow"
+        }
+      }
+    }
+  ]
+}

@@ -32,7 +32,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
 
 ### Ready
-- (none)
+- [coordinates.md](./coordinates.md) - Coordinates social alignment game (Cluster MVP)
 
 ### Draft
 - [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
@@ -45,7 +45,6 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [analytics.md](./analytics.md) - Gameplay analytics + stats
 - [codebase-map.md](./codebase-map.md) - Auto-generated docs & touchpoints
 - [anonymous_match.md](./anonymous_match.md) - Anonymous Match social game
-- [coordinates.md](./coordinates.md) - Coordinates social alignment game
 - [infrastructure.md](./infrastructure.md) - Scaling for WebSockets and events
 - [ideas.md](./ideas.md) - Raw concept backlog
 

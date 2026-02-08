@@ -52,6 +52,44 @@ Include an E2E validation step at the end of any implementation plan:
 - Note the dev server must already be running (user will start it).
 - Read the PNGs in `e2e/screenshots/` to verify the UI.
 
+## Decision Matrices
+
+- For high-impact or irreversible choices, create a matrix JSON at `.decisions/<slug>.json`.
+- Do not create a decision markdown file for matrix decisions.
+- Use `matrix-reloaded --instructions` to get the current schema and examples before creating or editing matrix JSON.
+- Agents must not run `matrix-reloaded` directly.
+- Expected artifacts are `.decisions/<slug>.json` and the auto-generated `.decisions/<slug>.xlsx`.
+- Expected JSON shape:
+
+```json
+{
+  "decision": {
+    "statement": "Question being decided",
+    "description": "Context and constraints"
+  },
+  "options": [
+    { "label": "Option A", "description": "Details about option A" },
+    { "label": "Option B", "description": "Details about option B" }
+  ],
+  "criteria": [
+    {
+      "name": "Criteria Name",
+      "cells": {
+        "Option A": { "text": "Assessment", "color": "green" },
+        "Option B": { "text": "Assessment", "color": "red" }
+      }
+    }
+  ]
+}
+```
+
+- Color meaning:
+  - `red`: blocker (eliminates option)
+  - `yellow`: concern (less than ideal)
+  - `green`: good (positive)
+  - omit color for neutral
+- Save matrix JSON in `.decisions/`. The `.xlsx` is generated from the JSON by external workflow/tooling.
+
 ## Validation Commands
 
 | Level | Command | When |
@@ -73,6 +111,7 @@ Include an E2E validation step at the end of any implementation plan:
 - `make e2e-screenshot` — Screenshot homepage or path.
 - `make e2e-flow` — Run flow with screenshots.
 - `make e2e-test` — Run Playwright smoke tests.
+- `matrix-reloaded --instructions` — Print matrix JSON schema and usage guidance.
 
 ## Require Confirmation
 
