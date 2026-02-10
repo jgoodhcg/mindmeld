@@ -404,11 +404,13 @@ func (g *ClusterGame) getScoredSubmissionsForLobby(ctx context.Context, q db.DBT
 
 func (g *ClusterGame) getStandings(ctx context.Context, lobbyID pgtype.UUID, players []db.GetLobbyPlayersRow, roundPoints map[string]int) ([]clustertmpl.StandingView, error) {
 	totals := make(map[string]int, len(players))
+	roundsPlayed := make(map[string]int, len(players))
 	names := make(map[string]string, len(players))
 
 	for _, p := range players {
 		playerKey := p.PlayerID.String()
 		totals[playerKey] = 0
+		roundsPlayed[playerKey] = 0
 		names[playerKey] = p.Nickname
 	}
 
@@ -420,6 +422,7 @@ func (g *ClusterGame) getStandings(ctx context.Context, lobbyID pgtype.UUID, pla
 	for _, row := range scored {
 		key := row.PlayerID.String()
 		totals[key] += row.RoundScore
+		roundsPlayed[key] += 1
 		if _, ok := names[key]; !ok {
 			names[key] = row.Nickname
 		}
@@ -427,10 +430,16 @@ func (g *ClusterGame) getStandings(ctx context.Context, lobbyID pgtype.UUID, pla
 
 	standings := make([]clustertmpl.StandingView, 0, len(names))
 	for key, nickname := range names {
+		avg := 0.0
+		if roundsPlayed[key] > 0 {
+			avg = float64(totals[key]) / float64(roundsPlayed[key])
+		}
+
 		standings = append(standings, clustertmpl.StandingView{
-			Nickname:    nickname,
-			RoundPoints: roundPoints[key],
-			TotalPoints: totals[key],
+			Nickname:          nickname,
+			RoundPoints:       roundPoints[key],
+			TotalPoints:       totals[key],
+			AvgPointsPerRound: avg,
 		})
 	}
 

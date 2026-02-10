@@ -30,7 +30,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ### Active
 - [work-party-prep.md](./work-party-prep.md) - Launch readiness polish and stability
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
-- [coordinates.md](./coordinates.md) - Coordinates social alignment game (Cluster MVP)
+- [cluster-mvp.md](./cluster-mvp.md) - Cluster MVP delivery and final completion checklist
 
 ### Ready
 - [game-instructions.md](./game-instructions.md) - Game rules and role-based guidance for players
@@ -38,6 +38,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ### Draft
 - [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
 - [security.md](./security.md) - App security hardening
+- [cluster-improvements.md](./cluster-improvements.md) - Post-MVP Cluster roadmap (user content, AI, reveal enhancements)
 - [chronology.md](./chronology.md) - Daily timeline sorting game
 - [vector-golf.md](./vector-golf.md) - Semantic golf daily game
 

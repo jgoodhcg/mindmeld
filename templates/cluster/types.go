@@ -21,8 +21,9 @@ type DotView struct {
 
 // StandingView is one row in standings.
 type StandingView struct {
-	Nickname    string
-	RoundPoints int
-	TotalPoints int
-	IsLeader    bool
+	Nickname          string
+	RoundPoints       int
+	TotalPoints       int
+	AvgPointsPerRound float64
+	IsLeader          bool
 }
