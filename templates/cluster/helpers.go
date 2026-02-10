@@ -45,6 +45,23 @@ func submissionProgress(submittedCount int, expectedCount int) string {
 	return fmt.Sprintf("%d / %d submitted", submittedCount, expectedCount)
 }
 
+func averageTotalPoints(standings []StandingView) float64 {
+	if len(standings) == 0 {
+		return 0
+	}
+
+	sum := 0
+	for _, s := range standings {
+		sum += s.TotalPoints
+	}
+
+	return float64(sum) / float64(len(standings))
+}
+
+func formatAveragePoints(points float64) string {
+	return fmt.Sprintf("%.1f", points)
+}
+
 func centerStyle(x, y float64) string {
 	clampedX := clampUnit(x)
 	clampedY := clampUnit(y)

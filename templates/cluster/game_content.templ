@@ -84,6 +84,7 @@ templ GameContent(
 				if len(standings) > 0 {
 					<div class="space-y-3">
 						<h3 class="font-mono text-xs tracking-widest uppercase text-text-muted">Final Standings</h3>
+						<p class="text-right text-xs font-mono text-text-muted uppercase tracking-wide">Avg total pts: <span class="text-cyan">{ formatAveragePoints(averageTotalPoints(standings)) }</span></p>
 						for i, s := range standings {
 							{{
 								rowClass := "grid grid-cols-12 gap-2 items-center p-3 rounded border bg-base border-border"
@@ -236,6 +237,7 @@ templ GameContent(
 						@MarkerLegend()
 						@ScoreExplanation()
 						<div class="space-y-2">
+							<p class="text-right text-xs font-mono text-text-muted uppercase tracking-wide">Avg total pts: <span class="text-cyan">{ formatAveragePoints(averageTotalPoints(standings)) }</span></p>
 							<div class="grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono">
 								<div class="col-span-6">Player</div>
 								<div class="col-span-3 text-right">Round pts</div>

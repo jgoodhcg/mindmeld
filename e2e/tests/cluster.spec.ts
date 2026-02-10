@@ -112,6 +112,7 @@ test.describe('Cluster Multiplayer', () => {
       for (const page of [hostPage, player2Page, player3Page]) {
         await expect(page.getByText('CENTROID REVEALED')).toBeVisible({ timeout: 10000 });
         await expect(page.locator('[title="Centroid target"]')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText(/Avg total pts:/i)).toBeVisible({ timeout: 10000 });
         await expect(page.locator('#game-content').getByText('Host', { exact: true })).toBeVisible();
         await expect(page.locator('#game-content').getByText('Player2', { exact: true })).toBeVisible();
         await expect(page.locator('#game-content').getByText('Player3', { exact: true })).toBeVisible();
