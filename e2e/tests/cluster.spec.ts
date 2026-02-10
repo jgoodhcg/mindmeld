@@ -11,12 +11,23 @@ async function joinLobby(page: Page, code: string, nickname: string) {
 }
 
 async function submitCoordinate(page: Page, x: string, y: string) {
-  await expect(page.locator('input[name="x"]')).toBeVisible({ timeout: 10000 });
-  await page.fill('input[name="x"]', x);
-  await page.fill('input[name="y"]', y);
+  const plane = page.locator('#cluster-plane-input');
+  await expect(plane).toBeVisible({ timeout: 10000 });
+
+  const box = await plane.boundingBox();
+  if (!box) {
+    throw new Error('cluster input plane is missing a bounding box');
+  }
+
+  const xNum = Number.parseFloat(x);
+  const yNum = Number.parseFloat(y);
+  const clickX = box.x + (box.width * xNum);
+  const clickY = box.y + (box.height * (1 - yNum));
+  await page.mouse.click(clickX, clickY);
+
   await Promise.all([
     page.waitForLoadState('networkidle'),
-    page.click('button:has-text("SUBMIT COORDINATE")'),
+    page.click('button:has-text("SUBMIT POINT")'),
   ]);
 }
 
@@ -72,7 +83,7 @@ test.describe('Cluster Multiplayer', () => {
 
       for (const page of [hostPage, player2Page, player3Page]) {
         await expect(page.getByText('ROUND 1')).toBeVisible({ timeout: 10000 });
-        await expect(page.locator('input[name="x"]')).toBeVisible({ timeout: 10000 });
+        await expect(page.locator('#cluster-plane-input')).toBeVisible({ timeout: 10000 });
       }
 
       await submitCoordinate(hostPage, '0.10', '0.20');
@@ -86,7 +97,7 @@ test.describe('Cluster Multiplayer', () => {
 
       for (const page of [hostPage, player2Page, player3Page]) {
         await expect(page.getByText('CENTROID REVEALED')).toBeVisible({ timeout: 10000 });
-        await expect(page.locator('[title="Centroid"]')).toBeVisible({ timeout: 10000 });
+        await expect(page.locator('[title="Centroid target"]')).toBeVisible({ timeout: 10000 });
         await expect(page.locator('#game-content').getByText('Host', { exact: true })).toBeVisible();
         await expect(page.locator('#game-content').getByText('Player2', { exact: true })).toBeVisible();
         await expect(page.locator('#game-content').getByText('Player3', { exact: true })).toBeVisible();
@@ -101,7 +112,7 @@ test.describe('Cluster Multiplayer', () => {
 
       for (const page of [hostPage, player2Page, player3Page]) {
         await expect(page.getByText('ROUND 2')).toBeVisible({ timeout: 10000 });
-        await expect(page.locator('input[name="x"]')).toBeVisible({ timeout: 10000 });
+        await expect(page.locator('#cluster-plane-input')).toBeVisible({ timeout: 10000 });
       }
     } finally {
       await safeCloseContext(hostContext);

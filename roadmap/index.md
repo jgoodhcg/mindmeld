@@ -33,6 +33,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [coordinates.md](./coordinates.md) - Coordinates social alignment game (Cluster MVP)
 
 ### Ready
+- [game-instructions.md](./game-instructions.md) - Game rules and role-based guidance for players
 
 ### Draft
 - [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state

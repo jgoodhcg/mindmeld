@@ -1,0 +1,63 @@
+package cluster
+
+import "fmt"
+
+// PlaneFrame renders a reusable coordinate plane with axis labels and center axes.
+templ PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) {
+	{{
+		planeClass := "relative w-full max-w-xl mx-auto aspect-square bg-base border border-border rounded overflow-hidden"
+		if interactive {
+			planeClass += " cursor-crosshair touch-none"
+		}
+	}}
+	<div id={ elementID } data-testid={ elementID } class={ planeClass }>
+		<!-- grid + axes -->
+		<div class="absolute inset-0 pointer-events-none">
+			<div class="absolute left-1/2 top-0 h-full border-l border-border"></div>
+			<div class="absolute top-1/2 left-0 w-full border-t border-border"></div>
+			<div class="absolute left-1/4 top-0 h-full border-l border-border/40"></div>
+			<div class="absolute left-3/4 top-0 h-full border-l border-border/40"></div>
+			<div class="absolute top-1/4 left-0 w-full border-t border-border/40"></div>
+			<div class="absolute top-3/4 left-0 w-full border-t border-border/40"></div>
+		</div>
+		{ children... }
+		<!-- axis labels rendered on-plane -->
+		<div class="absolute top-2 left-1/2 -translate-x-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none">{ prompt.YMaxLabel }</div>
+		<div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none">{ prompt.YMinLabel }</div>
+		<div class="absolute left-2 top-1/2 -translate-y-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none">{ prompt.XMinLabel }</div>
+		<div class="absolute right-2 top-1/2 -translate-y-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none text-right">{ prompt.XMaxLabel }</div>
+	</div>
+}
+
+templ MarkerLegend() {
+	<div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs font-mono text-text-muted">
+		<div class="flex items-center gap-2 bg-base border border-border rounded px-3 py-2">
+			<span class="inline-block h-3 w-3 rounded-full bg-text-muted"></span>
+			<span>Other players</span>
+		</div>
+		<div class="flex items-center gap-2 bg-base border border-border rounded px-3 py-2">
+			<span class="inline-block h-3 w-3 rounded-full bg-cyan"></span>
+			<span>Your point</span>
+		</div>
+		<div class="flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2">
+			<span class="inline-block h-3 w-3 rounded-full bg-text-muted ring-2 ring-amber"></span>
+			<span>Round winner</span>
+		</div>
+		<div class="flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2">
+			<span class="inline-block h-3 w-3 rounded-full border-2 border-amber"></span>
+			<span>Centroid target</span>
+		</div>
+	</div>
+}
+
+templ ScoreExplanation() {
+	<div class="bg-base border border-border rounded px-4 py-3 text-sm text-text-muted">
+		<p class="font-mono text-xs tracking-wide uppercase text-text mb-1">Scoring</p>
+		<p>Round points measure distance to centroid: <span class="text-success font-mono">100</span> = exact centroid, <span class="text-danger font-mono">0</span> = farthest possible point.</p>
+		<p class="mt-1">`Round` = this reveal. `Total` = cumulative across rounds.</p>
+	</div>
+}
+
+templ CoordinateReadout(x float64, y float64) {
+	<p id="cluster-coordinate-readout" class="text-center text-sm text-text-muted font-mono">Selected point: ({ fmt.Sprintf("%.2f", x) }, { fmt.Sprintf("%.2f", y) })</p>
+}

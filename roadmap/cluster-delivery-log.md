@@ -64,3 +64,27 @@ Estimated cost (very rough):
 
 Confidence in estimate:
 - low to medium (directional only; not billing-authoritative)
+
+### 2026-02-10 - UX feedback iteration (coordinate plane + scoring clarity)
+
+Scope delivered:
+- replaced numeric coordinate inputs with click/tap coordinate plane input
+- unified submit/reveal plane rendering with shared component (`PlaneFrame`)
+- moved axis labels onto the plane
+- updated marker semantics (gray others, cyan self, amber winner outline, target centroid)
+- added explicit scoring explanation copy in reveal UI
+- added roadmap note for future text+rationale input experiment
+
+What went right:
+- the requested UX direction was implementable without backend contract changes (`x/y` remained normalized).
+- E2E test adapted cleanly from field-fill to click-to-plot behavior.
+
+What went wrong:
+- no major regressions found yet; pending broader multi-browser manual check.
+
+Prompt count delta:
+- `+1` major UX feedback prompt
+
+Estimated token/cost delta (very rough):
+- tokens: `~15k-45k`
+- cost: `~$0.10-$0.60`

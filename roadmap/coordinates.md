@@ -5,7 +5,7 @@ description: "Cluster MVP: real-time 2D social alignment game with centroid scor
 tags: [area/game, type/feature]
 priority: high
 created: 2026-01-11
-updated: 2026-02-09
+updated: 2026-02-10
 effort: M
 depends-on: []
 ---
@@ -38,6 +38,20 @@ This MVP optimizes for:
   5. Centroid is highlighted with a pulse animation.
   6. Round winner + cumulative standings shown, then host continues.
 - When no unused active prompt/axis pair remains for the session, show a "You have played all available prompts" end state.
+
+### UX Refinements (Current Iteration)
+
+- Player submission uses an interactive coordinate plane (tap/click to plot) instead of numeric text inputs.
+- Axis labels render directly on the coordinate plane for both submit and reveal states.
+- Submit and reveal coordinate planes should share the same rendering component/style language.
+- Marker semantics:
+  - other players: neutral/gray
+  - current player: cyan highlight
+  - round winner(s): amber outline matching standings highlight
+  - centroid: target-style marker with pulse
+- Scoring explanation must be explicit in reveal UI:
+  - round points = distance-to-centroid score (`100` near centroid, `0` farthest)
+  - total points = cumulative sum across rounds
 
 ### Scoring (MVP)
 
@@ -144,6 +158,7 @@ CREATE TABLE coordinates_submissions (
 - User-facing prompt/axis authoring UI
 - Alternate scoring systems (outlier bonus, weighted/hybrid scoring)
 - Team mode and long-term trend analytics
+- Per-round free-text answer/rationale inputs alongside plotted coordinates (candidate Phase 2 experiment)
 
 ## Validation
 

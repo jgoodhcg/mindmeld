@@ -12,7 +12,7 @@
  *   npm run flow -- templates        # Open templates modal flow
  */
 
-import { chromium, Page } from '@playwright/test';
+import { chromium, Page, BrowserContext } from '@playwright/test';
 import { mkdir } from 'fs/promises';
 import { join } from 'path';
 
@@ -111,28 +111,138 @@ async function triviaFlow(page: Page, lobbyCode: string) {
 
 async function coordinatesFlow(page: Page, lobbyCode: string) {
   flowName = 'coordinates';
+  let code = lobbyCode;
+  const extraPlayers: Array<{ context: BrowserContext; page: Page }> = [];
   console.log(`\n=== Coordinates Flow (${lobbyCode}) ===\n`);
 
-  await page.goto(`${BASE_URL}/lobbies/${lobbyCode}`, { waitUntil: 'networkidle' });
+  if (lobbyCode.toUpperCase() === 'NEW') {
+    await page.goto(`${BASE_URL}/cluster`, { waitUntil: 'networkidle' });
+    await capture(page, 'cluster-home');
+
+    const createForm = page.locator('form[action="/lobbies"]').first();
+    await createForm.waitFor({ state: 'visible', timeout: 10000 });
+    await createForm.locator('input[name="name"]').fill(`Coordinates Flow ${Date.now()}`);
+    await createForm.locator('input[name="nickname"]').fill('FlowHost');
+    await Promise.all([
+      page.waitForURL(/\/lobbies\/[A-Z0-9]{6}/, { timeout: 10000 }),
+      createForm.locator('button[type="submit"]').click(),
+    ]);
+
+    const match = page.url().match(/\/lobbies\/([A-Z0-9]{6})/);
+    code = match ? match[1] : lobbyCode;
+    console.log(`  Created lobby code: ${code}`);
+
+    // Add two extra players so Cluster can start (minimum 3 players).
+    const browser = page.context().browser();
+    if (browser) {
+      const joinAs = async (nickname: string) => {
+        const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+        const p = await ctx.newPage();
+        await p.goto(`${BASE_URL}/lobbies/${code}`, { waitUntil: 'networkidle' });
+        const joinInput = p.locator('input[name="nickname"]').first();
+        if (await joinInput.isVisible().catch(() => false)) {
+          await joinInput.fill(nickname);
+          await Promise.all([
+            p.waitForURL(new RegExp(`/lobbies/${code}$`), { timeout: 10000 }),
+            p.locator('button:has-text("CONNECT")').first().click(),
+          ]);
+        }
+        extraPlayers.push({ context: ctx, page: p });
+      };
+
+      await joinAs('FlowPlayer2');
+      await joinAs('FlowPlayer3');
+      await page.waitForTimeout(1000);
+    }
+  } else {
+    await page.goto(`${BASE_URL}/lobbies/${code}`, { waitUntil: 'networkidle' });
+
+    const joinInput = page.locator('input[name="nickname"]').first();
+    if (await joinInput.isVisible().catch(() => false)) {
+      await joinInput.fill('FlowPlayer');
+      const connectBtn = page.locator('button:has-text("CONNECT")').first();
+      if (await connectBtn.isVisible().catch(() => false)) {
+        await Promise.all([
+          page.waitForURL(new RegExp(`/lobbies/${code}$`), { timeout: 10000 }),
+          connectBtn.click(),
+        ]);
+      }
+    }
+  }
+
   await capture(page, 'cluster-page');
 
-  const xInput = page.locator('input[name="x"]').first();
-  const yInput = page.locator('input[name="y"]').first();
-  if (await xInput.isVisible() && await yInput.isVisible()) {
-    await xInput.fill('0.33');
-    await yInput.fill('0.77');
-    await capture(page, 'coordinates-filled');
+  const startBtn = page.locator('form[action$="/cluster/start"] button:has-text("START CLUSTER")').first();
+  if (await startBtn.isVisible().catch(() => false)) {
+    await page.waitForSelector('#player-list li:nth-child(3)', { timeout: 10000 }).catch(() => {});
+    await Promise.all([
+      page.waitForLoadState('networkidle'),
+      startBtn.click(),
+    ]);
+    await capture(page, 'round-started');
+  }
 
-    const submitBtn = page.locator('button[type="submit"]', { hasText: 'SUBMIT COORDINATE' }).first();
-    if (await submitBtn.isVisible()) {
+  const plane = page.locator('#cluster-plane-input').first();
+  if (await plane.isVisible().catch(() => false)) {
+    const box = await plane.boundingBox();
+    if (box) {
+      const clickX = box.x + (box.width * 0.33);
+      const clickY = box.y + (box.height * (1 - 0.77));
+      await page.mouse.click(clickX, clickY);
+      await capture(page, 'coordinates-selected');
+    }
+
+    const submitBtn = page.locator('button[type="submit"]', { hasText: 'SUBMIT POINT' }).first();
+    if (await submitBtn.isVisible().catch(() => false)) {
       await submitBtn.click();
       await page.waitForLoadState('networkidle');
       await capture(page, 'coordinate-submitted');
     }
   }
 
+  if (extraPlayers.length > 0) {
+    const extraPoints = [
+      { x: 0.82, y: 0.22 },
+      { x: 0.61, y: 0.73 },
+    ];
+
+    for (let i = 0; i < extraPlayers.length; i++) {
+      const p = extraPlayers[i].page;
+      const pt = extraPoints[i] || { x: 0.5, y: 0.5 };
+      const pPlane = p.locator('#cluster-plane-input').first();
+      if (await pPlane.isVisible().catch(() => false)) {
+        const box = await pPlane.boundingBox();
+        if (box) {
+          const clickX = box.x + (box.width * pt.x);
+          const clickY = box.y + (box.height * (1 - pt.y));
+          await p.mouse.click(clickX, clickY);
+        }
+
+        const pSubmit = p.locator('button[type="submit"]', { hasText: 'SUBMIT POINT' }).first();
+        if (await pSubmit.isVisible().catch(() => false)) {
+          await pSubmit.click();
+          await p.waitForLoadState('networkidle');
+        }
+      }
+    }
+
+    await page.waitForTimeout(1200);
+    await capture(page, 'reveal-state');
+
+    const standingsHeader = page.locator('text=Round pts').first();
+    if (await standingsHeader.isVisible().catch(() => false)) {
+      await standingsHeader.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(200);
+      await capture(page, 'reveal-standings');
+    }
+  }
+
   await capture(page, 'final-state');
   console.log(`\nFinal URL: ${page.url()}`);
+
+  for (const extra of extraPlayers) {
+    await extra.context.close();
+  }
 }
 
 async function templatesFlow(page: Page) {

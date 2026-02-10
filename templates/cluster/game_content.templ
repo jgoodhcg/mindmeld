@@ -31,7 +31,7 @@ templ GameContent(
 			@keyframes cluster-dot-enter {
 				from {
 					opacity: 0;
-					transform: scale(0.25);
+					transform: scale(0.3);
 				}
 				to {
 					opacity: 1;
@@ -39,14 +39,14 @@ templ GameContent(
 				}
 			}
 
-			@keyframes cluster-centroid-pulse {
+			@keyframes cluster-target-pulse {
 				0%, 100% {
 					transform: scale(1);
-					box-shadow: 0 0 0 0 rgba(212, 162, 84, 0.7);
+					opacity: 1;
 				}
 				70% {
-					transform: scale(1.12);
-					box-shadow: 0 0 0 16px rgba(212, 162, 84, 0);
+					transform: scale(1.16);
+					opacity: 0.55;
 				}
 			}
 		</style>
@@ -113,42 +113,74 @@ templ GameContent(
 						<p class="text-text text-lg sm:text-xl leading-relaxed">{ prompt.PromptText }</p>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-					<div class="bg-base border border-border rounded p-4 space-y-2">
-						<p class="font-mono text-xs tracking-widest uppercase text-text-muted">X Axis</p>
-						<div class="flex justify-between text-sm">
-							<span class="text-text-muted">{ prompt.XMinLabel }</span>
-							<span class="text-text-muted">{ prompt.XMaxLabel }</span>
-						</div>
-					</div>
-					<div class="bg-base border border-border rounded p-4 space-y-2">
-						<p class="font-mono text-xs tracking-widest uppercase text-text-muted">Y Axis</p>
-						<div class="flex justify-between text-sm">
-							<span class="text-text-muted">{ prompt.YMinLabel }</span>
-							<span class="text-text-muted">{ prompt.YMaxLabel }</span>
-						</div>
-					</div>
-				</div>
 				if !revealed {
 					if hasSubmitted {
-						<div class="bg-base border border-success rounded p-5 text-center">
-							<p class="font-mono text-success tracking-wide">COORDINATE LOCKED</p>
-							<p class="text-text-muted text-sm mt-2">Waiting for all players to submit.</p>
+						<div class="space-y-4">
+							@PlaneFrame(prompt, "cluster-plane-pending", false) {
+								<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+									<div class="px-3 py-2 rounded border border-success/40 bg-base/90 text-sm font-mono text-success">Waiting for all submissions...</div>
+								</div>
+							}
+							<div class="bg-base border border-success rounded p-5 text-center">
+								<p class="font-mono text-success tracking-wide">COORDINATE LOCKED</p>
+								<p class="text-text-muted text-sm mt-2">Waiting for all players to submit.</p>
+							</div>
 						</div>
 					} else {
 						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/submissions") } method="POST" class="space-y-4">
-							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div>
-									<label for="x" class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">X (0.00 to 1.00)</label>
-									<input type="number" name="x" id="x" min="0" max="1" step="0.01" value="0.50" required class="w-full bg-base border border-border rounded px-4 py-3 text-text focus:outline-none focus:border-cyan transition-colors"/>
-								</div>
-								<div>
-									<label for="y" class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">Y (0.00 to 1.00)</label>
-									<input type="number" name="y" id="y" min="0" max="1" step="0.01" value="0.50" required class="w-full bg-base border border-border rounded px-4 py-3 text-text focus:outline-none focus:border-cyan transition-colors"/>
-								</div>
-							</div>
-							<button type="submit" class="w-full bg-cyan hover:bg-cyan/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">SUBMIT COORDINATE</button>
+							@PlaneFrame(prompt, "cluster-plane-input", true) {
+								<div id="cluster-selected-marker" class="absolute h-4 w-4 rounded-full border border-base bg-cyan ring-2 ring-cyan/60" style={ plotStyle(0.5, 0.5, 8, false) }></div>
+							}
+							<input type="hidden" name="x" id="cluster-x" value="0.50"/>
+							<input type="hidden" name="y" id="cluster-y" value="0.50"/>
+							@CoordinateReadout(0.50, 0.50)
+							<button type="submit" class="w-full bg-cyan hover:bg-cyan/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">SUBMIT POINT</button>
 						</form>
+						<script>
+							(function() {
+								const plane = document.getElementById('cluster-plane-input');
+								if (!plane || plane.dataset.bound === 'true') {
+									return;
+								}
+
+								const marker = document.getElementById('cluster-selected-marker');
+								const xInput = document.getElementById('cluster-x');
+								const yInput = document.getElementById('cluster-y');
+								const readout = document.getElementById('cluster-coordinate-readout');
+
+								if (!marker || !xInput || !yInput || !readout) {
+									return;
+								}
+
+								plane.dataset.bound = 'true';
+
+								const clamp = (v) => Math.max(0, Math.min(1, v));
+								const round2 = (v) => Math.round(v * 100) / 100;
+
+								function setPoint(x, y) {
+									const cx = clamp(x);
+									const cy = clamp(y);
+									xInput.value = cx.toFixed(2);
+									yInput.value = cy.toFixed(2);
+									marker.style.left = `calc(${(cx * 100).toFixed(2)}% - 8px)`;
+									marker.style.top = `calc(${((1 - cy) * 100).toFixed(2)}% - 8px)`;
+									readout.textContent = `Selected point: (${round2(cx).toFixed(2)}, ${round2(cy).toFixed(2)})`;
+								}
+
+								function updateFromPointer(event) {
+									const rect = plane.getBoundingClientRect();
+									if (!rect.width || !rect.height) {
+										return;
+									}
+
+									const relativeX = (event.clientX - rect.left) / rect.width;
+									const relativeY = 1 - ((event.clientY - rect.top) / rect.height);
+									setPoint(relativeX, relativeY);
+								}
+
+								plane.addEventListener('pointerdown', updateFromPointer);
+							})();
+						</script>
 					}
 					if isHost {
 						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/skip") } method="POST" class="pt-2">
@@ -158,42 +190,28 @@ templ GameContent(
 					}
 				} else {
 					<div class="space-y-5">
-						<div class="relative w-full max-w-xl mx-auto aspect-square bg-base border border-border rounded overflow-hidden">
-							<div class="absolute left-1/2 top-0 h-full border-l border-border"></div>
-							<div class="absolute top-1/2 left-0 w-full border-t border-border"></div>
+						@PlaneFrame(prompt, "cluster-plane-reveal", false) {
 							for _, dot := range dots {
-								{{
-									dotClass := "absolute h-4 w-4 rounded-full border border-base bg-cyan"
-									if dot.IsWinner {
-										dotClass = "absolute h-4 w-4 rounded-full border border-base bg-success"
-									}
-									if dot.IsCurrentPlayer {
-										dotClass += " ring-2 ring-amber"
-									}
-								}}
-								<div
-									class={ dotClass }
-									style={ plotStyle(dot.X, dot.Y, 8, true) }
-									title={ dot.Nickname + " (" + fmt.Sprintf("%d", dot.Points) + " pts)" }
-								></div>
+								<div class={ dotClass(dot) } style={ plotStyle(dot.X, dot.Y, 8, true) } title={ dot.Nickname + " (" + fmt.Sprintf("%d", dot.Points) + " pts)" }></div>
 							}
-							<div
-								class="absolute h-5 w-5 rounded-full bg-amber border border-base"
-								style={ plotStyle(centroidX, centroidY, 10, false) + " animation: cluster-centroid-pulse 1.25s infinite;" }
-								title="Centroid"
-							></div>
-						</div>
+							<div class="absolute h-6 w-6 rounded-full border-2 border-amber bg-amber/10" style={ plotStyle(centroidX, centroidY, 12, false) + " animation: cluster-target-pulse 1.3s infinite;" } title="Centroid target"></div>
+							<div class="absolute h-2 w-2 rounded-full bg-amber" style={ plotStyle(centroidX, centroidY, 4, false) }></div>
+							<div class="absolute h-1 w-6 bg-amber/80" style={ plotStyle(centroidX, centroidY, 12, false) + " transform: translate(9px, 11px);" }></div>
+							<div class="absolute h-6 w-1 bg-amber/80" style={ plotStyle(centroidX, centroidY, 12, false) + " transform: translate(11px, 9px);" }></div>
+						}
 						<div class="text-center">
 							<p class="font-mono text-amber text-sm tracking-wide">CENTROID REVEALED</p>
 							if len(winners) > 0 {
 								<p class="text-text mt-1">{ winnerSummary(winners) }</p>
 							}
 						</div>
+						@MarkerLegend()
+						@ScoreExplanation()
 						<div class="space-y-2">
 							<div class="grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono">
 								<div class="col-span-6">Player</div>
-								<div class="col-span-3 text-right">Round</div>
-								<div class="col-span-3 text-right">Total</div>
+								<div class="col-span-3 text-right">Round pts</div>
+								<div class="col-span-3 text-right">Total pts</div>
 							</div>
 							for _, s := range standings {
 								{{

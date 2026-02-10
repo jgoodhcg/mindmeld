@@ -17,6 +17,21 @@ func plotStyle(x, y float64, radiusPx int, withAnimation bool) string {
 	return style
 }
 
+func dotClass(dot DotView) string {
+	// Default all other players to gray; highlight current player in cyan.
+	className := "absolute h-4 w-4 rounded-full border border-base bg-text-muted"
+	if dot.IsCurrentPlayer {
+		className = "absolute h-4 w-4 rounded-full border border-base bg-cyan"
+	}
+
+	// Winner outline matches amber scoreboard highlight.
+	if dot.IsWinner {
+		className += " ring-2 ring-amber ring-offset-1 ring-offset-base"
+	}
+
+	return className
+}
+
 func winnerSummary(winners []string) string {
 	switch len(winners) {
 	case 0:
