@@ -33,11 +33,21 @@ func (s *Server) handleTriviaHome(w http.ResponseWriter, r *http.Request) {
 	templates.Home(stats.TotalLobbies, stats.TotalAnswers, stats.TotalRounds, liveLobbies).Render(r.Context(), w)
 }
 
+func (s *Server) handleClusterHome(w http.ResponseWriter, r *http.Request) {
+	templates.ClusterHome().Render(r.Context(), w)
+}
+
 func (s *Server) handleJoinByCode(w http.ResponseWriter, r *http.Request) {
-	code := strings.ToUpper(strings.TrimSpace(r.FormValue("code")))
-	if code == "" {
-		http.Redirect(w, r, "/trivia", http.StatusSeeOther)
-		return
+	s.handleJoinByCodeTo("/trivia")(w, r)
+}
+
+func (s *Server) handleJoinByCodeTo(fallbackPath string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		code := strings.ToUpper(strings.TrimSpace(r.FormValue("code")))
+		if code == "" {
+			http.Redirect(w, r, fallbackPath, http.StatusSeeOther)
+			return
+		}
+		http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 	}
-	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }

@@ -3,11 +3,11 @@ package templates
 import "github.com/jgoodhcg/mindmeld/internal/db"
 
 templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, isHost bool, gameContent templ.Component) {
-	@Layout("Trivia - " + lobby.Name) {
+	@Layout(gameLabel(lobby.GameType) + " - " + lobby.Name) {
 		<div class="max-w-4xl mx-auto space-y-6">
 			<!-- Platform brand -->
 			<div class="text-center pt-2">
-				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">Trivia</span></span>
+				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">{ gameLabel(lobby.GameType) }</span></span>
 			</div>
 			<!-- Header -->
 			<div class="bg-elevated border border-border rounded p-5 sm:p-6">

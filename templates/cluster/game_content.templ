@@ -1,0 +1,230 @@
+package cluster
+
+import (
+	"fmt"
+	"github.com/jgoodhcg/mindmeld/internal/db"
+)
+
+// GameContent renders Cluster state. The id is required for websocket OOB updates.
+templ GameContent(
+	lobby db.Lobby,
+	players []db.GetLobbyPlayersRow,
+	isHost bool,
+	minPlayers int,
+	hasRound bool,
+	roundNumber int32,
+	prompt PromptAxisView,
+	submittedCount int,
+	expectedCount int,
+	hasSubmitted bool,
+	revealed bool,
+	dots []DotView,
+	centroidX float64,
+	centroidY float64,
+	standings []StandingView,
+	winners []string,
+	remainingPairs int,
+	exhausted bool,
+) {
+	<div id="game-content">
+		<style>
+			@keyframes cluster-dot-enter {
+				from {
+					opacity: 0;
+					transform: scale(0.25);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1);
+				}
+			}
+
+			@keyframes cluster-centroid-pulse {
+				0%, 100% {
+					transform: scale(1);
+					box-shadow: 0 0 0 0 rgba(212, 162, 84, 0.7);
+				}
+				70% {
+					transform: scale(1.12);
+					box-shadow: 0 0 0 16px rgba(212, 162, 84, 0);
+				}
+			}
+		</style>
+		if lobby.Phase == "waiting" {
+			<div class="bg-elevated border border-border rounded p-5 sm:p-6 space-y-5">
+				<div class="text-center">
+					<h2 class="font-mono text-xl font-bold text-text">CLUSTER</h2>
+					<p class="text-text-muted text-sm mt-2">Plot your coordinates. Score by closeness to the group centroid.</p>
+				</div>
+				<div class="bg-base border border-border rounded p-4 text-center">
+					<p class="text-text-muted">Minimum players to start: <span class="text-text font-mono">{ fmt.Sprintf("%d", minPlayers) }</span></p>
+					<p class="text-text-muted text-sm mt-1">Connected now: <span class="text-cyan font-mono">{ fmt.Sprintf("%d", len(players)) }</span></p>
+				</div>
+				if isHost {
+					<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/start") } method="POST">
+						if len(players) >= minPlayers {
+							<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">START CLUSTER</button>
+						} else {
+							<button type="button" disabled class="w-full bg-border text-text-muted text-base py-3 rounded font-mono font-bold tracking-wide cursor-not-allowed">START CLUSTER</button>
+						}
+					</form>
+					if len(players) < minPlayers {
+						<p class="text-center text-sm text-text-muted">Waiting for at least { fmt.Sprintf("%d", minPlayers) } players.</p>
+					}
+				} else {
+					<p class="text-center text-text-muted">Waiting for host to start the game.</p>
+				}
+			</div>
+		} else if exhausted || lobby.Phase == "finished" || (lobby.Phase == "playing" && !hasRound) {
+			<div class="bg-elevated border border-border rounded p-5 sm:p-6 space-y-6">
+				<div class="text-center">
+					<h2 class="font-mono text-xl font-bold text-text">SESSION COMPLETE</h2>
+					<p class="text-text-muted mt-2">You have played all available prompts.</p>
+				</div>
+				if len(standings) > 0 {
+					<div class="space-y-3">
+						<h3 class="font-mono text-xs tracking-widest uppercase text-text-muted">Final Standings</h3>
+						for i, s := range standings {
+							{{
+								rowClass := "grid grid-cols-12 gap-2 items-center p-3 rounded border bg-base border-border"
+								if s.IsLeader {
+									rowClass = "grid grid-cols-12 gap-2 items-center p-3 rounded border bg-amber/10 border-amber/50"
+								}
+							}}
+							<div class={ rowClass }>
+								<div class="col-span-2 font-mono text-text-muted">{ fmt.Sprintf("%02d", i+1) }</div>
+								<div class="col-span-6 text-text truncate">{ s.Nickname }</div>
+								<div class="col-span-4 text-right font-mono text-cyan">{ fmt.Sprintf("%d", s.TotalPoints) } pts</div>
+							</div>
+						}
+					</div>
+				}
+				<a href="/" class="block text-center text-sm text-text-muted hover:text-text transition-colors">Return to platform</a>
+			</div>
+		} else if lobby.Phase == "playing" && hasRound {
+			<div class="bg-elevated border border-border rounded p-5 sm:p-6 space-y-6">
+				<div class="text-center space-y-3">
+					<div class="inline-flex items-center gap-2 px-3 py-1 rounded border border-border bg-base">
+						<span class="font-mono text-cyan text-sm">ROUND { fmt.Sprintf("%d", roundNumber) }</span>
+						<span class="text-text-muted">•</span>
+						<span class="font-mono text-xs text-text-muted">{ fmt.Sprintf("%d", submittedCount) } / { fmt.Sprintf("%d", expectedCount) } submitted</span>
+					</div>
+					<div class="bg-base border border-border rounded p-4 sm:p-5 max-w-2xl mx-auto">
+						<p class="text-text text-lg sm:text-xl leading-relaxed">{ prompt.PromptText }</p>
+					</div>
+				</div>
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+					<div class="bg-base border border-border rounded p-4 space-y-2">
+						<p class="font-mono text-xs tracking-widest uppercase text-text-muted">X Axis</p>
+						<div class="flex justify-between text-sm">
+							<span class="text-text-muted">{ prompt.XMinLabel }</span>
+							<span class="text-text-muted">{ prompt.XMaxLabel }</span>
+						</div>
+					</div>
+					<div class="bg-base border border-border rounded p-4 space-y-2">
+						<p class="font-mono text-xs tracking-widest uppercase text-text-muted">Y Axis</p>
+						<div class="flex justify-between text-sm">
+							<span class="text-text-muted">{ prompt.YMinLabel }</span>
+							<span class="text-text-muted">{ prompt.YMaxLabel }</span>
+						</div>
+					</div>
+				</div>
+				if !revealed {
+					if hasSubmitted {
+						<div class="bg-base border border-success rounded p-5 text-center">
+							<p class="font-mono text-success tracking-wide">COORDINATE LOCKED</p>
+							<p class="text-text-muted text-sm mt-2">Waiting for all players to submit.</p>
+						</div>
+					} else {
+						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/submissions") } method="POST" class="space-y-4">
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div>
+									<label for="x" class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">X (0.00 to 1.00)</label>
+									<input type="number" name="x" id="x" min="0" max="1" step="0.01" value="0.50" required class="w-full bg-base border border-border rounded px-4 py-3 text-text focus:outline-none focus:border-cyan transition-colors"/>
+								</div>
+								<div>
+									<label for="y" class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">Y (0.00 to 1.00)</label>
+									<input type="number" name="y" id="y" min="0" max="1" step="0.01" value="0.50" required class="w-full bg-base border border-border rounded px-4 py-3 text-text focus:outline-none focus:border-cyan transition-colors"/>
+								</div>
+							</div>
+							<button type="submit" class="w-full bg-cyan hover:bg-cyan/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">SUBMIT COORDINATE</button>
+						</form>
+					}
+					if isHost {
+						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/skip") } method="POST" class="pt-2">
+							<button type="submit" class="w-full bg-border hover:bg-amber/20 text-text py-3 rounded font-mono font-bold tracking-wide transition-colors">SKIP PROMPT</button>
+						</form>
+						<p class="text-center text-xs text-text-muted">Skip marks this prompt as used and moves to the next one.</p>
+					}
+				} else {
+					<div class="space-y-5">
+						<div class="relative w-full max-w-xl mx-auto aspect-square bg-base border border-border rounded overflow-hidden">
+							<div class="absolute left-1/2 top-0 h-full border-l border-border"></div>
+							<div class="absolute top-1/2 left-0 w-full border-t border-border"></div>
+							for _, dot := range dots {
+								{{
+									dotClass := "absolute h-4 w-4 rounded-full border border-base bg-cyan"
+									if dot.IsWinner {
+										dotClass = "absolute h-4 w-4 rounded-full border border-base bg-success"
+									}
+									if dot.IsCurrentPlayer {
+										dotClass += " ring-2 ring-amber"
+									}
+								}}
+								<div
+									class={ dotClass }
+									style={ plotStyle(dot.X, dot.Y, 8, true) }
+									title={ dot.Nickname + " (" + fmt.Sprintf("%d", dot.Points) + " pts)" }
+								></div>
+							}
+							<div
+								class="absolute h-5 w-5 rounded-full bg-amber border border-base"
+								style={ plotStyle(centroidX, centroidY, 10, false) + " animation: cluster-centroid-pulse 1.25s infinite;" }
+								title="Centroid"
+							></div>
+						</div>
+						<div class="text-center">
+							<p class="font-mono text-amber text-sm tracking-wide">CENTROID REVEALED</p>
+							if len(winners) > 0 {
+								<p class="text-text mt-1">{ winnerSummary(winners) }</p>
+							}
+						</div>
+						<div class="space-y-2">
+							<div class="grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono">
+								<div class="col-span-6">Player</div>
+								<div class="col-span-3 text-right">Round</div>
+								<div class="col-span-3 text-right">Total</div>
+							</div>
+							for _, s := range standings {
+								{{
+									rowClass := "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-base border-border"
+									if s.IsLeader {
+										rowClass = "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-amber/10 border-amber/50"
+									}
+								}}
+								<div class={ rowClass }>
+									<div class="col-span-6 text-text truncate">{ s.Nickname }</div>
+									<div class="col-span-3 text-right font-mono text-cyan">{ fmt.Sprintf("%d", s.RoundPoints) }</div>
+									<div class="col-span-3 text-right font-mono text-text">{ fmt.Sprintf("%d", s.TotalPoints) }</div>
+								</div>
+							}
+						</div>
+						if isHost {
+							<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/next") } method="POST">
+								<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">
+									if remainingPairs > 0 {
+										NEXT ROUND
+									} else {
+										FINISH SESSION
+									}
+								</button>
+							</form>
+						} else {
+							<p class="text-center text-sm text-text-muted">Waiting for host to continue.</p>
+						}
+					</div>
+				}
+			</div>
+		}
+	</div>
+}

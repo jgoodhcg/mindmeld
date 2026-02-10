@@ -30,9 +30,9 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ### Active
 - [work-party-prep.md](./work-party-prep.md) - Launch readiness polish and stability
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
+- [coordinates.md](./coordinates.md) - Coordinates social alignment game (Cluster MVP)
 
 ### Ready
-- [coordinates.md](./coordinates.md) - Coordinates social alignment game (Cluster MVP)
 
 ### Draft
 - [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state

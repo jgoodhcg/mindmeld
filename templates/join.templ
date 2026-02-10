@@ -7,7 +7,7 @@ templ JoinLobby(lobby db.Lobby) {
 		<div class="max-w-md mx-auto py-12 sm:py-20 px-4">
 			<!-- Platform brand -->
 			<div class="text-center mb-8">
-				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">Trivia</span></span>
+				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">{ gameLabel(lobby.GameType) }</span></span>
 			</div>
 			<div class="bg-elevated border border-border rounded p-6 sm:p-8">
 				<div class="text-center mb-6">

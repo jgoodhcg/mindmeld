@@ -8,6 +8,7 @@
  *   npm run flow                     # Run default flow (create lobby)
  *   npm run flow -- join ABC123      # Run join lobby flow
  *   npm run flow -- trivia ABC123    # Run trivia game flow
+ *   npm run flow -- coordinates CODE # Run Cluster game flow
  *   npm run flow -- templates        # Open templates modal flow
  */
 
@@ -108,6 +109,32 @@ async function triviaFlow(page: Page, lobbyCode: string) {
   console.log(`\nFinal URL: ${page.url()}`);
 }
 
+async function coordinatesFlow(page: Page, lobbyCode: string) {
+  flowName = 'coordinates';
+  console.log(`\n=== Coordinates Flow (${lobbyCode}) ===\n`);
+
+  await page.goto(`${BASE_URL}/lobbies/${lobbyCode}`, { waitUntil: 'networkidle' });
+  await capture(page, 'cluster-page');
+
+  const xInput = page.locator('input[name="x"]').first();
+  const yInput = page.locator('input[name="y"]').first();
+  if (await xInput.isVisible() && await yInput.isVisible()) {
+    await xInput.fill('0.33');
+    await yInput.fill('0.77');
+    await capture(page, 'coordinates-filled');
+
+    const submitBtn = page.locator('button[type="submit"]', { hasText: 'SUBMIT COORDINATE' }).first();
+    if (await submitBtn.isVisible()) {
+      await submitBtn.click();
+      await page.waitForLoadState('networkidle');
+      await capture(page, 'coordinate-submitted');
+    }
+  }
+
+  await capture(page, 'final-state');
+  console.log(`\nFinal URL: ${page.url()}`);
+}
+
 async function templatesFlow(page: Page) {
   flowName = 'templates';
   console.log('\n=== Templates Modal Flow ===\n');
@@ -189,12 +216,17 @@ async function main() {
         if (!param) throw new Error('trivia requires a lobby code');
         await triviaFlow(page, param);
         break;
+      case 'coordinates':
+      case 'cluster':
+        if (!param) throw new Error('coordinates requires a lobby code');
+        await coordinatesFlow(page, param);
+        break;
       case 'templates':
         await templatesFlow(page);
         break;
       default:
         console.error(`Unknown flow: ${command}`);
-        console.error('Available: create, join <code>, trivia <code>, templates');
+        console.error('Available: create, join <code>, trivia <code>, coordinates <code>, templates');
         process.exit(1);
     }
   } catch (e) {

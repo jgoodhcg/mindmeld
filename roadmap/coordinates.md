@@ -1,11 +1,11 @@
 ---
 title: "Coordinates"
-status: ready
+status: active
 description: "Cluster MVP: real-time 2D social alignment game with centroid scoring and normalized content schema."
 tags: [area/game, type/feature]
 priority: high
 created: 2026-01-11
-updated: 2026-02-08
+updated: 2026-02-09
 effort: M
 depends-on: []
 ---

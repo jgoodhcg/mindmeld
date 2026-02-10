@@ -43,6 +43,9 @@ func (s *Subscriber) HandleEvent(ctx context.Context, event events.Event) {
 	switch event.Type {
 	case events.EventPlayerJoined, events.EventPlayerLeft:
 		s.broadcastPlayerList(ctx, event.LobbyCode)
+		// Player changes can affect game-content state (e.g. minimum players/start button).
+		// Trigger a full content refresh in addition to the player-list OOB swap.
+		BroadcastUpdateTrigger(ctx, event.LobbyCode, s.hub)
 	default:
 		// Look up the lobby's game type and delegate to the game handler
 		lobby, err := s.queries.GetLobbyByCode(ctx, event.LobbyCode)

@@ -6,6 +6,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/internal/games"
+	"github.com/jgoodhcg/mindmeld/internal/games/cluster"
 	"github.com/jgoodhcg/mindmeld/internal/games/trivia"
 	"github.com/jgoodhcg/mindmeld/internal/ws"
 )
@@ -27,7 +28,9 @@ func NewServer(pool *pgxpool.Pool) *Server {
 	// Create game registry and register games
 	registry := games.NewRegistry()
 	triviaGame := trivia.New(queries, pool, eventBus)
+	clusterGame := cluster.New(queries, pool, eventBus)
 	registry.Register(triviaGame)
+	registry.Register(clusterGame)
 
 	// Register placeholder games (coming soon)
 	registry.RegisterPlaceholder(games.GameInfo{Slug: "wavelength", Name: "WAVELENGTH", Description: "Find the spectrum between extremes"})

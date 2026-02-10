@@ -80,6 +80,11 @@ const (
 	EventQuestionRevealed  = "question.revealed" // Everyone answered, show correct answer
 	EventRoundAdvanced     = "round.advanced"
 	EventNewRoundCreated   = "round.created" // For "Play Again" - new round started
+
+	EventClusterRoundStarted      = "cluster.round.started"
+	EventClusterSubmissionUpdated = "cluster.submission.updated"
+	EventClusterRoundRevealed     = "cluster.round.revealed"
+	EventClusterExhausted         = "cluster.exhausted"
 )
 
 // PlayerJoinedPayload is the payload for EventPlayerJoined.

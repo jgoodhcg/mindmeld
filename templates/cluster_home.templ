@@ -1,0 +1,53 @@
+package templates
+
+templ ClusterHome() {
+	@Layout("Mindmeld") {
+		<div class="max-w-md mx-auto space-y-8 sm:space-y-12 py-8 sm:py-16">
+			<div class="text-center">
+				<span class="text-text-muted text-xs font-display tracking-widest uppercase">Mindmeld</span>
+			</div>
+			<header class="text-center space-y-3">
+				<h1 class="font-mono text-4xl sm:text-5xl font-bold tracking-wide text-text">CLUSTER</h1>
+				<p class="text-text-muted text-sm tracking-wide">Plot together, reveal together</p>
+			</header>
+			<section class="bg-elevated border border-border rounded p-6 sm:p-8">
+				<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-6">Join Session</h2>
+				<form action="/cluster/join" method="POST" class="space-y-4">
+					<input
+						type="text"
+						name="code"
+						placeholder="ENTER CODE"
+						required
+						maxlength="6"
+						class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors font-mono text-center text-xl tracking-widest uppercase"
+					/>
+					<button type="submit" class="w-full bg-cyan hover:bg-cyan/80 text-base px-6 py-3 rounded font-mono font-bold tracking-wide transition-colors">CONNECT</button>
+				</form>
+			</section>
+			<section class="bg-elevated border border-border rounded p-6 sm:p-8">
+				<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-6">Initialize Session</h2>
+				<form action="/lobbies" method="POST" class="space-y-4">
+					<input type="hidden" name="game_type" value="cluster"/>
+					<input
+						type="text"
+						name="name"
+						placeholder="Session name"
+						required
+						class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
+					/>
+					<input
+						type="text"
+						name="nickname"
+						placeholder="Your identifier"
+						required
+						class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
+					/>
+					<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base px-6 py-3 rounded font-mono font-bold tracking-wide transition-colors">INITIALIZE</button>
+				</form>
+			</section>
+			<div class="text-center">
+				<a href="/" class="text-sm text-text-muted hover:text-text transition-colors">Back to platform</a>
+			</div>
+		</div>
+	}
+}

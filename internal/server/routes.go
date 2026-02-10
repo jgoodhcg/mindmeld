@@ -21,6 +21,8 @@ func (s *Server) routes() {
 	s.router.Get("/", s.handlePlatform)
 	s.router.Get("/trivia", s.handleTriviaHome)
 	s.router.Post("/trivia/join", s.handleJoinByCode)
+	s.router.Get("/cluster", s.handleClusterHome)
+	s.router.Post("/cluster/join", s.handleJoinByCodeTo("/cluster"))
 	s.router.Post("/lobbies", s.handleCreateLobby)
 	s.router.Get("/lobbies/{code}", s.handleLobbyRoom)
 	s.router.Get("/lobbies/{code}/content", s.handleGetGameContent)
