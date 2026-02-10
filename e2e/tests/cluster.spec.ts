@@ -11,6 +11,11 @@ async function joinLobby(page: Page, code: string, nickname: string) {
 }
 
 async function submitCoordinate(page: Page, x: string, y: string) {
+  await selectCoordinate(page, x, y);
+  await submitSelectedCoordinate(page);
+}
+
+async function selectCoordinate(page: Page, x: string, y: string) {
   const plane = page.locator('#cluster-plane-input');
   await expect(plane).toBeVisible({ timeout: 10000 });
 
@@ -24,7 +29,9 @@ async function submitCoordinate(page: Page, x: string, y: string) {
   const clickX = box.x + (box.width * xNum);
   const clickY = box.y + (box.height * (1 - yNum));
   await page.mouse.click(clickX, clickY);
+}
 
+async function submitSelectedCoordinate(page: Page) {
   await Promise.all([
     page.waitForLoadState('networkidle'),
     page.click('button:has-text("SUBMIT POINT")'),
@@ -86,11 +93,18 @@ test.describe('Cluster Multiplayer', () => {
         await expect(page.locator('#cluster-plane-input')).toBeVisible({ timeout: 10000 });
       }
 
+      await selectCoordinate(player2Page, '0.85', '0.65');
+      await expect(player2Page.locator('#cluster-x')).toHaveValue('0.85');
+      await expect(player2Page.locator('#cluster-y')).toHaveValue('0.65');
+
       await submitCoordinate(hostPage, '0.10', '0.20');
       await expect(hostPage.getByText('COORDINATE LOCKED')).toBeVisible({ timeout: 10000 });
       await expect(hostPage.getByText(/1\s*\/\s*3 submitted/i)).toBeVisible({ timeout: 10000 });
 
-      await submitCoordinate(player2Page, '0.85', '0.65');
+      await expect(player2Page.locator('#cluster-x')).toHaveValue('0.85');
+      await expect(player2Page.locator('#cluster-y')).toHaveValue('0.65');
+      await expect(player2Page.locator('#cluster-coordinate-readout')).toHaveText('Selected point: (0.70, 0.30)');
+      await submitSelectedCoordinate(player2Page);
       await expect(hostPage.getByText(/2\s*\/\s*3 submitted/i)).toBeVisible({ timeout: 10000 });
 
       await submitCoordinate(player3Page, '0.50', '0.45');

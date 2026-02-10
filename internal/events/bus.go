@@ -105,6 +105,12 @@ type QuestionSubmittedPayload struct {
 	HostPlayerID   string // The player ID (UUID string) of the lobby host
 }
 
+// ClusterSubmissionUpdatedPayload is the payload for EventClusterSubmissionUpdated.
+type ClusterSubmissionUpdatedPayload struct {
+	SubmittedCount int
+	TotalPlayers   int
+}
+
 // RoundAdvancedPayload is the payload for EventRoundAdvanced.
 type RoundAdvancedPayload struct {
 	RoundNumber int32

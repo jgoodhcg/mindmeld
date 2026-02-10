@@ -3,6 +3,8 @@ package games
 import (
 	"context"
 	"net/http"
+	"sort"
+	"strings"
 	"sync"
 
 	"github.com/a-h/templ"
@@ -95,6 +97,14 @@ func (r *Registry) AllInfo() []GameInfo {
 		infos = append(infos, game.Info())
 	}
 	infos = append(infos, r.placeholders...)
+	sort.Slice(infos, func(i, j int) bool {
+		nameI := strings.ToLower(infos[i].Name)
+		nameJ := strings.ToLower(infos[j].Name)
+		if nameI == nameJ {
+			return infos[i].Slug < infos[j].Slug
+		}
+		return nameI < nameJ
+	})
 	return infos
 }
 

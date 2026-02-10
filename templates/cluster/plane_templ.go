@@ -8,8 +8,6 @@ package cluster
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "fmt"
-
 // PlaneFrame renders a reusable coordinate plane with axis labels and center axes.
 func PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -48,7 +46,7 @@ func PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) templ
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(elementID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 13, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 11, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -61,7 +59,7 @@ func PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) templ
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(elementID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 13, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 11, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -88,14 +86,14 @@ func PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) templ
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- axis labels rendered on-plane --><div class=\"absolute top-2 left-1/2 -translate-x-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- numeric axis scale --><div class=\"absolute inset-0 pointer-events-none font-mono text-[10px] text-text-muted/80\"><span class=\"absolute left-2 top-1/2 -translate-y-1/2\">-1</span> <span class=\"absolute right-2 top-1/2 -translate-y-1/2\">1</span> <span class=\"absolute top-2\" style=\"left: calc(50% + 14px);\">1</span> <span class=\"absolute bottom-2\" style=\"left: calc(50% + 14px);\">-1</span></div><!-- axis labels rendered on-plane --><div class=\"absolute top-2 left-1/2 -translate-x-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.YMaxLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 25, Col: 206}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 30, Col: 206}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -108,7 +106,7 @@ func PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) templ
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.YMinLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 26, Col: 209}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 31, Col: 209}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -121,7 +119,7 @@ func PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) templ
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.XMinLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 27, Col: 206}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 32, Col: 206}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -134,7 +132,7 @@ func PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) templ
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.XMaxLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 28, Col: 218}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 33, Col: 218}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -169,7 +167,7 @@ func MarkerLegend() templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs font-mono text-text-muted\"><div class=\"flex items-center gap-2 bg-base border border-border rounded px-3 py-2\"><span class=\"inline-block h-3 w-3 rounded-full bg-text-muted\"></span> <span>Other players</span></div><div class=\"flex items-center gap-2 bg-base border border-border rounded px-3 py-2\"><span class=\"inline-block h-3 w-3 rounded-full bg-cyan\"></span> <span>Your point</span></div><div class=\"flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2\"><span class=\"inline-block h-3 w-3 rounded-full bg-text-muted ring-2 ring-amber\"></span> <span>Round winner</span></div><div class=\"flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2\"><span class=\"inline-block h-3 w-3 rounded-full border-2 border-amber\"></span> <span>Centroid target</span></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs font-mono text-text-muted\"><div class=\"flex items-center gap-2 bg-base border border-border rounded px-3 py-2\"><span class=\"inline-block h-3 w-3 rounded-full bg-text-muted\"></span> <span>Other players</span></div><div class=\"flex items-center gap-2 bg-base border border-border rounded px-3 py-2\"><span class=\"inline-block h-3 w-3 rounded-full bg-cyan\"></span> <span>Your point</span></div><div class=\"flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2\"><span class=\"inline-block h-3 w-3 rounded-full bg-text-muted ring-2 ring-amber\"></span> <span>Round winner</span></div><div class=\"flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2\"><span class=\"relative inline-block h-3 w-3\"><span class=\"absolute inset-0 rounded-full border border-amber\"></span> <span class=\"absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-amber\"></span> <span class=\"absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-amber\"></span></span> <span>Centroid target</span></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -232,9 +230,9 @@ func CoordinateReadout(x float64, y float64) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", x))
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(displayCoord(x))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 62, Col: 131}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 71, Col: 124}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -245,15 +243,67 @@ func CoordinateReadout(x float64, y float64) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", y))
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(displayCoord(y))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 62, Col: 159}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 71, Col: 145}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, ")</p>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func SubmissionStatus(submittedCount int, expectedCount int, isUpdate bool) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<span id=\"cluster-submission-progress\" class=\"font-mono text-xs text-text-muted\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if isUpdate {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " hx-swap-oob=\"outerHTML\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, ">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(submissionProgress(submittedCount, expectedCount))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/plane.templ`, Line: 81, Col: 53}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

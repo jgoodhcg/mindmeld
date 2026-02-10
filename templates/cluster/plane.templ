@@ -1,7 +1,5 @@
 package cluster
 
-import "fmt"
-
 // PlaneFrame renders a reusable coordinate plane with axis labels and center axes.
 templ PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) {
 	{{
@@ -21,6 +19,13 @@ templ PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) {
 			<div class="absolute top-3/4 left-0 w-full border-t border-border/40"></div>
 		</div>
 		{ children... }
+		<!-- numeric axis scale -->
+		<div class="absolute inset-0 pointer-events-none font-mono text-[10px] text-text-muted/80">
+			<span class="absolute left-2 top-1/2 -translate-y-1/2">-1</span>
+			<span class="absolute right-2 top-1/2 -translate-y-1/2">1</span>
+			<span class="absolute top-2" style="left: calc(50% + 14px);">1</span>
+			<span class="absolute bottom-2" style="left: calc(50% + 14px);">-1</span>
+		</div>
 		<!-- axis labels rendered on-plane -->
 		<div class="absolute top-2 left-1/2 -translate-x-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none">{ prompt.YMaxLabel }</div>
 		<div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-base/90 border border-border rounded px-2 py-1 text-[11px] font-mono text-text-muted uppercase tracking-wide pointer-events-none">{ prompt.YMinLabel }</div>
@@ -44,7 +49,11 @@ templ MarkerLegend() {
 			<span>Round winner</span>
 		</div>
 		<div class="flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2">
-			<span class="inline-block h-3 w-3 rounded-full border-2 border-amber"></span>
+			<span class="relative inline-block h-3 w-3">
+				<span class="absolute inset-0 rounded-full border border-amber"></span>
+				<span class="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-amber"></span>
+				<span class="absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-amber"></span>
+			</span>
 			<span>Centroid target</span>
 		</div>
 	</div>
@@ -59,5 +68,15 @@ templ ScoreExplanation() {
 }
 
 templ CoordinateReadout(x float64, y float64) {
-	<p id="cluster-coordinate-readout" class="text-center text-sm text-text-muted font-mono">Selected point: ({ fmt.Sprintf("%.2f", x) }, { fmt.Sprintf("%.2f", y) })</p>
+	<p id="cluster-coordinate-readout" class="text-center text-sm text-text-muted font-mono">Selected point: ({ displayCoord(x) }, { displayCoord(y) })</p>
+}
+
+templ SubmissionStatus(submittedCount int, expectedCount int, isUpdate bool) {
+	<span
+		id="cluster-submission-progress"
+		class="font-mono text-xs text-text-muted"
+		if isUpdate {
+			hx-swap-oob="outerHTML"
+		}
+	>{ submissionProgress(submittedCount, expectedCount) }</span>
 }

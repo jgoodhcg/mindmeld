@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -30,6 +31,26 @@ func dotClass(dot DotView) string {
 	}
 
 	return className
+}
+
+func displayCoord(v float64) string {
+	dv := (clampUnit(v) - 0.5) * 2
+	if math.Abs(dv) < 0.005 {
+		dv = 0
+	}
+	return fmt.Sprintf("%.2f", dv)
+}
+
+func submissionProgress(submittedCount int, expectedCount int) string {
+	return fmt.Sprintf("%d / %d submitted", submittedCount, expectedCount)
+}
+
+func centerStyle(x, y float64) string {
+	clampedX := clampUnit(x)
+	clampedY := clampUnit(y)
+	left := clampedX * 100
+	top := (1 - clampedY) * 100
+	return fmt.Sprintf("left: %.2f%%; top: %.2f%%;", left, top)
 }
 
 func winnerSummary(winners []string) string {

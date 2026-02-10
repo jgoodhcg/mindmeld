@@ -200,10 +200,15 @@ func (g *ClusterGame) handleSubmitCoordinate(w http.ResponseWriter, r *http.Requ
 	}
 
 	eventType := events.EventClusterSubmissionUpdated
+	var payload any = events.ClusterSubmissionUpdatedPayload{
+		SubmittedCount: submissionCount,
+		TotalPlayers:   len(players),
+	}
 	if revealed {
 		eventType = events.EventClusterRoundRevealed
+		payload = nil
 	}
-	g.eventBus.Publish(ctx, events.Event{Type: eventType, LobbyCode: code})
+	g.eventBus.Publish(ctx, events.Event{Type: eventType, LobbyCode: code, Payload: payload})
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }
