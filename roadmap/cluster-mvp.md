@@ -41,6 +41,7 @@ Implemented and validated:
 ## Remaining Before MVP Complete
 
 - [ ] Expand active Cluster prompt-axis seed pool beyond the initial starter set.
+    - Now tracked as Phase 3 of [work-party-prep.md](./work-party-prep.md) with expanded scope: 30+ combinations, spicier prompts, more axis variety, content rating tags.
 
 This is the only known remaining MVP deliverable.
 

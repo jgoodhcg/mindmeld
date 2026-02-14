@@ -33,6 +33,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [cluster-mvp.md](./cluster-mvp.md) - Cluster MVP delivery and final completion checklist
 
 ### Ready
+- [content-rating.md](./content-rating.md) - Cross-cutting audience rating (Kids/Work/Adults) for all content
 - [game-instructions.md](./game-instructions.md) - Game rules and role-based guidance for players
 
 ### Draft
@@ -59,19 +60,20 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 
 ## WSJF Prioritized Backlog
 
-*Sorted by (Value + Urgency + Risk) / Size. Do these in order.*
+*Sorted by (Value + Urgency + Risk) / Size. Do these in order. See [work-party-prep.md](./work-party-prep.md) for the active execution plan.*
 
-| # | Item | Why High Priority |
-|---|------|-------------------|
-| 1 | **Refactor Flicker Fix** | Current `reload()` fix is jarring; needs HTMX/WS polish |
-| 2 | **AI Question Assist** | Reduces friction for players submitting questions |
-| 3 | **Round results screen** | Creates discussion moments between questions |
-| 4 | **Accessibility pass** | Improves contrast, keyboard use, and screen reader flow for everyone |
-| 5 | **Show answer status while waiting** | Reduces "is it frozen?" anxiety |
-| 6 | **Mid-game player join sync** | Prevents confusion when friends arrive late |
-| 7 | **Per-round point analysis** | Fuels friendly banter about who's winning |
-| 8 | **Visual redesign completion** | Polish remaining screens for cohesive feel |
-| 9 | **Enhanced end-of-game stats** | Conversation fuel: "most missed question" etc |
+| # | Item | Status | Why |
+|---|------|--------|-----|
+| 1 | ~~Refactor Flicker Fix~~ | Done | HTMX/WS polish shipped |
+| 2 | **Content Rating System** | Ready | Foundation for all content work; host picks Kids/Work/Adults |
+| 3 | **Curated Trivia Packs** | Next | Kills question-writing friction without API dependency |
+| 4 | **AI Question Assist** | Next | Optional layer: generates questions constrained by content rating |
+| 5 | **Cluster Prompt Overhaul** | Next | 3 prompts is too few, and they're too safe — need 30+ with spice |
+| 6 | **Cluster Reveal Juice** | Planned | Centroid reveal needs animation and drama |
+| 7 | **Game instructions screen** | Ready | Pre-game rules for new players |
+| 8 | **Accessibility pass** | Backlog | Contrast, keyboard use, screen reader flow |
+| 9 | **Mid-game player join sync** | Backlog | Late arrivals get confused |
+| 10 | **Enhanced end-of-game stats** | Backlog | Conversation fuel: "most missed question" etc |
 
 ---
 
