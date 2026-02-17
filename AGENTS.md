@@ -1,6 +1,6 @@
 # AGENTS
 
-Follows AGENT_BLUEPRINT.md
+Follows `AGENT_BLUEPRINT.md` (version: 1.4.4)
 
 ## Project Overview
 
@@ -26,8 +26,17 @@ AI-Model: [AI_MODEL]
 
 Template rules:
 - `AI_PRODUCT_LINE` must be one of: `codex|claude|gemini|opencode`.
-- Determine `AI_PRODUCT_LINE` from current session.
+- Determine `AI_PRODUCT_LINE` from current session:
+  - Codex or ChatGPT coding agent -> `codex`
+  - Claude -> `claude`
+  - Gemini -> `gemini`
+  - OpenCode -> `opencode` (regardless underlying provider/model, including z.ai)
 - Determine `AI_PROVIDER` and `AI_MODEL` from runtime model metadata.
+- `AI_PRODUCT_NAME` and `AI_PRODUCT_EMAIL` format:
+  - `codex` -> `Codex <codex@users.noreply.github.com>`
+  - `claude` -> `Claude <claude@users.noreply.github.com>`
+  - `gemini` -> `Gemini <google-gemini@users.noreply.github.com>`
+  - `opencode` -> `GLM <zai-org@users.noreply.github.com>`
 - Fill this template at commit time; do not persist filled values in `AGENTS.md`.
 
 ## Safety
@@ -52,12 +61,12 @@ Include an E2E validation step at the end of any implementation plan:
 - Note the dev server must already be running (user will start it).
 - Read the PNGs in `e2e/screenshots/` to verify the UI.
 
-## Decision Matrices
+## Decision Artifacts
 
 - For high-impact or irreversible choices, create a matrix JSON at `.decisions/<slug>.json`.
 - Do not create a decision markdown file for matrix decisions.
-- Use `matrix-reloaded --instructions` to get the current schema and examples before creating or editing matrix JSON.
-- Agents must not run `matrix-reloaded` directly.
+- Use the project-provided schema and examples in this file when creating or editing matrix JSON.
+- Do not run `matrix-reloaded` CLI commands from agent sessions.
 - Expected artifacts are `.decisions/<slug>.json` and the auto-generated `.decisions/<slug>.xlsx`.
 - Expected JSON shape:
 
@@ -111,7 +120,6 @@ Include an E2E validation step at the end of any implementation plan:
 - `make e2e-screenshot` — Screenshot homepage or path.
 - `make e2e-flow` — Run flow with screenshots.
 - `make e2e-test` — Run Playwright smoke tests.
-- `matrix-reloaded --instructions` — Print matrix JSON schema and usage guidance.
 
 ## Require Confirmation
 
@@ -137,6 +145,13 @@ Include an E2E validation step at the end of any implementation plan:
 - For UI changes: run E2E validation and read the screenshots.
 - Commit only after explicit user approval.
 - When asked to align with blueprint, use the required alignment report format from `AGENT_BLUEPRINT.md`.
+
+## User Profile (optional)
+
+See `.agent-profile.md` (git-ignored) for interaction preferences. Create or update on project init or alignment:
+- If no profile exists, ask the user profile questions and create one.
+- If incomplete, ask targeted follow-up questions.
+- If complete, ask if the user wants to update it.
 
 ## References
 
