@@ -71,7 +71,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 | 5 | **Cluster Prompt Overhaul** | Next | 3 prompts is too few, and they're too safe — need 30+ with spice |
 | 6 | **Cluster Reveal Juice** | Planned | Centroid reveal needs animation and drama |
 | 7 | **Game instructions screen** | Ready | Pre-game rules for new players |
-| 8 | **Accessibility pass** | Backlog | Contrast, keyboard use, screen reader flow |
+| 8 | **Accessibility pass** | Backlog | Contrast, keyboard use, screen reader flow. Note: Safari tab order is not intuitive/consistent with other browsers |
 | 9 | **Mid-game player join sync** | Backlog | Late arrivals get confused |
 | 10 | **Enhanced end-of-game stats** | Backlog | Conversation fuel: "most missed question" etc |
 
