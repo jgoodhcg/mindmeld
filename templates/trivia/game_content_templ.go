@@ -16,7 +16,7 @@ import (
 // GameContent renders the main game content area.
 // This partial is used both in the initial page render and for WebSocket updates.
 // The id="game-content" is required for HTMX WebSocket OOB swaps.
-func GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, roundScoreboard []db.GetRoundScoreboardRow, distribution []events.AnswerStat, totalAnswers int) templ.Component {
+func GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, roundScoreboard []db.GetRoundScoreboardRow, distribution []events.AnswerStat, totalAnswers int, totalExpectedAnswers int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -97,12 +97,12 @@ func GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db
 				}
 			} else if activeRound.Phase == "playing" && questionActive {
 				if activeRound.QuestionState == "revealed" {
-					templ_7745c5c3_Err = QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, true, isHost).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, totalExpectedAnswers, true, isHost).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else if hasAnswered {
-					templ_7745c5c3_Err = QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, false, isHost).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = QuestionResults(lobby.Code, currentQuestion, distribution, totalAnswers, totalExpectedAnswers, false, isHost).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

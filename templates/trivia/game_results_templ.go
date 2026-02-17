@@ -14,7 +14,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/events"
 )
 
-func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, isRevealed bool, isHost bool) templ.Component {
+func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, totalExpectedAnswers int, isRevealed bool, isHost bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -52,6 +52,16 @@ func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		resultsTotal := totalAnswers
+		if isRevealed && totalExpectedAnswers > 0 {
+			resultsTotal = totalExpectedAnswers
+		}
+
+		unansweredCount := totalExpectedAnswers - totalAnswers
+		if unansweredCount < 0 {
+			unansweredCount = 0
+		}
+		unansweredPercent := CalculatePercentage(unansweredCount, resultsTotal)
 		shuffled := ShuffleAnswers(question)
 		for _, ans := range shuffled {
 			count := 0
@@ -61,7 +71,7 @@ func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution 
 					break
 				}
 			}
-			percent := CalculatePercentage(count, totalAnswers)
+			percent := CalculatePercentage(count, resultsTotal)
 			isCorrect := ans.Value == question.CorrectAnswer
 
 			// Color logic
@@ -83,7 +93,7 @@ func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution 
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(ans.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 46, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 58, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -96,7 +106,7 @@ func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution 
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(ans.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 46, Col: 82}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 58, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -109,7 +119,7 @@ func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution 
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d%%", percent))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 47, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 59, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -166,7 +176,7 @@ func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution 
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("width: %d%%", percent))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 50, Col: 122}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 62, Col: 122}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -187,40 +197,85 @@ func QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div><div class=\"h-24 flex items-center justify-center\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if isHost && isRevealed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<form action=\"")
+		if isRevealed && totalExpectedAnswers > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"relative\"><div class=\"flex items-center justify-between text-sm mb-1 px-1\"><span class=\"font-mono font-bold text-text-muted\">UNANSWERED</span> <span class=\"font-mono text-text\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var11 templ.SafeURL
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/lobbies/" + lobbyCode + "/trivia/next-question"))
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d%%", unansweredPercent))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 62, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 75, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" method=\"POST\"><button type=\"submit\" class=\"bg-amber hover:bg-amber/80 text-base px-10 py-4 rounded font-mono font-bold tracking-wide transition-all transform hover:scale-105 shadow-lg\">NEXT QUESTION →</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span></div><div class=\"h-12 w-full bg-base rounded-md border border-border relative overflow-hidden\"><div class=\"h-full transition-all duration-700 ease-out bg-amber/40\" style=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else if !isRevealed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"text-center animate-pulse\"><p class=\"text-cyan font-mono text-lg font-bold\">LIVE RESULTS</p><p class=\"text-text-muted text-sm\">Waiting for other players...</p></div>")
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("width: %d%%", unansweredPercent))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 78, Col: 128}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"text-center\"><p class=\"text-text-muted text-sm\">Waiting for host to continue...</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"></div><div class=\"absolute right-3 top-1/2 -translate-y-1/2 text-text-muted font-bold text-xs uppercase tracking-widest bg-base/90 px-2 py-1 rounded border border-border/50 shadow-sm\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d players", unansweredCount))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 80, Col: 51}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div class=\"h-24 flex items-center justify-center\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if isHost && isRevealed {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<form action=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var14 templ.SafeURL
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/lobbies/" + lobbyCode + "/trivia/next-question"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/trivia/game_results.templ`, Line: 88, Col: 83}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" method=\"POST\"><button type=\"submit\" class=\"bg-amber hover:bg-amber/80 text-base px-10 py-4 rounded font-mono font-bold tracking-wide transition-all transform hover:scale-105 shadow-lg\">NEXT QUESTION →</button></form>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else if !isRevealed {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"text-center animate-pulse\"><p class=\"text-cyan font-mono text-lg font-bold\">LIVE RESULTS</p><p class=\"text-text-muted text-sm\">Waiting for other players...</p></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"text-center\"><p class=\"text-text-muted text-sm\">Waiting for host to continue...</p></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

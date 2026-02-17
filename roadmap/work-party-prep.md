@@ -74,5 +74,5 @@ depends-on: []
 ## Phase 5: Small Polish
 **Objective:** Quality-of-life improvements that add up.
 
-- [ ] **Trivia: show "unanswered" bar** in the revealed results distribution.
+- [x] **Trivia: show "unanswered" bar** in the revealed results distribution.
 - [ ] **Game instructions** ([game-instructions.md](./game-instructions.md)): pre-game rules screen.

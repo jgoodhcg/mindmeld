@@ -77,6 +77,7 @@ func (g *TriviaGame) broadcastGameStarted(ctx context.Context, lobbyCode string,
 		emptyRoundScoreboard,
 		emptyDistribution,
 		0,
+		0,
 	).Render(ctx, &buf)
 	if err != nil {
 		log.Printf("[trivia-subscriber] Failed to render game content: %v", err)
@@ -170,6 +171,7 @@ func (g *TriviaGame) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 				currentQuestion,
 				payload.Distribution,
 				totalAnswers,
+				payload.TotalExpected,
 				false,
 				false,
 			).Render(ctx, &buf)

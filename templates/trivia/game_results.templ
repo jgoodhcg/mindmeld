@@ -6,7 +6,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/events"
 )
 
-templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, isRevealed bool, isHost bool) {
+templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, totalExpectedAnswers int, isRevealed bool, isHost bool) {
 	<div id="game-content" class="bg-elevated border border-border rounded p-5 sm:p-6">
 		<div class="text-center mb-6">
 			<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4">Results</h2>
@@ -15,6 +15,18 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 			</div>
 		</div>
 		<div class="space-y-6 mb-8 max-w-2xl mx-auto">
+			{{
+				resultsTotal := totalAnswers
+				if isRevealed && totalExpectedAnswers > 0 {
+					resultsTotal = totalExpectedAnswers
+				}
+
+				unansweredCount := totalExpectedAnswers - totalAnswers
+				if unansweredCount < 0 {
+					unansweredCount = 0
+				}
+				unansweredPercent := CalculatePercentage(unansweredCount, resultsTotal)
+			}}
 			{{ shuffled := ShuffleAnswers(question) }}
 			for _, ans := range shuffled {
 				{{
@@ -25,7 +37,7 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 							break
 						}
 					}
-					percent := CalculatePercentage(count, totalAnswers)
+					percent := CalculatePercentage(count, resultsTotal)
 					isCorrect := ans.Value == question.CorrectAnswer
 
 					// Color logic
@@ -53,6 +65,20 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 								Correct
 							</div>
 						}
+					</div>
+				</div>
+			}
+			if isRevealed && totalExpectedAnswers > 0 {
+				<div class="relative">
+					<div class="flex items-center justify-between text-sm mb-1 px-1">
+						<span class="font-mono font-bold text-text-muted">UNANSWERED</span>
+						<span class="font-mono text-text">{ fmt.Sprintf("%d%%", unansweredPercent) }</span>
+					</div>
+					<div class="h-12 w-full bg-base rounded-md border border-border relative overflow-hidden">
+						<div class="h-full transition-all duration-700 ease-out bg-amber/40" style={ fmt.Sprintf("width: %d%%", unansweredPercent) }></div>
+						<div class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted font-bold text-xs uppercase tracking-widest bg-base/90 px-2 py-1 rounded border border-border/50 shadow-sm">
+							{ fmt.Sprintf("%d players", unansweredCount) }
+						</div>
 					</div>
 				</div>
 			}

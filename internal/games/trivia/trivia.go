@@ -53,6 +53,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 	var roundScoreboard []db.GetRoundScoreboardRow
 	var distribution []events.AnswerStat
 	var totalAnswers int
+	var totalExpectedAnswers int
 
 	if lobby.Phase == "playing" {
 		var err error
@@ -89,6 +90,12 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 							isAuthor = true
 						}
 
+						for _, lobbyPlayer := range players {
+							if lobbyPlayer.PlayerID != currentQuestion.Author {
+								totalExpectedAnswers++
+							}
+						}
+
 						answers, err := g.queries.GetAnswersForQuestion(ctx, currentQuestion.ID)
 						if err == nil {
 							totalAnswers = len(answers)
@@ -121,7 +128,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 		}
 	}
 
-	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers)
+	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers, totalExpectedAnswers)
 }
 
 // RegisterRoutes registers trivia-specific HTTP routes.
