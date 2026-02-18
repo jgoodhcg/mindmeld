@@ -49,7 +49,7 @@ func (g *ClusterGame) handleStartGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	next, nextErr := g.getNextPromptAxisSet(r.Context(), g.dbPool, lobby.ID)
+	next, nextErr := g.getNextPromptAxisSet(r.Context(), g.dbPool, lobby.ID, lobby.ContentRating)
 	if nextErr != nil {
 		if errors.Is(nextErr, pgx.ErrNoRows) {
 			if updateErr := g.queries.UpdateLobbyPhase(r.Context(), db.UpdateLobbyPhaseParams{ID: lobby.ID, Phase: "finished"}); updateErr != nil {
@@ -257,7 +257,7 @@ func (g *ClusterGame) advanceRound(w http.ResponseWriter, r *http.Request, requi
 		return
 	}
 
-	next, nextErr := g.getNextPromptAxisSet(ctx, g.dbPool, lobby.ID)
+	next, nextErr := g.getNextPromptAxisSet(ctx, g.dbPool, lobby.ID, lobby.ContentRating)
 	if nextErr != nil {
 		if errors.Is(nextErr, pgx.ErrNoRows) {
 			if updateErr := g.queries.UpdateLobbyPhase(ctx, db.UpdateLobbyPhaseParams{ID: lobby.ID, Phase: "finished"}); updateErr != nil {

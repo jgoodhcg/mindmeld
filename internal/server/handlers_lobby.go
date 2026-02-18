@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jgoodhcg/mindmeld/internal/auth"
+	"github.com/jgoodhcg/mindmeld/internal/contentrating"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/templates"
@@ -21,6 +22,11 @@ func (s *Server) handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 	lobbyName := strings.TrimSpace(r.FormValue("name"))
 	nickname := strings.TrimSpace(r.FormValue("nickname"))
 	gameType := strings.TrimSpace(r.FormValue("game_type"))
+	contentRating, err := contentrating.ParseID(r.FormValue("content_rating"))
+	if err != nil {
+		http.Error(w, "Invalid content rating", http.StatusBadRequest)
+		return
+	}
 
 	if lobbyName == "" || nickname == "" {
 		http.Error(w, "Lobby name and nickname are required", http.StatusBadRequest)
@@ -36,9 +42,10 @@ func (s *Server) handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 
 	// Create Lobby
 	lobby, err := s.queries.CreateLobby(r.Context(), db.CreateLobbyParams{
-		Code:     code,
-		Name:     lobbyName,
-		GameType: gameType,
+		Code:          code,
+		Name:          lobbyName,
+		GameType:      gameType,
+		ContentRating: contentRating,
 	})
 	if err != nil {
 		log.Printf("Error creating lobby: %v", err)
@@ -155,6 +162,48 @@ func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {
 			Nickname: nickname,
 		},
 	})
+
+	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
+}
+
+func (s *Server) handleUpdateLobbyContentRating(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	player := auth.GetPlayer(r.Context())
+
+	lobby, err := s.queries.GetLobbyByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Lobby not found", http.StatusNotFound)
+		return
+	}
+
+	participation, err := s.queries.GetPlayerParticipation(r.Context(), db.GetPlayerParticipationParams{
+		LobbyID:  lobby.ID,
+		PlayerID: player.ID,
+	})
+	if err != nil || !participation.IsHost {
+		http.Error(w, "Only the host can change audience", http.StatusForbidden)
+		return
+	}
+
+	contentRating, err := contentrating.ParseID(r.FormValue("content_rating"))
+	if err != nil {
+		http.Error(w, "Invalid content rating", http.StatusBadRequest)
+		return
+	}
+
+	rowsUpdated, err := s.queries.UpdateLobbyContentRatingIfWaiting(r.Context(), db.UpdateLobbyContentRatingIfWaitingParams{
+		ID:            lobby.ID,
+		ContentRating: contentRating,
+	})
+	if err != nil {
+		log.Printf("Error updating content rating: %v", err)
+		http.Error(w, "Failed to update audience", http.StatusInternalServerError)
+		return
+	}
+	if rowsUpdated == 0 {
+		http.Error(w, "Audience can only be changed before game start", http.StatusConflict)
+		return
+	}
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
 }

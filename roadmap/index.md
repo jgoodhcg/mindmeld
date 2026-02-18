@@ -31,9 +31,9 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [work-party-prep.md](./work-party-prep.md) - Launch readiness polish and stability
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
 - [cluster-mvp.md](./cluster-mvp.md) - Cluster MVP delivery and final completion checklist
+- [content-rating.md](./content-rating.md) - Cross-cutting audience rating (Kids/Work/Adults) for all content
 
 ### Ready
-- [content-rating.md](./content-rating.md) - Cross-cutting audience rating (Kids/Work/Adults) for all content
 - [game-instructions.md](./game-instructions.md) - Game rules and role-based guidance for players
 
 ### Draft

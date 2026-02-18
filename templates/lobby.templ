@@ -26,6 +26,38 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, isHost bool, ga
 								</button>
 							</div>
 						</div>
+						<div class="pt-3">
+							<p class="text-text-muted text-xs uppercase tracking-wide mb-1">Audience</p>
+							if isHost && lobby.Phase == "waiting" {
+								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/content-rating") } method="POST" class="flex items-center gap-2">
+									<select name="content_rating" class="bg-base border border-border rounded px-2 py-1 text-sm text-text">
+										<option
+											value="10"
+											if lobby.ContentRating == 10 {
+												selected
+											}
+										>Kids</option>
+										<option
+											value="20"
+											if lobby.ContentRating == 20 {
+												selected
+											}
+										>Work</option>
+										<option
+											value="30"
+											if lobby.ContentRating == 30 {
+												selected
+											}
+										>Adults</option>
+									</select>
+									<button type="submit" class="text-xs bg-base hover:bg-border px-2 py-1 rounded text-text-muted hover:text-text transition-colors">
+										Save
+									</button>
+								</form>
+							} else {
+								<p class="text-sm text-text-muted">{ contentRatingLabel(lobby.ContentRating) }</p>
+							}
+						</div>
 					</div>
 				</div>
 			</div>

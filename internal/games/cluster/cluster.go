@@ -61,7 +61,7 @@ func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players
 		winners        []string
 	)
 
-	remainingPairs, err := g.countRemainingPromptAxisSets(ctx, g.dbPool, lobby.ID)
+	remainingPairs, err := g.countRemainingPromptAxisSets(ctx, g.dbPool, lobby.ID, lobby.ContentRating)
 	if err != nil {
 		log.Printf("[cluster] failed to count remaining prompt-axis pairs for lobby %s: %v", lobby.Code, err)
 	}
@@ -315,7 +315,7 @@ func (g *ClusterGame) setRoundCentroid(ctx context.Context, q db.DBTX, roundID p
 	return err
 }
 
-func (g *ClusterGame) countRemainingPromptAxisSets(ctx context.Context, q db.DBTX, lobbyID pgtype.UUID) (int, error) {
+func (g *ClusterGame) countRemainingPromptAxisSets(ctx context.Context, q db.DBTX, lobbyID pgtype.UUID, lobbyContentRating int16) (int, error) {
 	const query = `
 		SELECT COUNT(*)
 		FROM coordinates_prompt_axis_sets cpas
@@ -324,6 +324,8 @@ func (g *ClusterGame) countRemainingPromptAxisSets(ctx context.Context, q db.DBT
 		WHERE cpas.is_active = TRUE
 		  AND cp.is_active = TRUE
 		  AND cas.is_active = TRUE
+		  AND cp.min_rating <= $2
+		  AND cas.min_rating <= $2
 		  AND NOT EXISTS (
 				SELECT 1
 				FROM coordinates_rounds cr
@@ -333,11 +335,11 @@ func (g *ClusterGame) countRemainingPromptAxisSets(ctx context.Context, q db.DBT
 	`
 
 	var count int
-	err := q.QueryRow(ctx, query, lobbyID).Scan(&count)
+	err := q.QueryRow(ctx, query, lobbyID, lobbyContentRating).Scan(&count)
 	return count, err
 }
 
-func (g *ClusterGame) getNextPromptAxisSet(ctx context.Context, q db.DBTX, lobbyID pgtype.UUID) (promptAxisSetRecord, error) {
+func (g *ClusterGame) getNextPromptAxisSet(ctx context.Context, q db.DBTX, lobbyID pgtype.UUID, lobbyContentRating int16) (promptAxisSetRecord, error) {
 	const query = `
 		SELECT cpas.id, cp.prompt_text, cas.x_min_label, cas.x_max_label, cas.y_min_label, cas.y_max_label
 		FROM coordinates_prompt_axis_sets cpas
@@ -346,6 +348,8 @@ func (g *ClusterGame) getNextPromptAxisSet(ctx context.Context, q db.DBTX, lobby
 		WHERE cpas.is_active = TRUE
 		  AND cp.is_active = TRUE
 		  AND cas.is_active = TRUE
+		  AND cp.min_rating <= $2
+		  AND cas.min_rating <= $2
 		  AND NOT EXISTS (
 				SELECT 1
 				FROM coordinates_rounds cr
@@ -356,7 +360,7 @@ func (g *ClusterGame) getNextPromptAxisSet(ctx context.Context, q db.DBTX, lobby
 		LIMIT 1
 	`
 
-	row := q.QueryRow(ctx, query, lobbyID)
+	row := q.QueryRow(ctx, query, lobbyID, lobbyContentRating)
 	var record promptAxisSetRecord
 	err := row.Scan(
 		&record.ID,

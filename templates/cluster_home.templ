@@ -42,6 +42,23 @@ templ ClusterHome() {
 						required
 						class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
 					/>
+					<fieldset class="space-y-2">
+						<legend class="text-text-muted text-xs uppercase tracking-wide">Who's playing?</legend>
+						<div class="flex items-center gap-4 text-sm text-text-muted">
+							<label class="inline-flex items-center gap-1.5">
+								<input type="radio" name="content_rating" value="10"/>
+								<span>Kids</span>
+							</label>
+							<label class="inline-flex items-center gap-1.5">
+								<input type="radio" name="content_rating" value="20" checked/>
+								<span>Work</span>
+							</label>
+							<label class="inline-flex items-center gap-1.5">
+								<input type="radio" name="content_rating" value="30"/>
+								<span>Adults</span>
+							</label>
+						</div>
+					</fieldset>
 					<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base px-6 py-3 rounded font-mono font-bold tracking-wide transition-colors">INITIALIZE</button>
 				</form>
 			</section>

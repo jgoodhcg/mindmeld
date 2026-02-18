@@ -60,8 +60,8 @@ WHERE question_id = $1
 GROUP BY selected_answer;
 
 -- name: CreateQuestion :one
-INSERT INTO trivia_questions (round_id, author, question_text, correct_answer, wrong_answer_1, wrong_answer_2, wrong_answer_3)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO trivia_questions (round_id, author, question_text, correct_answer, wrong_answer_1, wrong_answer_2, wrong_answer_3, min_rating)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
 -- name: GetQuestionsForRound :many

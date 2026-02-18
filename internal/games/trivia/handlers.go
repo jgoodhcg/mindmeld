@@ -154,6 +154,7 @@ func (g *TriviaGame) handleSubmitQuestion(w http.ResponseWriter, r *http.Request
 		WrongAnswer1:  r.FormValue("wrong_answer_1"),
 		WrongAnswer2:  r.FormValue("wrong_answer_2"),
 		WrongAnswer3:  r.FormValue("wrong_answer_3"),
+		MinRating:     lobby.ContentRating,
 	})
 	if err != nil {
 		log.Printf("Error creating question: %v", err)
