@@ -30,7 +30,7 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, isHost bool, ga
 							<p class="text-text-muted text-xs uppercase tracking-wide mb-1">Audience</p>
 							if isHost && lobby.Phase == "waiting" {
 								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/content-rating") } method="POST" class="flex items-center gap-2">
-									<select name="content_rating" class="bg-base border border-border rounded px-2 py-1 text-sm text-text">
+									<select name="content_rating" class="bg-base border border-border rounded px-3 py-2 text-sm font-mono tracking-wide text-text transition-colors hover:border-cyan/50 focus:outline-none focus:border-cyan">
 										<option
 											value="10"
 											if lobby.ContentRating == 10 {
@@ -50,12 +50,14 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, isHost bool, ga
 											}
 										>Adults</option>
 									</select>
-									<button type="submit" class="text-xs bg-base hover:bg-border px-2 py-1 rounded text-text-muted hover:text-text transition-colors">
-										Save
+									<button type="submit" class="text-xs uppercase tracking-wide border border-border bg-base px-3 py-2 rounded text-text-muted hover:text-text hover:border-cyan/50 transition-colors">
+										Apply
 									</button>
 								</form>
 							} else {
-								<p class="text-sm text-text-muted">{ contentRatingLabel(lobby.ContentRating) }</p>
+								<span class="inline-flex items-center rounded border border-border bg-base px-3 py-1.5 text-sm font-mono tracking-wide text-text-muted">
+									{ contentRatingLabel(lobby.ContentRating) }
+								</span>
 							}
 						</div>
 					</div>

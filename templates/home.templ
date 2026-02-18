@@ -57,18 +57,18 @@ templ Home(totalLobbies int64, totalAnswers int64, totalRounds int64, liveLobbie
 					/>
 					<fieldset class="space-y-2">
 						<legend class="text-text-muted text-xs uppercase tracking-wide">Who's playing?</legend>
-						<div class="flex items-center gap-4 text-sm text-text-muted">
-							<label class="inline-flex items-center gap-1.5">
-								<input type="radio" name="content_rating" value="10"/>
-								<span>Kids</span>
+						<div class="grid grid-cols-3 gap-2">
+							<label class="cursor-pointer">
+								<input type="radio" name="content_rating" value="10" class="peer sr-only"/>
+								<span class="flex items-center justify-center rounded border border-border bg-base px-2 py-2 text-xs font-mono tracking-wide text-text-muted transition-colors hover:border-cyan/50 hover:text-text peer-checked:border-cyan peer-checked:bg-cyan/10 peer-checked:text-cyan">KIDS</span>
 							</label>
-							<label class="inline-flex items-center gap-1.5">
-								<input type="radio" name="content_rating" value="20" checked/>
-								<span>Work</span>
+							<label class="cursor-pointer">
+								<input type="radio" name="content_rating" value="20" checked class="peer sr-only"/>
+								<span class="flex items-center justify-center rounded border border-border bg-base px-2 py-2 text-xs font-mono tracking-wide text-text-muted transition-colors hover:border-cyan/50 hover:text-text peer-checked:border-cyan peer-checked:bg-cyan/10 peer-checked:text-cyan">WORK</span>
 							</label>
-							<label class="inline-flex items-center gap-1.5">
-								<input type="radio" name="content_rating" value="30"/>
-								<span>Adults</span>
+							<label class="cursor-pointer">
+								<input type="radio" name="content_rating" value="30" class="peer sr-only"/>
+								<span class="flex items-center justify-center rounded border border-border bg-base px-2 py-2 text-xs font-mono tracking-wide text-text-muted transition-colors hover:border-cyan/50 hover:text-text peer-checked:border-cyan peer-checked:bg-cyan/10 peer-checked:text-cyan">ADULTS</span>
 							</label>
 						</div>
 					</fieldset>
