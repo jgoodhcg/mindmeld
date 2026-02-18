@@ -5,7 +5,7 @@ description: "Playable real-time Cluster game. Only remaining MVP item: expand p
 tags: [area/game, type/feature]
 priority: high
 created: 2026-01-11
-updated: 2026-02-10
+updated: 2026-02-18
 effort: M
 depends-on: []
 ---
@@ -32,6 +32,7 @@ Implemented and validated:
 - [x] Marker semantics: gray others, cyan self, amber winner outline, centroid target crosshair.
 - [x] Clear scoring explanation and standings labels (`Round pts`, `Avg/round`, `Total pts`).
 - [x] Real-time updates without wiping in-progress selection while other players submit.
+- [x] Audience-aware content filtering (Kids/Work/Adults tiers) wired into prompt-axis selection.
 - [x] Deterministic game listing order on platform page.
 - [x] Automated test coverage:
   - unit tests for centroid and scoring logic

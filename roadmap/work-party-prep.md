@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-02-12
+updated: 2026-02-18
 effort: L
 depends-on: []
 ---
@@ -27,9 +27,10 @@ depends-on: []
 ## Phase 2: Trivia Question Friction
 **Objective:** Remove "writer's block" so games start fast and questions are good.
 
-- [ ] **Content Rating System** ([content-rating.md](./content-rating.md)):
+- [x] **Content Rating System** ([archived/content-rating.md](./archived/content-rating.md)):
     - Host selects audience (Adults / Work / Kids) at lobby creation.
-    - All content filtered by rating. Needed before adding packs or AI generation.
+    - Host can change audience while lobby is still waiting.
+    - Lobby + content filtering implemented (`min_rating <= lobby.content_rating`) for Cluster and authored Trivia questions.
 
 - [ ] **Curated Question Packs**:
     - Pre-built themed decks (pop culture, science, history, "about each other", etc.).
@@ -45,6 +46,8 @@ depends-on: []
 
 ## Phase 3: Cluster Content Overhaul
 **Objective:** Make Cluster rounds provoke opinions and split the room.
+
+**Current priority:** This is the next execution focus for game-day polish.
 
 - [ ] **Expand prompt-axis pool** (quantity):
     - Target: 30+ prompt-axis combinations (currently 3).
@@ -75,4 +78,6 @@ depends-on: []
 **Objective:** Quality-of-life improvements that add up.
 
 - [x] **Trivia: show "unanswered" bar** in the revealed results distribution.
+- [x] **Audience control styling pass**: radio options and lobby audience controls aligned with existing UI visual language.
+- [x] **Baseline analytics wiring**: Plausible script loaded in shared layout for site-wide pageview capture.
 - [ ] **Game instructions** ([game-instructions.md](./game-instructions.md)): pre-game rules screen.

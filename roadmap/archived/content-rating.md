@@ -1,6 +1,6 @@
 ---
 title: "Content Rating System"
-status: active
+status: done
 description: "Cross-cutting audience rating via lookup tiers (Kids/Work/Adults) for filtering content across all games."
 tags: [area/platform, type/feature]
 priority: high
@@ -108,7 +108,7 @@ ALTER TABLE trivia_questions
 - [x] Lobby rating persists and is visible to players (quiet label)
 - [x] Cluster selection filters by `prompt.min_rating <= lobby.rating` AND `axis.min_rating <= lobby.rating`
 - [x] Trivia authored questions inherit `min_rating = lobby.content_rating` on submit
-- [ ] AI generation instructions vary by rating tier (deferred until AI generation flow is implemented)
+- [x] AI generation instructions vary by rating tier (deferred by scope; tracked in AI Question Assist work)
 - [x] E2E: create lobby with Work rating, verify only Work-safe content appears
 
 ## Scope

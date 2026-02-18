@@ -22,6 +22,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ## Current Focus
 
 - **[Work Party Prep](./work-party-prep.md)** - Getting the platform polished and ready for a company social event.
+- **Immediate next execution:** Phase 3 Cluster Content Overhaul (expand and improve prompt-axis pool for game day).
 
 ---
 
@@ -31,7 +32,6 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [work-party-prep.md](./work-party-prep.md) - Launch readiness polish and stability
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
 - [cluster-mvp.md](./cluster-mvp.md) - Cluster MVP delivery and final completion checklist
-- [content-rating.md](./content-rating.md) - Cross-cutting audience rating (Kids/Work/Adults) for all content
 
 ### Ready
 - [game-instructions.md](./game-instructions.md) - Game rules and role-based guidance for players
@@ -55,6 +55,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [archived/housekeeping.md](./archived/housekeeping.md) - Build cleanup & project structure
 - [archived/css-cache-busting.md](./archived/css-cache-busting.md) - CSS cache invalidation
 - [archived/game-isolation-refactor.md](./archived/game-isolation-refactor.md) - Isolate game logic for future games
+- [archived/content-rating.md](./archived/content-rating.md) - Cross-cutting audience rating (Kids/Work/Adults) for all content
 
 ---
 
@@ -65,10 +66,10 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 | # | Item | Status | Why |
 |---|------|--------|-----|
 | 1 | ~~Refactor Flicker Fix~~ | Done | HTMX/WS polish shipped |
-| 2 | **Content Rating System** | Ready | Foundation for all content work; host picks Kids/Work/Adults |
+| 2 | **Content Rating System** | Done | Foundation shipped: host audience control + filtering tiers in gameplay content selection |
 | 3 | **Curated Trivia Packs** | Next | Kills question-writing friction without API dependency |
 | 4 | **AI Question Assist** | Next | Optional layer: generates questions constrained by content rating |
-| 5 | **Cluster Prompt Overhaul** | Next | 3 prompts is too few, and they're too safe — need 30+ with spice |
+| 5 | **Cluster Prompt Overhaul** | Now | 3 prompts is too few, and they're too safe — need 30+ with spice |
 | 6 | **Cluster Reveal Juice** | Planned | Centroid reveal needs animation and drama |
 | 7 | **Game instructions screen** | Ready | Pre-game rules for new players |
 | 8 | **Accessibility pass** | Backlog | Contrast, keyboard use, screen reader flow. Note: Safari tab order is not intuitive/consistent with other browsers |
