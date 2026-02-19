@@ -104,12 +104,8 @@ func (g *TriviaGame) handleGetQuestionTemplates(w http.ResponseWriter, r *http.R
 		usedTemplateIDs = []string{}
 	}
 
-	// Get available templates (not yet used)
-	available := questions.GetAvailableTemplates(usedTemplateIDs)
-	grouped := questions.GroupByCategory(available)
-	categories := questions.GetCategories()
-
-	triviatmpl.QuestionTemplatesModal(grouped, categories).Render(r.Context(), w)
+	sections := questions.BuildPackSections(usedTemplateIDs, lobby.ContentRating)
+	triviatmpl.QuestionTemplatesModal(sections).Render(r.Context(), w)
 }
 
 func (g *TriviaGame) handleSubmitQuestion(w http.ResponseWriter, r *http.Request) {

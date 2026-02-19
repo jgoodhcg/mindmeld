@@ -1,366 +1,452 @@
 package questions
 
-// Template represents a pre-made question template that players can use
+import (
+	"sort"
+
+	"github.com/jgoodhcg/mindmeld/internal/contentrating"
+)
+
+// Pack represents a curated collection of templates.
+type Pack struct {
+	ID          string
+	Name        string
+	Description string
+	MinRating   int16
+}
+
+// Template represents a ready-to-play trivia question template.
 type Template struct {
 	ID            string
+	PackID        string
 	Category      string
 	QuestionText  string
 	CorrectAnswer string
 	WrongAnswer1  string
 	WrongAnswer2  string
 	WrongAnswer3  string
+	MinRating     int16
 }
 
-// Categories for organizing templates
+// PackSection is the render-ready shape used by the templates modal.
+type PackSection struct {
+	Pack                Pack
+	Categories          []string
+	TemplatesByCategory map[string][]Template
+	TemplateCount       int
+}
+
 const (
-	CategoryPopCulture  = "Pop Culture"
-	CategoryHistory     = "History"
-	CategoryScience     = "Science & Nature"
-	CategoryGeography   = "Geography"
-	CategoryPersonal    = "Personal"
-	CategoryPreferences = "About Me"
+	PackWorkEssentials = "work-essentials"
+	PackProductTech    = "product-tech-basics"
+	PackOfficePop      = "office-pop-culture"
+	PackQuickBrain     = "quick-brain-boost"
+	PackWorldSnapshot  = "world-snapshot"
 )
 
-// AllTemplates contains all available question templates
+// Categories for organizing templates inside each pack.
+const (
+	CategoryMeetingsProcess = "Meetings & Process"
+	CategoryProductDelivery = "Product Delivery"
+	CategoryWebFundamentals = "Web Fundamentals"
+	CategoryDevWorkflow     = "Dev Workflow"
+	CategoryTVFilm          = "TV & Film"
+	CategoryMusicCulture    = "Music & Culture"
+	CategoryScienceMath     = "Science & Math"
+	CategoryEverydayFacts   = "Everyday Facts"
+	CategoryHistory         = "History"
+	CategoryGeography       = "Geography"
+)
+
+var categoryOrder = []string{
+	CategoryMeetingsProcess,
+	CategoryProductDelivery,
+	CategoryWebFundamentals,
+	CategoryDevWorkflow,
+	CategoryTVFilm,
+	CategoryMusicCulture,
+	CategoryScienceMath,
+	CategoryEverydayFacts,
+	CategoryHistory,
+	CategoryGeography,
+}
+
+// AllPacks contains all curated template packs, ordered for display.
+var AllPacks = []Pack{
+	{
+		ID:          PackWorkEssentials,
+		Name:        "Work Essentials",
+		Description: "Fast-start work-safe questions about meetings, delivery, and team process.",
+		MinRating:   contentrating.Work,
+	},
+	{
+		ID:          PackProductTech,
+		Name:        "Product & Tech Basics",
+		Description: "Practical software and web fundamentals for mixed technical teams.",
+		MinRating:   contentrating.Work,
+	},
+	{
+		ID:          PackOfficePop,
+		Name:        "Office Pop Culture",
+		Description: "Work-safe pop culture prompts with broad recognition.",
+		MinRating:   contentrating.Work,
+	},
+	{
+		ID:          PackQuickBrain,
+		Name:        "Quick Brain Boost",
+		Description: "Simple general-knowledge questions for all audiences.",
+		MinRating:   contentrating.Kids,
+	},
+	{
+		ID:          PackWorldSnapshot,
+		Name:        "World Snapshot",
+		Description: "Classic history and geography questions that play well in groups.",
+		MinRating:   contentrating.Kids,
+	},
+}
+
+// AllTemplates contains all available templates.
 var AllTemplates = []Template{
-	// Pop Culture
+	// Work Essentials
+	{
+		ID:            "work-001",
+		PackID:        PackWorkEssentials,
+		Category:      CategoryMeetingsProcess,
+		QuestionText:  `In a RACI matrix, what does the "A" stand for?`,
+		CorrectAnswer: "Accountable",
+		WrongAnswer1:  "Available",
+		WrongAnswer2:  "Approved",
+		WrongAnswer3:  "Assigned",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "work-002",
+		PackID:        PackWorkEssentials,
+		Category:      CategoryProductDelivery,
+		QuestionText:  "What does OKR stand for?",
+		CorrectAnswer: "Objectives and Key Results",
+		WrongAnswer1:  "Operations and Knowledge Review",
+		WrongAnswer2:  "Objectives and KPI Reporting",
+		WrongAnswer3:  "Outcomes, Knowledge, and Roadmaps",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "work-003",
+		PackID:        PackWorkEssentials,
+		Category:      CategoryProductDelivery,
+		QuestionText:  "In Scrum, who usually prioritizes the product backlog?",
+		CorrectAnswer: "Product Owner",
+		WrongAnswer1:  "Engineering Manager",
+		WrongAnswer2:  "Scrum Master",
+		WrongAnswer3:  "QA Lead",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "work-004",
+		PackID:        PackWorkEssentials,
+		Category:      CategoryMeetingsProcess,
+		QuestionText:  "What is the main goal of a sprint retrospective?",
+		CorrectAnswer: "Improve how the team works",
+		WrongAnswer1:  "Assign performance ratings",
+		WrongAnswer2:  "Rewrite the product roadmap",
+		WrongAnswer3:  "Choose next sprint's holiday schedule",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "work-005",
+		PackID:        PackWorkEssentials,
+		Category:      CategoryProductDelivery,
+		QuestionText:  "What does MVP stand for in product development?",
+		CorrectAnswer: "Minimum Viable Product",
+		WrongAnswer1:  "Most Valuable Proposal",
+		WrongAnswer2:  "Managed Validation Process",
+		WrongAnswer3:  "Minimum Visual Prototype",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "work-006",
+		PackID:        PackWorkEssentials,
+		Category:      CategoryMeetingsProcess,
+		QuestionText:  "In project updates, ETA usually means:",
+		CorrectAnswer: "Estimated Time of Arrival",
+		WrongAnswer1:  "Estimated Task Assignment",
+		WrongAnswer2:  "Expected Team Action",
+		WrongAnswer3:  "Effective Turnaround Agreement",
+		MinRating:     contentrating.Work,
+	},
+
+	// Product & Tech Basics
+	{
+		ID:            "tech-001",
+		PackID:        PackProductTech,
+		Category:      CategoryWebFundamentals,
+		QuestionText:  `Which HTTP status code means "Not Found"?`,
+		CorrectAnswer: "404",
+		WrongAnswer1:  "401",
+		WrongAnswer2:  "302",
+		WrongAnswer3:  "500",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "tech-002",
+		PackID:        PackProductTech,
+		Category:      CategoryDevWorkflow,
+		QuestionText:  "Which Git command creates a local copy of a repository?",
+		CorrectAnswer: "git clone",
+		WrongAnswer1:  "git fork",
+		WrongAnswer2:  "git init",
+		WrongAnswer3:  "git copy",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "tech-003",
+		PackID:        PackProductTech,
+		Category:      CategoryWebFundamentals,
+		QuestionText:  "In SQL, which keyword filters rows before grouping?",
+		CorrectAnswer: "WHERE",
+		WrongAnswer1:  "HAVING",
+		WrongAnswer2:  "ORDER BY",
+		WrongAnswer3:  "LIMIT",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "tech-004",
+		PackID:        PackProductTech,
+		Category:      CategoryWebFundamentals,
+		QuestionText:  "What does API stand for?",
+		CorrectAnswer: "Application Programming Interface",
+		WrongAnswer1:  "Automated Program Integration",
+		WrongAnswer2:  "Application Process Input",
+		WrongAnswer3:  "Advanced Protocol Interface",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "tech-005",
+		PackID:        PackProductTech,
+		Category:      CategoryDevWorkflow,
+		QuestionText:  `In CI/CD, what does "CI" stand for?`,
+		CorrectAnswer: "Continuous Integration",
+		WrongAnswer1:  "Code Inspection",
+		WrongAnswer2:  "Change Implementation",
+		WrongAnswer3:  "Continuous Improvement",
+		MinRating:     contentrating.Work,
+	},
+	{
+		ID:            "tech-006",
+		PackID:        PackProductTech,
+		Category:      CategoryWebFundamentals,
+		QuestionText:  "Which CSS property controls spacing inside an element's border?",
+		CorrectAnswer: "padding",
+		WrongAnswer1:  "margin",
+		WrongAnswer2:  "gap",
+		WrongAnswer3:  "outline",
+		MinRating:     contentrating.Work,
+	},
+
+	// Office Pop Culture
 	{
 		ID:            "pop-001",
-		Category:      CategoryPopCulture,
-		QuestionText:  "Which movie won the Academy Award for Best Picture in 2020?",
-		CorrectAnswer: "Parasite",
-		WrongAnswer1:  "1917",
-		WrongAnswer2:  "Joker",
-		WrongAnswer3:  "Once Upon a Time in Hollywood",
+		PackID:        PackOfficePop,
+		Category:      CategoryTVFilm,
+		QuestionText:  "Which TV comedy is set at Dunder Mifflin?",
+		CorrectAnswer: "The Office",
+		WrongAnswer1:  "Parks and Recreation",
+		WrongAnswer2:  "Brooklyn Nine-Nine",
+		WrongAnswer3:  "Community",
+		MinRating:     contentrating.Work,
 	},
 	{
 		ID:            "pop-002",
-		Category:      CategoryPopCulture,
-		QuestionText:  "What is the highest-grossing film of all time (not adjusted for inflation)?",
-		CorrectAnswer: "Avatar",
-		WrongAnswer1:  "Avengers: Endgame",
-		WrongAnswer2:  "Titanic",
-		WrongAnswer3:  "Star Wars: The Force Awakens",
+		PackID:        PackOfficePop,
+		Category:      CategoryTVFilm,
+		QuestionText:  "In Friends, what is the name of the coffee shop hangout?",
+		CorrectAnswer: "Central Perk",
+		WrongAnswer1:  "Coffee Bean",
+		WrongAnswer2:  "Monk's Cafe",
+		WrongAnswer3:  "The Grind",
+		MinRating:     contentrating.Work,
 	},
 	{
 		ID:            "pop-003",
-		Category:      CategoryPopCulture,
-		QuestionText:  "Which band released the album 'Abbey Road'?",
-		CorrectAnswer: "The Beatles",
-		WrongAnswer1:  "The Rolling Stones",
-		WrongAnswer2:  "Led Zeppelin",
-		WrongAnswer3:  "Pink Floyd",
+		PackID:        PackOfficePop,
+		Category:      CategoryTVFilm,
+		QuestionText:  "Which movie franchise features Woody and Buzz Lightyear?",
+		CorrectAnswer: "Toy Story",
+		WrongAnswer1:  "Cars",
+		WrongAnswer2:  "Shrek",
+		WrongAnswer3:  "Despicable Me",
+		MinRating:     contentrating.Work,
 	},
 	{
 		ID:            "pop-004",
-		Category:      CategoryPopCulture,
-		QuestionText:  "What TV show features a chemistry teacher turned drug manufacturer?",
-		CorrectAnswer: "Breaking Bad",
-		WrongAnswer1:  "Better Call Saul",
-		WrongAnswer2:  "Ozark",
-		WrongAnswer3:  "The Wire",
+		PackID:        PackOfficePop,
+		Category:      CategoryMusicCulture,
+		QuestionText:  `Which sport is often called "the beautiful game"?`,
+		CorrectAnswer: "Soccer",
+		WrongAnswer1:  "Basketball",
+		WrongAnswer2:  "Tennis",
+		WrongAnswer3:  "Baseball",
+		MinRating:     contentrating.Work,
 	},
 	{
 		ID:            "pop-005",
-		Category:      CategoryPopCulture,
-		QuestionText:  "Who played Iron Man in the Marvel Cinematic Universe?",
-		CorrectAnswer: "Robert Downey Jr.",
-		WrongAnswer1:  "Chris Evans",
-		WrongAnswer2:  "Chris Hemsworth",
-		WrongAnswer3:  "Mark Ruffalo",
+		PackID:        PackOfficePop,
+		Category:      CategoryMusicCulture,
+		QuestionText:  `Which artist released the song "Shake It Off"?`,
+		CorrectAnswer: "Taylor Swift",
+		WrongAnswer1:  "Katy Perry",
+		WrongAnswer2:  "Ariana Grande",
+		WrongAnswer3:  "Dua Lipa",
+		MinRating:     contentrating.Work,
 	},
 	{
 		ID:            "pop-006",
-		Category:      CategoryPopCulture,
-		QuestionText:  "Which artist released the album 'Thriller'?",
-		CorrectAnswer: "Michael Jackson",
-		WrongAnswer1:  "Prince",
-		WrongAnswer2:  "Whitney Houston",
-		WrongAnswer3:  "Madonna",
+		PackID:        PackOfficePop,
+		Category:      CategoryTVFilm,
+		QuestionText:  "What is the name of the school in the Harry Potter series?",
+		CorrectAnswer: "Hogwarts",
+		WrongAnswer1:  "Beauxbatons",
+		WrongAnswer2:  "Durmstrang",
+		WrongAnswer3:  "Ilvermorny",
+		MinRating:     contentrating.Work,
 	},
 
-	// History
+	// Quick Brain Boost
 	{
-		ID:            "hist-001",
+		ID:            "quick-001",
+		PackID:        PackQuickBrain,
+		Category:      CategoryScienceMath,
+		QuestionText:  "Which planet is known as the Red Planet?",
+		CorrectAnswer: "Mars",
+		WrongAnswer1:  "Venus",
+		WrongAnswer2:  "Jupiter",
+		WrongAnswer3:  "Mercury",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "quick-002",
+		PackID:        PackQuickBrain,
+		Category:      CategoryEverydayFacts,
+		QuestionText:  "What is the largest ocean on Earth?",
+		CorrectAnswer: "Pacific Ocean",
+		WrongAnswer1:  "Atlantic Ocean",
+		WrongAnswer2:  "Indian Ocean",
+		WrongAnswer3:  "Arctic Ocean",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "quick-003",
+		PackID:        PackQuickBrain,
+		Category:      CategoryScienceMath,
+		QuestionText:  "How many sides does a hexagon have?",
+		CorrectAnswer: "6",
+		WrongAnswer1:  "5",
+		WrongAnswer2:  "7",
+		WrongAnswer3:  "8",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "quick-004",
+		PackID:        PackQuickBrain,
+		Category:      CategoryScienceMath,
+		QuestionText:  "What is H2O commonly called?",
+		CorrectAnswer: "Water",
+		WrongAnswer1:  "Hydrogen Peroxide",
+		WrongAnswer2:  "Salt",
+		WrongAnswer3:  "Ozone",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "quick-005",
+		PackID:        PackQuickBrain,
+		Category:      CategoryEverydayFacts,
+		QuestionText:  "What is the capital city of Japan?",
+		CorrectAnswer: "Tokyo",
+		WrongAnswer1:  "Kyoto",
+		WrongAnswer2:  "Osaka",
+		WrongAnswer3:  "Seoul",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "quick-006",
+		PackID:        PackQuickBrain,
+		Category:      CategoryScienceMath,
+		QuestionText:  "Which instrument has 88 keys on a standard model?",
+		CorrectAnswer: "Piano",
+		WrongAnswer1:  "Guitar",
+		WrongAnswer2:  "Violin",
+		WrongAnswer3:  "Saxophone",
+		MinRating:     contentrating.Kids,
+	},
+
+	// World Snapshot
+	{
+		ID:            "world-001",
+		PackID:        PackWorldSnapshot,
+		Category:      CategoryHistory,
+		QuestionText:  "Who was the first person to walk on the moon?",
+		CorrectAnswer: "Neil Armstrong",
+		WrongAnswer1:  "Buzz Aldrin",
+		WrongAnswer2:  "Yuri Gagarin",
+		WrongAnswer3:  "John Glenn",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "world-002",
+		PackID:        PackWorldSnapshot,
+		Category:      CategoryHistory,
+		QuestionText:  "What year did the Berlin Wall fall?",
+		CorrectAnswer: "1989",
+		WrongAnswer1:  "1987",
+		WrongAnswer2:  "1991",
+		WrongAnswer3:  "1979",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "world-003",
+		PackID:        PackWorldSnapshot,
 		Category:      CategoryHistory,
 		QuestionText:  "In what year did World War II end?",
 		CorrectAnswer: "1945",
 		WrongAnswer1:  "1944",
 		WrongAnswer2:  "1946",
-		WrongAnswer3:  "1943",
+		WrongAnswer3:  "1939",
+		MinRating:     contentrating.Kids,
 	},
 	{
-		ID:            "hist-002",
-		Category:      CategoryHistory,
-		QuestionText:  "Who was the first President of the United States?",
-		CorrectAnswer: "George Washington",
-		WrongAnswer1:  "Thomas Jefferson",
-		WrongAnswer2:  "John Adams",
-		WrongAnswer3:  "Benjamin Franklin",
-	},
-	{
-		ID:            "hist-003",
-		Category:      CategoryHistory,
-		QuestionText:  "Which ancient wonder was located in Alexandria, Egypt?",
-		CorrectAnswer: "The Lighthouse (Pharos)",
-		WrongAnswer1:  "The Hanging Gardens",
-		WrongAnswer2:  "The Colossus",
-		WrongAnswer3:  "The Great Pyramid",
-	},
-	{
-		ID:            "hist-004",
-		Category:      CategoryHistory,
-		QuestionText:  "What year did the Berlin Wall fall?",
-		CorrectAnswer: "1989",
-		WrongAnswer1:  "1991",
-		WrongAnswer2:  "1987",
-		WrongAnswer3:  "1990",
-	},
-	{
-		ID:            "hist-005",
-		Category:      CategoryHistory,
-		QuestionText:  "Who was the first person to walk on the moon?",
-		CorrectAnswer: "Neil Armstrong",
-		WrongAnswer1:  "Buzz Aldrin",
-		WrongAnswer2:  "John Glenn",
-		WrongAnswer3:  "Yuri Gagarin",
-	},
-	{
-		ID:            "hist-006",
-		Category:      CategoryHistory,
-		QuestionText:  "Which empire was ruled by Julius Caesar?",
-		CorrectAnswer: "Roman Empire",
-		WrongAnswer1:  "Greek Empire",
-		WrongAnswer2:  "Persian Empire",
-		WrongAnswer3:  "Ottoman Empire",
-	},
-
-	// Science & Nature
-	{
-		ID:            "sci-001",
-		Category:      CategoryScience,
-		QuestionText:  "What is the chemical symbol for gold?",
-		CorrectAnswer: "Au",
-		WrongAnswer1:  "Ag",
-		WrongAnswer2:  "Go",
-		WrongAnswer3:  "Gd",
-	},
-	{
-		ID:            "sci-002",
-		Category:      CategoryScience,
-		QuestionText:  "What planet is known as the Red Planet?",
-		CorrectAnswer: "Mars",
-		WrongAnswer1:  "Venus",
-		WrongAnswer2:  "Jupiter",
-		WrongAnswer3:  "Mercury",
-	},
-	{
-		ID:            "sci-003",
-		Category:      CategoryScience,
-		QuestionText:  "What is the largest organ in the human body?",
-		CorrectAnswer: "Skin",
-		WrongAnswer1:  "Liver",
-		WrongAnswer2:  "Brain",
-		WrongAnswer3:  "Heart",
-	},
-	{
-		ID:            "sci-004",
-		Category:      CategoryScience,
-		QuestionText:  "How many bones are in the adult human body?",
-		CorrectAnswer: "206",
-		WrongAnswer1:  "186",
-		WrongAnswer2:  "226",
-		WrongAnswer3:  "256",
-	},
-	{
-		ID:            "sci-005",
-		Category:      CategoryScience,
-		QuestionText:  "What gas do plants absorb from the atmosphere?",
-		CorrectAnswer: "Carbon dioxide",
-		WrongAnswer1:  "Oxygen",
-		WrongAnswer2:  "Nitrogen",
-		WrongAnswer3:  "Hydrogen",
-	},
-	{
-		ID:            "sci-006",
-		Category:      CategoryScience,
-		QuestionText:  "What is the speed of light in a vacuum (approximately)?",
-		CorrectAnswer: "300,000 km/s",
-		WrongAnswer1:  "150,000 km/s",
-		WrongAnswer2:  "500,000 km/s",
-		WrongAnswer3:  "1,000,000 km/s",
-	},
-
-	// Geography
-	{
-		ID:            "geo-001",
+		ID:            "world-004",
+		PackID:        PackWorldSnapshot,
 		Category:      CategoryGeography,
-		QuestionText:  "What is the capital of Australia?",
-		CorrectAnswer: "Canberra",
-		WrongAnswer1:  "Sydney",
-		WrongAnswer2:  "Melbourne",
-		WrongAnswer3:  "Brisbane",
-	},
-	{
-		ID:            "geo-002",
-		Category:      CategoryGeography,
-		QuestionText:  "Which country has the most time zones?",
-		CorrectAnswer: "France",
-		WrongAnswer1:  "Russia",
-		WrongAnswer2:  "United States",
-		WrongAnswer3:  "China",
-	},
-	{
-		ID:            "geo-003",
-		Category:      CategoryGeography,
-		QuestionText:  "What is the longest river in the world?",
-		CorrectAnswer: "Nile",
-		WrongAnswer1:  "Amazon",
-		WrongAnswer2:  "Yangtze",
-		WrongAnswer3:  "Mississippi",
-	},
-	{
-		ID:            "geo-004",
-		Category:      CategoryGeography,
-		QuestionText:  "Which country is home to the Great Barrier Reef?",
-		CorrectAnswer: "Australia",
-		WrongAnswer1:  "Indonesia",
-		WrongAnswer2:  "Philippines",
-		WrongAnswer3:  "New Zealand",
-	},
-	{
-		ID:            "geo-005",
-		Category:      CategoryGeography,
-		QuestionText:  "What is the smallest country in the world?",
+		QuestionText:  "What is the smallest country in the world by area?",
 		CorrectAnswer: "Vatican City",
 		WrongAnswer1:  "Monaco",
 		WrongAnswer2:  "San Marino",
 		WrongAnswer3:  "Liechtenstein",
+		MinRating:     contentrating.Kids,
 	},
 	{
-		ID:            "geo-006",
+		ID:            "world-005",
+		PackID:        PackWorldSnapshot,
+		Category:      CategoryHistory,
+		QuestionText:  "Which country gifted the Statue of Liberty to the United States?",
+		CorrectAnswer: "France",
+		WrongAnswer1:  "United Kingdom",
+		WrongAnswer2:  "Spain",
+		WrongAnswer3:  "Italy",
+		MinRating:     contentrating.Kids,
+	},
+	{
+		ID:            "world-006",
+		PackID:        PackWorldSnapshot,
 		Category:      CategoryGeography,
 		QuestionText:  "On which continent is the Sahara Desert located?",
 		CorrectAnswer: "Africa",
 		WrongAnswer1:  "Asia",
-		WrongAnswer2:  "Middle East",
-		WrongAnswer3:  "Australia",
-	},
-
-	// Personal / Get to Know You - these have placeholder answers for players to customize
-	{
-		ID:            "personal-001",
-		Category:      CategoryPersonal,
-		QuestionText:  "What is [my name]'s favorite movie of all time?",
-		CorrectAnswer: "[Your favorite movie]",
-		WrongAnswer1:  "[Wrong option 1]",
-		WrongAnswer2:  "[Wrong option 2]",
-		WrongAnswer3:  "[Wrong option 3]",
-	},
-	{
-		ID:            "personal-002",
-		Category:      CategoryPersonal,
-		QuestionText:  "What city was [my name] born in?",
-		CorrectAnswer: "[Your birth city]",
-		WrongAnswer1:  "[Wrong city 1]",
-		WrongAnswer2:  "[Wrong city 2]",
-		WrongAnswer3:  "[Wrong city 3]",
-	},
-	{
-		ID:            "personal-003",
-		Category:      CategoryPersonal,
-		QuestionText:  "How many siblings does [my name] have?",
-		CorrectAnswer: "[Your answer]",
-		WrongAnswer1:  "[Wrong number 1]",
-		WrongAnswer2:  "[Wrong number 2]",
-		WrongAnswer3:  "[Wrong number 3]",
-	},
-	{
-		ID:            "personal-004",
-		Category:      CategoryPersonal,
-		QuestionText:  "What was [my name]'s first job?",
-		CorrectAnswer: "[Your first job]",
-		WrongAnswer1:  "[Wrong job 1]",
-		WrongAnswer2:  "[Wrong job 2]",
-		WrongAnswer3:  "[Wrong job 3]",
-	},
-	{
-		ID:            "personal-005",
-		Category:      CategoryPersonal,
-		QuestionText:  "What is [my name]'s dream vacation destination?",
-		CorrectAnswer: "[Your dream destination]",
-		WrongAnswer1:  "[Wrong destination 1]",
-		WrongAnswer2:  "[Wrong destination 2]",
-		WrongAnswer3:  "[Wrong destination 3]",
-	},
-	{
-		ID:            "personal-006",
-		Category:      CategoryPersonal,
-		QuestionText:  "What is [my name]'s hidden talent?",
-		CorrectAnswer: "[Your hidden talent]",
-		WrongAnswer1:  "[Wrong talent 1]",
-		WrongAnswer2:  "[Wrong talent 2]",
-		WrongAnswer3:  "[Wrong talent 3]",
-	},
-
-	// About Me
-	{
-		ID:            "pref-001",
-		Category:      CategoryPreferences,
-		QuestionText:  "What is [my name]'s favorite cuisine?",
-		CorrectAnswer: "[Your favorite cuisine]",
-		WrongAnswer1:  "[Wrong cuisine 1]",
-		WrongAnswer2:  "[Wrong cuisine 2]",
-		WrongAnswer3:  "[Wrong cuisine 3]",
-	},
-	{
-		ID:            "pref-002",
-		Category:      CategoryPreferences,
-		QuestionText:  "What is [my name]'s go-to comfort food?",
-		CorrectAnswer: "[Your comfort food]",
-		WrongAnswer1:  "[Wrong food 1]",
-		WrongAnswer2:  "[Wrong food 2]",
-		WrongAnswer3:  "[Wrong food 3]",
-	},
-	{
-		ID:            "pref-003",
-		Category:      CategoryPreferences,
-		QuestionText:  "What music genre does [my name] listen to most?",
-		CorrectAnswer: "[Your favorite genre]",
-		WrongAnswer1:  "[Wrong genre 1]",
-		WrongAnswer2:  "[Wrong genre 2]",
-		WrongAnswer3:  "[Wrong genre 3]",
-	},
-	{
-		ID:            "pref-004",
-		Category:      CategoryPreferences,
-		QuestionText:  "What is [my name]'s favorite season?",
-		CorrectAnswer: "[Your favorite season]",
-		WrongAnswer1:  "[Wrong season 1]",
-		WrongAnswer2:  "[Wrong season 2]",
-		WrongAnswer3:  "[Wrong season 3]",
-	},
-	{
-		ID:            "pref-005",
-		Category:      CategoryPreferences,
-		QuestionText:  "Is [my name] a morning person or night owl?",
-		CorrectAnswer: "[Morning person/Night owl]",
-		WrongAnswer1:  "[The opposite]",
-		WrongAnswer2:  "Neither",
-		WrongAnswer3:  "Both equally",
-	},
-	{
-		ID:            "pref-006",
-		Category:      CategoryPreferences,
-		QuestionText:  "What is [my name]'s favorite holiday?",
-		CorrectAnswer: "[Your favorite holiday]",
-		WrongAnswer1:  "[Wrong holiday 1]",
-		WrongAnswer2:  "[Wrong holiday 2]",
-		WrongAnswer3:  "[Wrong holiday 3]",
+		WrongAnswer2:  "Australia",
+		WrongAnswer3:  "South America",
+		MinRating:     contentrating.Kids,
 	},
 }
 
-// GetTemplateByID returns a template by its ID, or nil if not found
 func GetTemplateByID(id string) *Template {
 	for i := range AllTemplates {
 		if AllTemplates[i].ID == id {
@@ -370,39 +456,94 @@ func GetTemplateByID(id string) *Template {
 	return nil
 }
 
-// GetAvailableTemplates returns templates that haven't been used (not in usedIDs)
-func GetAvailableTemplates(usedIDs []string) []Template {
-	usedSet := make(map[string]bool)
+func GetPackByID(id string) *Pack {
+	for i := range AllPacks {
+		if AllPacks[i].ID == id {
+			return &AllPacks[i]
+		}
+	}
+	return nil
+}
+
+// GetAvailableTemplates returns templates that are unused and allowed for the lobby audience.
+func GetAvailableTemplates(usedIDs []string, lobbyContentRating int16) []Template {
+	usedSet := make(map[string]bool, len(usedIDs))
 	for _, id := range usedIDs {
 		usedSet[id] = true
 	}
 
-	available := make([]Template, 0)
+	available := make([]Template, 0, len(AllTemplates))
 	for _, t := range AllTemplates {
-		if !usedSet[t.ID] {
-			available = append(available, t)
+		if usedSet[t.ID] {
+			continue
 		}
+		if t.MinRating > lobbyContentRating {
+			continue
+		}
+		available = append(available, t)
 	}
+
 	return available
 }
 
-// GetCategories returns all unique categories
-func GetCategories() []string {
-	return []string{
-		CategoryPreferences,
-		CategoryPersonal,
-		CategoryPopCulture,
-		CategoryHistory,
-		CategoryScience,
-		CategoryGeography,
+// BuildPackSections returns templates grouped first by pack, then by category.
+func BuildPackSections(usedIDs []string, lobbyContentRating int16) []PackSection {
+	available := GetAvailableTemplates(usedIDs, lobbyContentRating)
+	templatesByPack := make(map[string][]Template)
+	for _, t := range available {
+		templatesByPack[t.PackID] = append(templatesByPack[t.PackID], t)
 	}
+
+	sections := make([]PackSection, 0, len(AllPacks))
+	for _, pack := range AllPacks {
+		if pack.MinRating > lobbyContentRating {
+			continue
+		}
+		templates := templatesByPack[pack.ID]
+		if len(templates) == 0 {
+			continue
+		}
+
+		grouped := GroupByCategory(templates)
+		sections = append(sections, PackSection{
+			Pack:                pack,
+			Categories:          orderedCategories(grouped),
+			TemplatesByCategory: grouped,
+			TemplateCount:       len(templates),
+		})
+	}
+
+	return sections
 }
 
-// GroupByCategory groups templates by their category
+// GroupByCategory groups templates by their category.
 func GroupByCategory(templates []Template) map[string][]Template {
 	grouped := make(map[string][]Template)
 	for _, t := range templates {
 		grouped[t.Category] = append(grouped[t.Category], t)
 	}
 	return grouped
+}
+
+func orderedCategories(grouped map[string][]Template) []string {
+	result := make([]string, 0, len(grouped))
+	seen := make(map[string]bool, len(grouped))
+
+	for _, category := range categoryOrder {
+		if _, ok := grouped[category]; ok {
+			result = append(result, category)
+			seen[category] = true
+		}
+	}
+
+	extra := make([]string, 0)
+	for category := range grouped {
+		if !seen[category] {
+			extra = append(extra, category)
+		}
+	}
+	sort.Strings(extra)
+	result = append(result, extra...)
+
+	return result
 }

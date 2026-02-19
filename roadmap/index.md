@@ -22,7 +22,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ## Current Focus
 
 - **[Work Party Prep](./work-party-prep.md)** - Getting the platform polished and ready for a company social event.
-- **Immediate next execution:** Phase 3 Cluster Content Overhaul (expand and improve prompt-axis pool for game day).
+- **Immediate next execution:** Final game-day rehearsal pass (6–8 players) and friction cleanup.
 
 ---
 
@@ -32,14 +32,13 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [work-party-prep.md](./work-party-prep.md) - Launch readiness polish and stability
 - [trivia.md](./trivia.md) - Trivia MVP (core complete, polish remaining)
 - [cluster-mvp.md](./cluster-mvp.md) - Cluster MVP delivery and final completion checklist
-
-### Ready
 - [game-instructions.md](./game-instructions.md) - Game rules and role-based guidance for players
 
 ### Draft
 - [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
 - [security.md](./security.md) - App security hardening
 - [cluster-improvements.md](./cluster-improvements.md) - Post-MVP Cluster roadmap (user content, AI, reveal enhancements)
+- [juice-playbook.md](./juice-playbook.md) - Not Boring-style polish backlog for Trivia + Cluster within 1970s sci-fi constraints
 - [chronology.md](./chronology.md) - Daily timeline sorting game
 - [vector-golf.md](./vector-golf.md) - Semantic golf daily game
 
@@ -67,11 +66,11 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 |---|------|--------|-----|
 | 1 | ~~Refactor Flicker Fix~~ | Done | HTMX/WS polish shipped |
 | 2 | **Content Rating System** | Done | Foundation shipped: host audience control + filtering tiers in gameplay content selection |
-| 3 | **Curated Trivia Packs** | Next | Kills question-writing friction without API dependency |
-| 4 | **AI Question Assist** | Next | Optional layer: generates questions constrained by content rating |
-| 5 | **Cluster Prompt Overhaul** | Now | 3 prompts is too few, and they're too safe — need 30+ with spice |
-| 6 | **Cluster Reveal Juice** | Planned | Centroid reveal needs animation and drama |
-| 7 | **Game instructions screen** | Ready | Pre-game rules for new players |
+| 3 | **Curated Trivia Packs** | Done | Pack-based, work-safe-first templates shipped for faster starts |
+| 4 | **AI Question Assist** | Done | Generate button shipped with audience-safe constraints + local fallback |
+| 5 | **Cluster Prompt Overhaul** | Done | New migration seeds 60 combinations and retires weak starter prompts |
+| 6 | **Cluster Reveal Juice** | Done | Staggered reveal motion + centroid drop + outlier/debrief insights shipped |
+| 7 | **Game instructions screen** | Done | Role-based pre-game + in-game help shipped for both games |
 | 8 | **Accessibility pass** | Backlog | Contrast, keyboard use, screen reader flow. Note: Safari tab order is not intuitive/consistent with other browsers |
 | 9 | **Mid-game player join sync** | Backlog | Late arrivals get confused |
 | 10 | **Enhanced end-of-game stats** | Backlog | Conversation fuel: "most missed question" etc |

@@ -18,6 +18,14 @@ func plotStyle(x, y float64, radiusPx int, withAnimation bool) string {
 	return style
 }
 
+func plotStyleAnimated(x, y float64, radiusPx int, delayMs int) string {
+	style := plotStyle(x, y, radiusPx, true)
+	if delayMs > 0 {
+		style += fmt.Sprintf(" animation-delay: %dms;", delayMs)
+	}
+	return style
+}
+
 func dotClass(dot DotView) string {
 	// Default all other players to gray; highlight current player in cyan.
 	className := "absolute h-4 w-4 rounded-full border border-base bg-text-muted"
@@ -65,6 +73,17 @@ func winnerSummary(winners []string) string {
 		return winners[0] + " wins this round"
 	default:
 		return strings.Join(winners, ", ") + " tie this round"
+	}
+}
+
+func outlierSummary(outliers []string) string {
+	switch len(outliers) {
+	case 0:
+		return ""
+	case 1:
+		return outliers[0] + " was furthest from the centroid"
+	default:
+		return strings.Join(outliers, ", ") + " were furthest from the centroid"
 	}
 }
 

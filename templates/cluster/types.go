@@ -15,6 +15,7 @@ type DotView struct {
 	X               float64
 	Y               float64
 	Points          int
+	AnimationDelay  int
 	IsWinner        bool
 	IsCurrentPlayer bool
 }

@@ -135,6 +135,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 func (g *TriviaGame) RegisterRoutes(r chi.Router) {
 	r.Post("/start", g.handleStartGame)
 	r.Get("/question-templates", g.handleGetQuestionTemplates)
+	r.Post("/generate-question", g.handleGenerateQuestion)
 	r.Post("/questions", g.handleSubmitQuestion)
 	r.Post("/advance", g.handleAdvanceRound)
 	r.Post("/next-question", g.handleNextQuestion)

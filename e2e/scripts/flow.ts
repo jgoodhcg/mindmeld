@@ -284,7 +284,7 @@ async function templatesFlow(page: Page) {
   const submitForm = page.locator('form[action$="/questions"]').first();
   await submitForm.waitFor({ state: 'visible', timeout: 10000 });
 
-  const templatesButton = page.locator('button', { hasText: 'Need help? Use a template' }).first();
+  const templatesButton = page.locator('button', { hasText: /Need help\? Use a question pack|Need help\? Use a template/ }).first();
   await templatesButton.click();
 
   const templatesModal = page.locator('#templates-modal');
@@ -300,6 +300,20 @@ async function templatesFlow(page: Page) {
   console.log(`  "[my name]" placeholders: ${namePlaceholderCount}`);
 
   await capture(page, 'templates-modal');
+
+  const closeButton = page.locator('#templates-modal button[type="button"]').last();
+  if (await closeButton.isVisible().catch(() => false)) {
+    await closeButton.click();
+    await page.waitForTimeout(200);
+  }
+
+  const aiAssistButton = page.locator('#assist_generate_button');
+  if (await aiAssistButton.isVisible().catch(() => false)) {
+    await aiAssistButton.click();
+    await page.waitForTimeout(800);
+    await capture(page, 'ai-assist-generated');
+  }
+
   console.log(`\nFinal URL: ${page.url()}`);
 }
 

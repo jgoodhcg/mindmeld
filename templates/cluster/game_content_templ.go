@@ -31,6 +31,8 @@ func GameContent(
 	centroidY float64,
 	standings []StandingView,
 	winners []string,
+	outliers []string,
+	discussionHint string,
 	remainingPairs int,
 	exhausted bool,
 ) templ.Component {
@@ -54,110 +56,118 @@ func GameContent(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"game-content\"><style>\n\t\t\t@keyframes cluster-dot-enter {\n\t\t\t\tfrom {\n\t\t\t\t\topacity: 0;\n\t\t\t\t\ttransform: scale(0.3);\n\t\t\t\t}\n\t\t\t\tto {\n\t\t\t\t\topacity: 1;\n\t\t\t\t\ttransform: scale(1);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t@keyframes cluster-target-pulse {\n\t\t\t\t0%, 100% {\n\t\t\t\t\ttransform: scale(1);\n\t\t\t\t\topacity: 1;\n\t\t\t\t}\n\t\t\t\t70% {\n\t\t\t\t\ttransform: scale(1.16);\n\t\t\t\t\topacity: 0.55;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"game-content\"><style>\n\t\t\t@keyframes cluster-dot-enter {\n\t\t\t\tfrom {\n\t\t\t\t\topacity: 0;\n\t\t\t\t\ttransform: scale(0.3);\n\t\t\t\t}\n\t\t\t\tto {\n\t\t\t\t\topacity: 1;\n\t\t\t\t\ttransform: scale(1);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t@keyframes cluster-target-pulse {\n\t\t\t\t0%, 100% {\n\t\t\t\t\ttransform: scale(1);\n\t\t\t\t\topacity: 1;\n\t\t\t\t}\n\t\t\t\t70% {\n\t\t\t\t\ttransform: scale(1.16);\n\t\t\t\t\topacity: 0.55;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t@keyframes cluster-centroid-drop {\n\t\t\t\tfrom {\n\t\t\t\t\topacity: 0;\n\t\t\t\t\ttransform: translateY(-18px) scale(0.35);\n\t\t\t\t}\n\t\t\t\tto {\n\t\t\t\t\topacity: 1;\n\t\t\t\t\ttransform: translateY(0) scale(1);\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if lobby.Phase == "waiting" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"bg-elevated border border-border rounded p-5 sm:p-6 space-y-5\"><div class=\"text-center\"><h2 class=\"font-mono text-xl font-bold text-text\">CLUSTER</h2><p class=\"text-text-muted text-sm mt-2\">Plot your coordinates. Score by closeness to the group centroid.</p></div><div class=\"bg-base border border-border rounded p-4 text-center\"><p class=\"text-text-muted\">Minimum players to start: <span class=\"text-text font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"space-y-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = InstructionsCard(isHost, false).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"bg-elevated border border-border rounded p-5 sm:p-6 space-y-5\"><div class=\"text-center\"><h2 class=\"font-mono text-xl font-bold text-text\">CLUSTER</h2><p class=\"text-text-muted text-sm mt-2\">Plot your coordinates. Score by closeness to the group centroid.</p></div><div class=\"bg-base border border-border rounded p-4 text-center\"><p class=\"text-text-muted\">Minimum players to start: <span class=\"text-text font-mono\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", minPlayers))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 60, Col: 123}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 75, Col: 124}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</span></p><p class=\"text-text-muted text-sm mt-1\">Connected now: <span class=\"text-cyan font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span></p><p class=\"text-text-muted text-sm mt-1\">Connected now: <span class=\"text-cyan font-mono\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(players)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 61, Col: 127}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 76, Col: 128}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span></p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span></p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if isHost {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 templ.SafeURL
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/start"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 64, Col: 78}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 79, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" method=\"POST\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" method=\"POST\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if len(players) >= minPlayers {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"submit\" class=\"w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors\">START CLUSTER</button>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button type=\"submit\" class=\"w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors\">START CLUSTER</button>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button type=\"button\" disabled class=\"w-full bg-border text-text-muted text-base py-3 rounded font-mono font-bold tracking-wide cursor-not-allowed\">START CLUSTER</button>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<button type=\"button\" disabled class=\"w-full bg-border text-text-muted text-base py-3 rounded font-mono font-bold tracking-wide cursor-not-allowed\">START CLUSTER</button>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if len(players) < minPlayers {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<p class=\"text-center text-sm text-text-muted\">Waiting for at least ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<p class=\"text-center text-sm text-text-muted\">Waiting for at least ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", minPlayers))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 72, Col: 105}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 87, Col: 106}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " players.</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " players.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<p class=\"text-center text-text-muted\">Waiting for host to start the game.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<p class=\"text-center text-text-muted\">Waiting for host to start the game.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else if exhausted || lobby.Phase == "finished" || (lobby.Phase == "playing" && !hasRound) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"bg-elevated border border-border rounded p-5 sm:p-6 space-y-6\"><div class=\"text-center\"><h2 class=\"font-mono text-xl font-bold text-text\">SESSION COMPLETE</h2><p class=\"text-text-muted mt-2\">You have played all available prompts.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"bg-elevated border border-border rounded p-5 sm:p-6 space-y-6\"><div class=\"text-center\"><h2 class=\"font-mono text-xl font-bold text-text\">SESSION COMPLETE</h2><p class=\"text-text-muted mt-2\">You have played all available prompts.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(standings) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"space-y-3\"><h3 class=\"font-mono text-xs tracking-widest uppercase text-text-muted\">Final Standings</h3><div class=\"grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono\"><div class=\"col-span-2\">Rank</div><div class=\"col-span-5\">Player</div><div class=\"col-span-2 text-right\">Avg/round</div><div class=\"col-span-3 text-right\">Total pts</div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"space-y-3\"><h3 class=\"font-mono text-xs tracking-widest uppercase text-text-muted\">Final Standings</h3><div class=\"grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono\"><div class=\"col-span-2\">Rank</div><div class=\"col-span-5\">Player</div><div class=\"col-span-2 text-right\">Avg/round</div><div class=\"col-span-3 text-right\">Total pts</div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -171,7 +181,7 @@ func GameContent(
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -184,87 +194,95 @@ func GameContent(
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\"><div class=\"col-span-2 font-mono text-text-muted\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"><div class=\"col-span-2 font-mono text-text-muted\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%02d", i+1))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 101, Col: 84}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 117, Col: 84}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div class=\"col-span-5 text-text truncate\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div><div class=\"col-span-5 text-text truncate\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(s.Nickname)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 102, Col: 63}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 118, Col: 63}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div><div class=\"col-span-2 text-right font-mono text-cyan\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div><div class=\"col-span-2 text-right font-mono text-cyan\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var10 string
 					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(formatAveragePoints(s.AvgPointsPerRound))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 103, Col: 105}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 119, Col: 105}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div><div class=\"col-span-3 text-right font-mono text-cyan\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div><div class=\"col-span-3 text-right font-mono text-cyan\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var11 string
 					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", s.TotalPoints))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 104, Col: 97}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 120, Col: 97}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, " pts</div></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, " pts</div></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<a href=\"/\" class=\"block text-center text-sm text-text-muted hover:text-text transition-colors\">Return to platform</a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<a href=\"/\" class=\"block text-center text-sm text-text-muted hover:text-text transition-colors\">Return to platform</a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else if lobby.Phase == "playing" && hasRound {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"bg-elevated border border-border rounded p-5 sm:p-6 space-y-6\"><div class=\"text-center space-y-3\"><div class=\"inline-flex items-center gap-2 px-3 py-1 rounded border border-border bg-base\"><span class=\"font-mono text-cyan text-sm\">ROUND ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"space-y-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = InstructionsCard(isHost, true).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"bg-elevated border border-border rounded p-5 sm:p-6 space-y-6\"><div class=\"text-center space-y-3\"><div class=\"inline-flex items-center gap-2 px-3 py-1 rounded border border-border bg-base\"><span class=\"font-mono text-cyan text-sm\">ROUND ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", roundNumber))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 115, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 133, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</span> <span class=\"text-text-muted\">•</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</span> <span class=\"text-text-muted\">•</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -272,26 +290,26 @@ func GameContent(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div><div class=\"bg-base border border-border rounded p-4 sm:p-5 max-w-2xl mx-auto\"><p class=\"text-text text-lg sm:text-xl leading-relaxed\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div><div class=\"bg-base border border-border rounded p-4 sm:p-5 max-w-2xl mx-auto\"><p class=\"text-text text-lg sm:text-xl leading-relaxed\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.PromptText)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 120, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 138, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</p></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</p></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if !revealed {
 				if hasSubmitted {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"space-y-4\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"space-y-4\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -307,7 +325,7 @@ func GameContent(
 							}()
 						}
 						ctx = templ.InitializeContext(ctx)
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"absolute inset-0 flex items-center justify-center pointer-events-none\"><div class=\"px-3 py-2 rounded border border-success/40 bg-base/90 text-sm font-mono text-success\">Waiting for all submissions...</div></div>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"absolute inset-0 flex items-center justify-center pointer-events-none\"><div class=\"px-3 py-2 rounded border border-success/40 bg-base/90 text-sm font-mono text-success\">Waiting for all submissions...</div></div>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -317,38 +335,38 @@ func GameContent(
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"bg-base border border-success rounded p-5 text-center\"><p class=\"font-mono text-success tracking-wide\">COORDINATE LOCKED</p><p class=\"text-text-muted text-sm mt-2\">Waiting for all players to submit.</p></div></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"bg-base border border-success rounded p-5 text-center\"><p class=\"font-mono text-success tracking-wide\">COORDINATE LOCKED</p><p class=\"text-text-muted text-sm mt-2\">Waiting for all players to submit.</p></div></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<form id=\"cluster-submit-form\" action=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<form id=\"cluster-submit-form\" action=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var15 templ.SafeURL
 					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/submissions"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 137, Col: 110}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 155, Col: 111}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" method=\"POST\" class=\"space-y-4\" data-selection-key=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" method=\"POST\" class=\"space-y-4\" data-selection-key=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var16 string
 					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("cluster-selection:" + lobby.Code + ":" + fmt.Sprintf("%d", roundNumber))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 137, Col: 238}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 155, Col: 239}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -364,20 +382,20 @@ func GameContent(
 							}()
 						}
 						ctx = templ.InitializeContext(ctx)
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div id=\"cluster-selected-marker\" class=\"absolute h-4 w-4 rounded-full border border-base bg-cyan ring-2 ring-cyan/60\" style=\"")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<div id=\"cluster-selected-marker\" class=\"absolute h-4 w-4 rounded-full border border-base bg-cyan ring-2 ring-cyan/60\" style=\"")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var18 string
 						templ_7745c5c3_Var18, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(plotStyle(0.5, 0.5, 8, false))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 139, Col: 164}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 157, Col: 165}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\"></div>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\"></div>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -387,7 +405,7 @@ func GameContent(
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<input type=\"hidden\" name=\"x\" id=\"cluster-x\" value=\"0.50\"> <input type=\"hidden\" name=\"y\" id=\"cluster-y\" value=\"0.50\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<input type=\"hidden\" name=\"x\" id=\"cluster-x\" value=\"0.50\"> <input type=\"hidden\" name=\"y\" id=\"cluster-y\" value=\"0.50\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -395,36 +413,36 @@ func GameContent(
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<button type=\"submit\" class=\"w-full bg-cyan hover:bg-cyan/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors\">SUBMIT POINT</button></form><script>\n\t\t\t\t\t\t\t(function() {\n\t\t\t\t\t\t\t\tconst plane = document.getElementById('cluster-plane-input');\n\t\t\t\t\t\t\t\tif (!plane || plane.dataset.bound === 'true') {\n\t\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tconst marker = document.getElementById('cluster-selected-marker');\n\t\t\t\t\t\t\t\tconst xInput = document.getElementById('cluster-x');\n\t\t\t\t\t\t\t\tconst yInput = document.getElementById('cluster-y');\n\t\t\t\t\t\t\t\tconst readout = document.getElementById('cluster-coordinate-readout');\n\t\t\t\t\t\t\t\tconst form = document.getElementById('cluster-submit-form');\n\n\t\t\t\t\t\t\t\tif (!marker || !xInput || !yInput || !readout || !form) {\n\t\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tplane.dataset.bound = 'true';\n\t\t\t\t\t\t\t\tconst storageKey = form.dataset.selectionKey || '';\n\n\t\t\t\t\t\t\t\tconst clamp = (v) => Math.max(0, Math.min(1, v));\n\t\t\t\t\t\t\t\tconst round2 = (v) => Math.round(v * 100) / 100;\n\t\t\t\t\t\t\t\tconst toDisplay = (v) => ((clamp(v) - 0.5) * 2);\n\t\t\t\t\t\t\t\tconst formatDisplay = (v) => {\n\t\t\t\t\t\t\t\t\tconst rounded = round2(v).toFixed(2);\n\t\t\t\t\t\t\t\t\treturn rounded === '-0.00' ? '0.00' : rounded;\n\t\t\t\t\t\t\t\t};\n\n\t\t\t\t\t\t\t\tfunction setPoint(x, y, shouldPersist) {\n\t\t\t\t\t\t\t\t\tconst cx = clamp(x);\n\t\t\t\t\t\t\t\t\tconst cy = clamp(y);\n\t\t\t\t\t\t\t\t\txInput.value = cx.toFixed(2);\n\t\t\t\t\t\t\t\t\tyInput.value = cy.toFixed(2);\n\t\t\t\t\t\t\t\t\tmarker.style.left = `calc(${(cx * 100).toFixed(2)}% - 8px)`;\n\t\t\t\t\t\t\t\t\tmarker.style.top = `calc(${((1 - cy) * 100).toFixed(2)}% - 8px)`;\n\t\t\t\t\t\t\t\t\treadout.textContent = `Selected point: (${formatDisplay(toDisplay(cx))}, ${formatDisplay(toDisplay(cy))})`;\n\t\t\t\t\t\t\t\t\tif (shouldPersist && storageKey) {\n\t\t\t\t\t\t\t\t\t\twindow.sessionStorage.setItem(storageKey, JSON.stringify({ x: cx, y: cy }));\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tfunction updateFromPointer(event) {\n\t\t\t\t\t\t\t\t\tconst rect = plane.getBoundingClientRect();\n\t\t\t\t\t\t\t\t\tif (!rect.width || !rect.height) {\n\t\t\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\t\tconst relativeX = (event.clientX - rect.left) / rect.width;\n\t\t\t\t\t\t\t\t\tconst relativeY = 1 - ((event.clientY - rect.top) / rect.height);\n\t\t\t\t\t\t\t\t\tsetPoint(relativeX, relativeY, true);\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tconst initialX = Number.parseFloat(xInput.value);\n\t\t\t\t\t\t\t\tconst initialY = Number.parseFloat(yInput.value);\n\t\t\t\t\t\t\t\tsetPoint(Number.isFinite(initialX) ? initialX : 0.5, Number.isFinite(initialY) ? initialY : 0.5, false);\n\n\t\t\t\t\t\t\t\tif (storageKey) {\n\t\t\t\t\t\t\t\t\tconst stored = window.sessionStorage.getItem(storageKey);\n\t\t\t\t\t\t\t\t\tif (stored) {\n\t\t\t\t\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\t\t\t\t\tconst parsed = JSON.parse(stored);\n\t\t\t\t\t\t\t\t\t\t\tif (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {\n\t\t\t\t\t\t\t\t\t\t\t\tsetPoint(parsed.x, parsed.y, false);\n\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t} catch (_) {}\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tplane.addEventListener('pointerdown', updateFromPointer);\n\t\t\t\t\t\t\t})();\n\t\t\t\t\t\t</script>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<button type=\"submit\" class=\"w-full bg-cyan hover:bg-cyan/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors\">SUBMIT POINT</button></form><script>\n\t\t\t\t\t\t\t(function() {\n\t\t\t\t\t\t\t\tconst plane = document.getElementById('cluster-plane-input');\n\t\t\t\t\t\t\t\tif (!plane || plane.dataset.bound === 'true') {\n\t\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tconst marker = document.getElementById('cluster-selected-marker');\n\t\t\t\t\t\t\t\tconst xInput = document.getElementById('cluster-x');\n\t\t\t\t\t\t\t\tconst yInput = document.getElementById('cluster-y');\n\t\t\t\t\t\t\t\tconst readout = document.getElementById('cluster-coordinate-readout');\n\t\t\t\t\t\t\t\tconst form = document.getElementById('cluster-submit-form');\n\n\t\t\t\t\t\t\t\tif (!marker || !xInput || !yInput || !readout || !form) {\n\t\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tplane.dataset.bound = 'true';\n\t\t\t\t\t\t\t\tconst storageKey = form.dataset.selectionKey || '';\n\n\t\t\t\t\t\t\t\tconst clamp = (v) => Math.max(0, Math.min(1, v));\n\t\t\t\t\t\t\t\tconst round2 = (v) => Math.round(v * 100) / 100;\n\t\t\t\t\t\t\t\tconst toDisplay = (v) => ((clamp(v) - 0.5) * 2);\n\t\t\t\t\t\t\t\tconst formatDisplay = (v) => {\n\t\t\t\t\t\t\t\t\tconst rounded = round2(v).toFixed(2);\n\t\t\t\t\t\t\t\t\treturn rounded === '-0.00' ? '0.00' : rounded;\n\t\t\t\t\t\t\t\t};\n\n\t\t\t\t\t\t\t\tfunction setPoint(x, y, shouldPersist) {\n\t\t\t\t\t\t\t\t\tconst cx = clamp(x);\n\t\t\t\t\t\t\t\t\tconst cy = clamp(y);\n\t\t\t\t\t\t\t\t\txInput.value = cx.toFixed(2);\n\t\t\t\t\t\t\t\t\tyInput.value = cy.toFixed(2);\n\t\t\t\t\t\t\t\t\tmarker.style.left = `calc(${(cx * 100).toFixed(2)}% - 8px)`;\n\t\t\t\t\t\t\t\t\tmarker.style.top = `calc(${((1 - cy) * 100).toFixed(2)}% - 8px)`;\n\t\t\t\t\t\t\t\t\treadout.textContent = `Selected point: (${formatDisplay(toDisplay(cx))}, ${formatDisplay(toDisplay(cy))})`;\n\t\t\t\t\t\t\t\t\tif (shouldPersist && storageKey) {\n\t\t\t\t\t\t\t\t\t\twindow.sessionStorage.setItem(storageKey, JSON.stringify({ x: cx, y: cy }));\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tfunction updateFromPointer(event) {\n\t\t\t\t\t\t\t\t\tconst rect = plane.getBoundingClientRect();\n\t\t\t\t\t\t\t\t\tif (!rect.width || !rect.height) {\n\t\t\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\t\tconst relativeX = (event.clientX - rect.left) / rect.width;\n\t\t\t\t\t\t\t\t\tconst relativeY = 1 - ((event.clientY - rect.top) / rect.height);\n\t\t\t\t\t\t\t\t\tsetPoint(relativeX, relativeY, true);\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tconst initialX = Number.parseFloat(xInput.value);\n\t\t\t\t\t\t\t\tconst initialY = Number.parseFloat(yInput.value);\n\t\t\t\t\t\t\t\tsetPoint(Number.isFinite(initialX) ? initialX : 0.5, Number.isFinite(initialY) ? initialY : 0.5, false);\n\n\t\t\t\t\t\t\t\tif (storageKey) {\n\t\t\t\t\t\t\t\t\tconst stored = window.sessionStorage.getItem(storageKey);\n\t\t\t\t\t\t\t\t\tif (stored) {\n\t\t\t\t\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\t\t\t\t\tconst parsed = JSON.parse(stored);\n\t\t\t\t\t\t\t\t\t\t\tif (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {\n\t\t\t\t\t\t\t\t\t\t\t\tsetPoint(parsed.x, parsed.y, false);\n\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t} catch (_) {}\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t\tplane.addEventListener('pointerdown', updateFromPointer);\n\t\t\t\t\t\t\t})();\n\t\t\t\t\t\t</script>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, " ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, " ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if isHost {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<form action=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<form action=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var19 templ.SafeURL
 					templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/skip"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 219, Col: 78}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 237, Col: 79}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" method=\"POST\" class=\"pt-2\"><button type=\"submit\" class=\"w-full bg-border hover:bg-amber/20 text-text py-3 rounded font-mono font-bold tracking-wide transition-colors\">SKIP PROMPT</button></form><p class=\"text-center text-xs text-text-muted\">Skip marks this prompt as used and moves to the next one.</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" method=\"POST\" class=\"pt-2\"><button type=\"submit\" class=\"w-full bg-border hover:bg-amber/20 text-text py-3 rounded font-mono font-bold tracking-wide transition-colors\">SKIP PROMPT</button></form><p class=\"text-center text-xs text-text-muted\">Skip marks this prompt as used and moves to the next one.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div class=\"space-y-5\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"space-y-5\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -446,7 +464,7 @@ func GameContent(
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div class=\"")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<div class=\"")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -459,116 +477,116 @@ func GameContent(
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" style=\"")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" style=\"")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var23 string
-						templ_7745c5c3_Var23, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(plotStyle(dot.X, dot.Y, 8, true))
+						templ_7745c5c3_Var23, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(plotStyleAnimated(dot.X, dot.Y, 8, dot.AnimationDelay))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 228, Col: 77}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 246, Col: 100}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" title=\"")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" title=\"")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var24 string
 						templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(dot.Nickname + " (" + fmt.Sprintf("%d", dot.Points) + " pts)")
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 228, Col: 149}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 246, Col: 172}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\"></div>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\"></div>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, " <div class=\"absolute h-6 w-6 rounded-full border-2 border-amber bg-amber/10\" style=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, " <div class=\"absolute h-6 w-6 rounded-full border-2 border-amber bg-amber/10\" style=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var25 string
-					templ_7745c5c3_Var25, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(plotStyle(centroidX, centroidY, 12, false) + " animation: cluster-target-pulse 1.3s infinite;")
+					templ_7745c5c3_Var25, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(plotStyle(centroidX, centroidY, 12, false) + " animation: cluster-centroid-drop 380ms ease-out both, cluster-target-pulse 1.3s 420ms infinite;")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 230, Col: 186}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 248, Col: 236}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" title=\"Centroid target\"></div><div class=\"absolute h-2 w-2 rounded-full bg-amber\" style=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" title=\"Centroid target\"></div><div class=\"absolute h-2 w-2 rounded-full bg-amber\" style=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var26 string
 					templ_7745c5c3_Var26, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(plotStyle(centroidX, centroidY, 4, false))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 231, Col: 108}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 249, Col: 109}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\"></div><div class=\"absolute h-0.5 w-8 bg-amber/85\" style=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\"></div><div class=\"absolute h-0.5 w-8 bg-amber/85\" style=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var27 string
 					templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%);")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 232, Col: 131}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 250, Col: 132}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\"></div><div class=\"absolute h-8 w-0.5 bg-amber/85\" style=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\"></div><div class=\"absolute h-8 w-0.5 bg-amber/85\" style=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var28 string
 					templ_7745c5c3_Var28, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%);")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 233, Col: 131}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 251, Col: 132}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\"></div><div class=\"absolute h-0.5 w-7 bg-amber/50\" style=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"></div><div class=\"absolute h-0.5 w-7 bg-amber/50\" style=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var29 string
 					templ_7745c5c3_Var29, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%) rotate(45deg);")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 234, Col: 145}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 252, Col: 146}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\"></div><div class=\"absolute h-0.5 w-7 bg-amber/50\" style=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\"></div><div class=\"absolute h-0.5 w-7 bg-amber/50\" style=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var30 string
 					templ_7745c5c3_Var30, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%) rotate(-45deg);")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 235, Col: 146}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 253, Col: 147}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\"></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -578,32 +596,70 @@ func GameContent(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"text-center\"><p class=\"font-mono text-amber text-sm tracking-wide\">CENTROID REVEALED</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<div class=\"text-center\"><p class=\"font-mono text-amber text-sm tracking-wide\">CENTROID REVEALED</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if len(winners) > 0 {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<p class=\"text-text mt-1\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<p class=\"text-text mt-1\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var31 string
 					templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(winnerSummary(winners))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 240, Col: 58}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 258, Col: 59}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</div>")
+				if len(outliers) > 0 {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<p class=\"text-text-muted text-sm mt-1\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var32 string
+					templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(outlierSummary(outliers))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 261, Col: 75}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
+				}
+				if discussionHint != "" {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<div class=\"rounded border border-cyan/30 bg-cyan/10 p-3\"><p class=\"font-mono text-[11px] uppercase tracking-widest text-cyan\">Debrief Prompt</p><p class=\"text-text-muted mt-1\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var33 string
+					templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(discussionHint)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 267, Col: 57}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</p></div>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
 				templ_7745c5c3_Err = MarkerLegend().Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -613,7 +669,7 @@ func GameContent(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"space-y-2\"><div class=\"grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono\"><div class=\"col-span-5\">Player</div><div class=\"col-span-2 text-right\">Round pts</div><div class=\"col-span-2 text-right\">Avg/round</div><div class=\"col-span-3 text-right\">Total pts</div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"space-y-2\"><div class=\"grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono\"><div class=\"col-span-5\">Player</div><div class=\"col-span-2 text-right\">Round pts</div><div class=\"col-span-2 text-right\">Avg/round</div><div class=\"col-span-3 text-right\">Total pts</div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -622,135 +678,135 @@ func GameContent(
 					if s.IsLeader {
 						rowClass = "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-amber/10 border-amber/50"
 					}
-					var templ_7745c5c3_Var32 = []any{rowClass}
-					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var32...)
+					var templ_7745c5c3_Var34 = []any{rowClass}
+					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<div class=\"")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var33 string
-					templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var32).String())
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 1, Col: 0}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\"><div class=\"col-span-5 text-text truncate\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var34 string
-					templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(s.Nickname)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 260, Col: 64}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</div><div class=\"col-span-2 text-right font-mono text-cyan\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<div class=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var35 string
-					templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", s.RoundPoints))
+					templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var34).String())
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 261, Col: 98}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 1, Col: 0}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</div><div class=\"col-span-2 text-right font-mono text-cyan\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\"><div class=\"col-span-5 text-text truncate\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var36 string
-					templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(formatAveragePoints(s.AvgPointsPerRound))
+					templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(s.Nickname)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 262, Col: 106}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 287, Col: 65}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</div><div class=\"col-span-3 text-right font-mono text-text\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</div><div class=\"col-span-2 text-right font-mono text-cyan\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var37 string
-					templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", s.TotalPoints))
+					templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", s.RoundPoints))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 263, Col: 98}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 288, Col: 99}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</div></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "</div><div class=\"col-span-2 text-right font-mono text-cyan\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if isHost {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<form action=\"")
+					var templ_7745c5c3_Var38 string
+					templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(formatAveragePoints(s.AvgPointsPerRound))
 					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var38 templ.SafeURL
-					templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/next"))
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 268, Col: 79}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 289, Col: 107}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" method=\"POST\"><button type=\"submit\" class=\"w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</div><div class=\"col-span-3 text-right font-mono text-text\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var39 string
+					templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", s.TotalPoints))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 290, Col: 99}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</div></div>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if isHost {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<form action=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var40 templ.SafeURL
+					templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/next"))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/cluster/game_content.templ`, Line: 295, Col: 80}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" method=\"POST\"><button type=\"submit\" class=\"w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					if remainingPairs > 0 {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "NEXT ROUND")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "NEXT ROUND")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					} else {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "FINISH SESSION")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "FINISH SESSION")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</button></form>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</button></form>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<p class=\"text-center text-sm text-text-muted\">Waiting for host to continue.</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "<p class=\"text-center text-sm text-text-muted\">Waiting for host to continue.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,9 +1,9 @@
 ---
 title: "Game Instructions"
-status: ready
+status: active
 description: "Game rules and role-based guidance for players"
 created: 2025-02-09
-updated: 2025-02-09
+updated: 2026-02-19
 tags: [ux, ui, onboarding]
 priority: high
 ---
@@ -33,11 +33,17 @@ Instructions should be:
 
 ## Validation
 
-- [ ] Create instruction template for Trivia game
-- [ ] Host sees "Start Game" CTA, participants see "Waiting for host" status
-- [ ] Help button available during game play to re-view instructions
-- [ ] E2E flow: Verify instructions display correctly for both host and non-host
-- [ ] Visual criteria: Match 1970s sci-fi theme from visual-redesign.md
+- [x] Create instruction template for Trivia game
+- [x] Host sees "Start Game" CTA, participants see "Waiting for host" status
+- [x] Help button available during game play to re-view instructions
+- [x] E2E flow: Verify instructions display correctly for both host and non-host
+- [x] Visual criteria: Match 1970s sci-fi theme from visual-redesign.md
+
+## Implementation Notes (2026-02-19)
+
+- Added role-based pre-game instructions for Trivia and Cluster.
+- Added persistent in-game "Help: How ... Works" expandable panels for both games.
+- Verified instruction visibility and host/player role messaging via E2E flows + screenshot review.
 
 ## Scope
 

@@ -5,7 +5,7 @@ description: "Core trivia game MVP with real-time play and polish tasks."
 tags: [area/game, type/feature, tech/websocket]
 priority: medium
 created: 2025-12-14
-updated: 2026-02-18
+updated: 2026-02-19
 effort: L
 depends-on: []
 ---
@@ -57,6 +57,8 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 - [x] Basic Tailwind CSS styling
 - [x] Host can start game
 - [x] Audience rating inheritance for authored questions (`trivia_questions.min_rating` from lobby setting)
+- [x] Curated question packs in template modal (pack-based grouping, work-safe-first ordering, content-rating filtering)
+- [x] AI Question Assist button in submit flow (OpenAI when explicitly configured, local fallback otherwise)
 
 ---
 

@@ -11,23 +11,29 @@ import (
 templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound db.TriviaRound, hasSubmitted bool, currentQuestion db.TriviaQuestion, questionActive bool, isAuthor bool, hasAnswered bool, submittedCount int, isHost bool, scoreboard []db.GetLobbyScoreboardRow, roundScoreboard []db.GetRoundScoreboardRow, distribution []events.AnswerStat, totalAnswers int, totalExpectedAnswers int) {
 	<div id="game-content">
 		if lobby.Phase == "waiting" {
-			<div class="bg-elevated border border-border rounded p-5 sm:p-6">
-				<div class="space-y-4">
-					<div class="text-center py-6">
-						<p class="text-text-muted">Waiting for players to join...</p>
+			<div class="space-y-4">
+				@InstructionsCard(isHost, false)
+				<div class="bg-elevated border border-border rounded p-5 sm:p-6">
+					<div class="space-y-4">
+						<div class="text-center py-6">
+							<p class="text-text-muted">Waiting for players to join...</p>
+						</div>
+						if isHost {
+							<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/start") } method="POST">
+								<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">
+									START GAME
+								</button>
+							</form>
+						} else {
+							<p class="text-center text-text-muted py-4">Waiting for host to start...</p>
+						}
 					</div>
-					if isHost {
-						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/start") } method="POST">
-							<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">
-								START GAME
-							</button>
-						</form>
-					} else {
-						<p class="text-center text-text-muted py-4">Waiting for host to start...</p>
-					}
 				</div>
 			</div>
 		} else if lobby.Phase == "playing" {
+			<div class="mb-4">
+				@InstructionsCard(isHost, true)
+			</div>
 			if activeRound.Phase == "submitting" {
 				if hasSubmitted {
 					<div class="bg-elevated border border-success rounded p-6 sm:p-8 text-center">
