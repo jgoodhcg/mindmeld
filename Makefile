@@ -1,4 +1,4 @@
-.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint e2e-install e2e-screenshot e2e-flow e2e-multiplayer e2e-test
+.PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint cluster-content-validate cluster-content-import e2e-install e2e-screenshot e2e-flow e2e-multiplayer e2e-test
 
 # Load environment variables
 include .env.local
@@ -27,6 +27,14 @@ fmt:
 # Lint code (go vet)
 lint:
 	go vet ./...
+
+# Validate cluster content library JSON without DB writes
+cluster-content-validate:
+	go run ./cmd/cluster-content validate -file content/cluster/library.v1.json
+
+# Import cluster content library into database
+cluster-content-import:
+	go run ./cmd/cluster-content import -file content/cluster/library.v1.json
 
 # Generate templ templates
 templ:
