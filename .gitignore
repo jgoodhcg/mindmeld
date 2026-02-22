@@ -33,6 +33,7 @@
 # For local dev: make generate (templ + sqlc), make css (tailwind)
 /internal/db/
 templates/*_templ.go
+templates/**/*_templ.go
 static/css/output.css
 .decisions/*.xlsx
 
