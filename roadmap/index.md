@@ -38,6 +38,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - [multi-agent-local-isolation.md](./multi-agent-local-isolation.md) - Parallel local instances with isolated Postgres state
 - [security.md](./security.md) - App security hardening
 - [cluster-improvements.md](./cluster-improvements.md) - Post-MVP Cluster roadmap (user content, AI, reveal enhancements)
+- [cluster-content-studio.md](./cluster-content-studio.md) - File-first authoring + live review tool for large Cluster prompt libraries
 - [juice-playbook.md](./juice-playbook.md) - Not Boring-style polish backlog for Trivia + Cluster within 1970s sci-fi constraints
 - [chronology.md](./chronology.md) - Daily timeline sorting game
 - [vector-golf.md](./vector-golf.md) - Semantic golf daily game
