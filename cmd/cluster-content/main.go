@@ -214,8 +214,8 @@ func printReport(report clustercontent.Report) {
 	fmt.Printf("Axis sets: %d\n", report.AxisSetCount)
 	fmt.Printf("Prompts: %d\n", report.PromptCount)
 	fmt.Printf("Pairs: %d\n", report.PairCount)
-	fmt.Printf("Pairs available for Kids (%d): %d\n", contentrating.Kids, report.PairCountByRating[contentrating.Kids])
-	fmt.Printf("Pairs available for Work (%d): %d\n", contentrating.Work, report.PairCountByRating[contentrating.Work])
+	fmt.Printf("Pairs available for Mild (%d): %d\n", contentrating.Kids, report.PairCountByRating[contentrating.Kids])
+	fmt.Printf("Pairs available for Polite (%d): %d\n", contentrating.Work, report.PairCountByRating[contentrating.Work])
 	fmt.Printf("Pairs available for Adults (%d): %d\n", contentrating.Adults, report.PairCountByRating[contentrating.Adults])
 }
 

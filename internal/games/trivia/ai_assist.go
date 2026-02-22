@@ -255,12 +255,12 @@ func trimToLen(value string, max int) string {
 func audiencePolicy(rating int16) string {
 	switch rating {
 	case contentrating.Kids:
-		return "Kids: family-friendly language, no mature themes."
+		return "Mild: family-friendly language, no mature themes."
 	case contentrating.Work:
-		return "Work: professional and workplace-safe content."
+		return "Polite: workplace-safe and generally suitable for mixed company."
 	case contentrating.Adults:
 		return "Adults: still avoid hateful/harassing or unsafe content."
 	default:
-		return "Work-safe content."
+		return "Polite, work-safe content."
 	}
 }

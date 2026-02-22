@@ -56,21 +56,14 @@ templ Home(totalLobbies int64, totalAnswers int64, totalRounds int64, liveLobbie
 						class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
 					/>
 					<fieldset class="space-y-2">
-						<legend class="text-text-muted text-xs uppercase tracking-wide">Who's playing?</legend>
-						<div class="grid grid-cols-3 gap-2">
-							<label class="cursor-pointer">
-								<input type="radio" name="content_rating" value="10" class="peer sr-only"/>
-								<span class="flex items-center justify-center rounded border border-border bg-base px-2 py-2 text-xs font-mono tracking-wide text-text-muted transition-colors hover:border-cyan/50 hover:text-text peer-checked:border-cyan peer-checked:bg-cyan/10 peer-checked:text-cyan">KIDS</span>
-							</label>
-							<label class="cursor-pointer">
-								<input type="radio" name="content_rating" value="20" checked class="peer sr-only"/>
-								<span class="flex items-center justify-center rounded border border-border bg-base px-2 py-2 text-xs font-mono tracking-wide text-text-muted transition-colors hover:border-cyan/50 hover:text-text peer-checked:border-cyan peer-checked:bg-cyan/10 peer-checked:text-cyan">WORK</span>
-							</label>
-							<label class="cursor-pointer">
-								<input type="radio" name="content_rating" value="30" class="peer sr-only"/>
-								<span class="flex items-center justify-center rounded border border-border bg-base px-2 py-2 text-xs font-mono tracking-wide text-text-muted transition-colors hover:border-cyan/50 hover:text-text peer-checked:border-cyan peer-checked:bg-cyan/10 peer-checked:text-cyan">ADULTS</span>
-							</label>
-						</div>
+						<legend class="text-text-muted text-xs uppercase tracking-wide">Prompt Filter</legend>
+						<label class="flex items-start gap-3 rounded border border-border bg-base px-3 py-3 cursor-pointer hover:border-cyan/50 transition-colors">
+							<input type="checkbox" name="polite_mode" checked class="mt-0.5 h-4 w-4 accent-cyan"/>
+							<span class="block">
+								<span class="block text-xs font-mono tracking-widest text-text">POLITE MODE</span>
+								<span class="block text-[11px] text-text-muted mt-1">On for coworker-safe prompts. Turn off to allow more provocative prompts.</span>
+							</span>
+						</label>
 					</fieldset>
 					<button
 						type="submit"

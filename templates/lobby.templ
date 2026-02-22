@@ -27,33 +27,25 @@ templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, isHost bool, ga
 							</div>
 						</div>
 						<div class="pt-3">
-							<p class="text-text-muted text-xs uppercase tracking-wide mb-1">Audience</p>
+							<p class="text-text-muted text-xs uppercase tracking-wide mb-1">Prompt Filter</p>
 							if isHost && lobby.Phase == "waiting" {
-								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/content-rating") } method="POST" class="flex items-center gap-2">
-									<select name="content_rating" class="bg-base border border-border rounded px-3 py-2 text-sm font-mono tracking-wide text-text transition-colors hover:border-cyan/50 focus:outline-none focus:border-cyan">
-										<option
-											value="10"
-											if lobby.ContentRating == 10 {
-												selected
+								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/content-rating") } method="POST" class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+									<label class="flex items-center gap-2 rounded border border-border bg-base px-3 py-2 cursor-pointer hover:border-cyan/50 transition-colors">
+										<input
+											type="checkbox"
+											name="polite_mode"
+											class="h-4 w-4 accent-cyan"
+											if politeModeEnabled(lobby.ContentRating) {
+												checked
 											}
-										>Kids</option>
-										<option
-											value="20"
-											if lobby.ContentRating == 20 {
-												selected
-											}
-										>Work</option>
-										<option
-											value="30"
-											if lobby.ContentRating == 30 {
-												selected
-											}
-										>Adults</option>
-									</select>
+										/>
+										<span class="text-sm font-mono tracking-wide text-text">Polite mode</span>
+									</label>
 									<button type="submit" class="text-xs uppercase tracking-wide border border-border bg-base px-3 py-2 rounded text-text-muted hover:text-text hover:border-cyan/50 transition-colors">
 										Apply
 									</button>
 								</form>
+								<p class="text-[11px] text-text-muted mt-2">On for coworker-safe prompts. Turn off to include more provocative prompts.</p>
 							} else {
 								<span class="inline-flex items-center rounded border border-border bg-base px-3 py-1.5 text-sm font-mono tracking-wide text-text-muted">
 									{ contentRatingLabel(lobby.ContentRating) }

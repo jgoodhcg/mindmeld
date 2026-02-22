@@ -22,7 +22,7 @@ func (s *Server) handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 	lobbyName := strings.TrimSpace(r.FormValue("name"))
 	nickname := strings.TrimSpace(r.FormValue("nickname"))
 	gameType := strings.TrimSpace(r.FormValue("game_type"))
-	contentRating, err := contentrating.ParseID(r.FormValue("content_rating"))
+	contentRating, err := contentRatingFromForm(r)
 	if err != nil {
 		http.Error(w, "Invalid content rating", http.StatusBadRequest)
 		return
@@ -185,7 +185,7 @@ func (s *Server) handleUpdateLobbyContentRating(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	contentRating, err := contentrating.ParseID(r.FormValue("content_rating"))
+	contentRating, err := contentRatingFromForm(r)
 	if err != nil {
 		http.Error(w, "Invalid content rating", http.StatusBadRequest)
 		return
@@ -206,4 +206,11 @@ func (s *Server) handleUpdateLobbyContentRating(w http.ResponseWriter, r *http.R
 	}
 
 	http.Redirect(w, r, "/lobbies/"+code, http.StatusSeeOther)
+}
+
+func contentRatingFromForm(r *http.Request) (int16, error) {
+	if raw := strings.TrimSpace(r.FormValue("content_rating")); raw != "" {
+		return contentrating.ParseID(raw)
+	}
+	return contentrating.FromPoliteMode(r.FormValue("polite_mode") != ""), nil
 }

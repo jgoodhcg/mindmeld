@@ -48,7 +48,7 @@ The model is prompt-centric: each prompt lists multiple `axis_slugs`.
 
 ## Authoring guidance
 
-- Keep prompts work-safe unless intentionally marked for higher ratings.
+- Keep prompts polite/work-safe unless intentionally marked for higher ratings.
 - Prefer prompts that create disagreement, not trivia-style factual answers.
 - Avoid duplicates phrased slightly differently.
 - Keep each prompt mapped to 3-6 axis sets for variety.
@@ -56,8 +56,8 @@ The model is prompt-centric: each prompt lists multiple `axis_slugs`.
 ## Rating rules
 
 - `min_rating` values:
-  - `10` = Kids
-  - `20` = Work
+  - `10` = Mild (family-friendly)
+  - `20` = Polite (work-safe / mixed company)
   - `30` = Adults
 
 A pair is available only when both prompt and axis are allowed by lobby rating.

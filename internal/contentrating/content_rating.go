@@ -48,14 +48,41 @@ func ParseID(raw string) (int16, error) {
 func Label(id int16) string {
 	switch id {
 	case Kids:
-		return "Kids"
+		return "Mild"
 	case Work:
-		return "Work"
+		return "Polite"
 	case Adults:
 		return "Adults"
 	default:
 		return "Unknown"
 	}
+}
+
+// PoliteModeEnabled maps legacy ratings into the current UX toggle.
+// Kids and Work ratings both behave as "polite mode on"; Adults is off.
+func PoliteModeEnabled(id int16) bool {
+	switch id {
+	case Adults:
+		return false
+	case Kids, Work:
+		return true
+	default:
+		return true
+	}
+}
+
+func PoliteModeLabel(id int16) string {
+	if PoliteModeEnabled(id) {
+		return "Polite mode: ON"
+	}
+	return "Polite mode: OFF"
+}
+
+func FromPoliteMode(enabled bool) int16 {
+	if enabled {
+		return Work
+	}
+	return Adults
 }
 
 func Code(id int16) string {
