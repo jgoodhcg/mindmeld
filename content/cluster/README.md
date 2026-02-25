@@ -1,20 +1,28 @@
 # Cluster Content Library
 
-This directory is the source of truth for imported Cluster prompts/axes.
+This directory contains the source files for imported Cluster prompts/axes.
 
 ## Files
 
-- `library.v1.json` - current content library
+- `library.v1.json` - generated import library (still stores axis sets; prompts are generated from `prompts/*.csv`)
+- `prompts/` - row-based prompt authoring files (`.csv` or `.tsv`)
 
 ## Workflow
 
-1. Edit `library.v1.json`.
-2. Validate locally:
+1. Edit prompt source files in `content/cluster/prompts/` (and axis sets in `library.v1.json` if needed).
+2. Rebuild the generated import library:
+   - `go run ./cmd/cluster-content build -prompts-dir content/cluster/prompts -file content/cluster/library.v1.json`
+3. Validate locally:
    - `go run ./cmd/cluster-content validate -file content/cluster/library.v1.json`
-3. Preview DB changes (no writes):
+4. Preview DB changes (no writes):
    - `go run ./cmd/cluster-content import -file content/cluster/library.v1.json -dry-run -env dev`
-4. Import to your dev DB when ready:
+5. Import to your dev DB when ready:
    - `go run ./cmd/cluster-content import -file content/cluster/library.v1.json -env dev`
+
+Notes:
+
+- `build` reads prompt rows from `prompts/*.csv` or `prompts/*.tsv` and copies `version`, `created_by_label`, and `axis_sets` from the JSON template (`-axis-file`, defaulting to `-file`).
+- Prompt rows with `status=draft` are excluded from the generated library.
 
 ## Dev vs Prod Imports
 
@@ -52,6 +60,18 @@ The model is prompt-centric: each prompt lists multiple `axis_slugs`.
 - Prefer prompts that create disagreement, not trivia-style factual answers.
 - Avoid duplicates phrased slightly differently.
 - Keep each prompt mapped to 3-6 axis sets for variety.
+
+## Prompt Source Columns
+
+Supported prompt source columns:
+
+- `slug`
+- `text`
+- `min_rating` (`10|20|30` or `mild|polite|adults`)
+- `axis_slugs` (pipe-separated: `slug-a|slug-b`)
+- `theme` (optional; review tooling metadata)
+- `status` (`draft|ready`; defaults to `ready`)
+- `notes` (optional; review tooling metadata)
 
 ## Rating rules
 

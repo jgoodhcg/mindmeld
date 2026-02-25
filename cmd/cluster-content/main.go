@@ -23,6 +23,10 @@ func main() {
 	}
 
 	switch os.Args[1] {
+	case "build":
+		if err := runBuild(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
 	case "validate":
 		if err := runValidate(os.Args[2:]); err != nil {
 			log.Fatal(err)
@@ -41,14 +45,64 @@ func usage() {
 	fmt.Println("Cluster Content Tool")
 	fmt.Println()
 	fmt.Println("Usage:")
+	fmt.Println("  go run ./cmd/cluster-content build -prompts-dir content/cluster/prompts [-file content/cluster/library.v1.json]")
 	fmt.Println("  go run ./cmd/cluster-content validate -file content/cluster/library.v1.json")
 	fmt.Println("  go run ./cmd/cluster-content import -file content/cluster/library.v1.json [flags]")
+	fmt.Println()
+	fmt.Println("Build Flags:")
+	fmt.Println("  -file string           Output library JSON path (default content/cluster/library.v1.json)")
+	fmt.Println("  -axis-file string      JSON file to read version/created_by_label/axis_sets from (default -file)")
+	fmt.Println("  -prompts-dir string    Directory containing CSV/TSV prompt source files")
 	fmt.Println()
 	fmt.Println("Import Flags:")
 	fmt.Println("  -database-url string   Explicit DB URL (fallback: DATABASE_URL env)")
 	fmt.Println("  -env string            Target environment: dev|prod (default dev)")
 	fmt.Println("  -dry-run               Preview DB changes without writes")
 	fmt.Println("  -allow-production      Required for production-like DB URLs")
+}
+
+func runBuild(args []string) error {
+	fs := flag.NewFlagSet("build", flag.ContinueOnError)
+	file := fs.String("file", "content/cluster/library.v1.json", "Output cluster library JSON path")
+	axisFile := fs.String("axis-file", "", "JSON file used for version/created_by_label/axis_sets (default: -file)")
+	promptsDir := fs.String("prompts-dir", "content/cluster/prompts", "Directory containing CSV/TSV prompt source files")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	axisTemplatePath := strings.TrimSpace(*axisFile)
+	if axisTemplatePath == "" {
+		axisTemplatePath = strings.TrimSpace(*file)
+	}
+
+	axisTemplate, err := clustercontent.Load(axisTemplatePath)
+	if err != nil {
+		return fmt.Errorf("load axis template %q: %w", axisTemplatePath, err)
+	}
+
+	rows, promptLoadReport, err := clustercontent.LoadPromptSourceRows(strings.TrimSpace(*promptsDir))
+	if err != nil {
+		return err
+	}
+
+	lib := clustercontent.BuildLibraryFromPromptRows(axisTemplate, rows)
+	report, _, err := clustercontent.Validate(lib)
+	if err != nil {
+		return err
+	}
+
+	if err := clustercontent.SaveLibrary(strings.TrimSpace(*file), lib); err != nil {
+		return err
+	}
+
+	fmt.Printf("Prompt source files: %d\n", promptLoadReport.SourceFiles)
+	fmt.Printf("Prompt rows read: %d (ready=%d, draft=%d)\n", promptLoadReport.RowsRead, promptLoadReport.RowsReady, promptLoadReport.RowsDraft)
+	fmt.Printf("Generated prompts: %d\n", len(lib.Prompts))
+	fmt.Printf("Wrote: %s\n", strings.TrimSpace(*file))
+	printReport(report)
+	printTargetGap(report)
+	fmt.Println("Build: OK")
+	return nil
 }
 
 func runValidate(args []string) error {
