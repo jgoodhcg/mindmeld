@@ -1,0 +1,18 @@
+slug	x_min_label	x_max_label	y_min_label	y_max_label	min_rating
+consensus-vs-contrarian	Consensus-first	Contrarian	Low stakes	High stakes	20
+personal-vs-team	Personal preference	Team impact	Immediate	Long-term	20
+async-vs-live	Async-friendly	Live collaboration	Structured	Flexible	10
+structured-vs-flexible	Structured	Flexible	Clear protocol	Adaptive protocol	10
+budget-vs-premium	Budget-friendly	Premium	Calm energy	High energy	10
+classic-vs-experimental	Classic approach	Experimental approach	Independent work	Pair or group work	10
+practical-vs-aspirational	Practical	Aspirational	Immediate payoff	Long-term payoff	20
+risk-low-vs-risk-high	Risk-averse	Bold bet	Evidence-first	Intuition-first	20
+depth-vs-speed	Deep dive	Quick pass	Solo prep	Group synthesis	20
+playful-vs-serious	Playful	Serious	Lightweight	Mission-critical	10
+visibility-vs-focus	Visible output	Behind-the-scenes	Short horizon	Strategic horizon	20
+shortterm-vs-longterm	Short-term	Long-term	Immediate value	Compounding value	20
+individual-vs-collective	Individual ownership	Collective ownership	Clear boundaries	Shared boundaries	20
+stability-vs-change	Stability	Change	Incremental	Step-change	20
+high-context-vs-low-context	High context	Low context	Insider language	Universal language	20
+ceremony-vs-autonomy	Ceremony-heavy	Autonomy-heavy	Predictable	Adaptive	20
+comfort-vs-challenge	Comfort zone	Stretch zone	Low pressure	Performance pressure	20

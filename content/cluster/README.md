@@ -1,27 +1,30 @@
 # Cluster Content Library
 
-This directory contains the source files for imported Cluster prompts/axes.
+This directory contains the source files and generated artifacts for Cluster content imports.
 
 ## Files
 
-- `library.v1.json` - generated import library (still stores axis sets; prompts are generated from `prompts/*.csv`)
-- `prompts/` - row-based prompt authoring files (`.csv` or `.tsv`)
+- `source/` - canonical editable source files (`meta.json`, `axes.tsv`, `prompts.tsv`)
+- `library.v1.json` - generated/import-compatible library snapshot (optional build artifact)
 
 ## Workflow
 
-1. Edit prompt source files in `content/cluster/prompts/` (and axis sets in `library.v1.json` if needed).
-2. Rebuild the generated import library:
-   - `go run ./cmd/cluster-content build -prompts-dir content/cluster/prompts -file content/cluster/library.v1.json`
-3. Validate locally:
-   - `go run ./cmd/cluster-content validate -file content/cluster/library.v1.json`
-4. Preview DB changes (no writes):
-   - `go run ./cmd/cluster-content import -file content/cluster/library.v1.json -dry-run -env dev`
-5. Import to your dev DB when ready:
-   - `go run ./cmd/cluster-content import -file content/cluster/library.v1.json -env dev`
+1. Edit source files:
+   - prompts: `content/cluster/source/prompts.tsv`
+   - axes: `content/cluster/source/axes.tsv`
+   - metadata: `content/cluster/source/meta.json`
+2. Validate directly from source (no JSON required):
+   - `go run ./cmd/cluster-content validate -source-dir content/cluster/source`
+3. Preview DB changes directly from source (no writes):
+   - `go run ./cmd/cluster-content import -source-dir content/cluster/source -dry-run -env dev`
+4. Import to your dev DB when ready:
+   - `go run ./cmd/cluster-content import -source-dir content/cluster/source -env dev`
+5. Optional: generate/update JSON snapshot artifact:
+   - `go run ./cmd/cluster-content build -source-dir content/cluster/source -file content/cluster/library.v1.json`
 
 Notes:
 
-- `build` reads prompt rows from `prompts/*.csv` or `prompts/*.tsv` and copies `version`, `created_by_label`, and `axis_sets` from the JSON template (`-axis-file`, defaulting to `-file`).
+- `build`, `validate`, and `import` all support `-source-dir` (canonical TSV source pipeline).
 - Prompt rows with `status=draft` are excluded from the generated library.
 
 ## Dev vs Prod Imports
@@ -61,7 +64,25 @@ The model is prompt-centric: each prompt lists multiple `axis_slugs`.
 - Avoid duplicates phrased slightly differently.
 - Keep each prompt mapped to 3-6 axis sets for variety.
 
-## Prompt Source Columns
+## Source Files
+
+### `source/meta.json`
+
+- `version`
+- `created_by_label`
+
+### `source/axes.tsv`
+
+Columns:
+
+- `slug`
+- `x_min_label`
+- `x_max_label`
+- `y_min_label`
+- `y_max_label`
+- `min_rating`
+
+### `source/prompts.tsv`
 
 Supported prompt source columns:
 

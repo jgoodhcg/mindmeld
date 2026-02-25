@@ -1,0 +1,104 @@
+slug	text	min_rating	axis_slugs	theme	status	notes
+monday-sync-start	The best way to start a Monday team sync	20	consensus-vs-contrarian|async-vs-live|depth-vs-speed|ceremony-vs-autonomy|playful-vs-serious		ready	
+retro-after-rough-sprint	The most useful retro move after a rough sprint	20	classic-vs-experimental|practical-vs-aspirational|risk-low-vs-risk-high|comfort-vs-challenge|individual-vs-collective		ready	
+project-update-format	An ideal format for weekly project updates	20	high-context-vs-low-context|depth-vs-speed|visibility-vs-focus|async-vs-live|ceremony-vs-autonomy		ready	
+onboarding-first-week	The strongest onboarding moment in a teammate's first week	20	personal-vs-team|practical-vs-aspirational|playful-vs-serious|individual-vs-collective|comfort-vs-challenge		ready	
+cross-team-disagreement	The best way to resolve a cross-team disagreement	20	consensus-vs-contrarian|risk-low-vs-risk-high|individual-vs-collective|stability-vs-change|high-context-vs-low-context		ready	
+post-launch-celebration	A perfect celebration after shipping a major release	10	budget-vs-premium|playful-vs-serious|personal-vs-team|practical-vs-aspirational|classic-vs-experimental		ready	
+focus-reset-break	The best 15-minute reset during a high-stress day	10	budget-vs-premium|playful-vs-serious|visibility-vs-focus|comfort-vs-challenge|classic-vs-experimental		ready	
+meeting-should-have-been-async	The clearest sign a meeting should have been async	20	async-vs-live|depth-vs-speed|high-context-vs-low-context|ceremony-vs-autonomy|stability-vs-change		ready	
+recognition-that-motivates	Recognition that motivates people the most	10	personal-vs-team|playful-vs-serious|visibility-vs-focus|individual-vs-collective|practical-vs-aspirational		ready	
+ritual-worth-protecting	A team ritual worth protecting as the company grows	20	stability-vs-change|ceremony-vs-autonomy|playful-vs-serious|individual-vs-collective|consensus-vs-contrarian		ready	
+best-way-to-give-feedback	The best way to give constructive feedback	20	high-context-vs-low-context|comfort-vs-challenge|personal-vs-team|async-vs-live|risk-low-vs-risk-high		ready	
+deadline-under-pressure	The most effective way to recover a slipping deadline	20	risk-low-vs-risk-high|depth-vs-speed|individual-vs-collective|stability-vs-change|practical-vs-aspirational		ready	
+new-idea-socialization	How to socialize a bold new idea	20	consensus-vs-contrarian|high-context-vs-low-context|risk-low-vs-risk-high|visibility-vs-focus|classic-vs-experimental		ready	
+best-team-offsite-shape	The best shape for a team offsite	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|personal-vs-team|classic-vs-experimental		ready	
+note-taking-default	The best default for shared meeting notes	10	async-vs-live|high-context-vs-low-context|visibility-vs-focus|depth-vs-speed|stability-vs-change		ready	
+sprint-goal-quality	What makes a sprint goal actually useful	20	practical-vs-aspirational|depth-vs-speed|ceremony-vs-autonomy|consensus-vs-contrarian|stability-vs-change		ready	
+best-demo-format	The best format for a product demo	10	playful-vs-serious|high-context-vs-low-context|visibility-vs-focus|depth-vs-speed|classic-vs-experimental		ready	
+great-mentorship-move	A mentorship move that makes the biggest difference	20	comfort-vs-challenge|personal-vs-team|individual-vs-collective|practical-vs-aspirational|risk-low-vs-risk-high		ready	
+daily-standup-style	The most useful daily standup style	20	depth-vs-speed|ceremony-vs-autonomy|async-vs-live|high-context-vs-low-context|stability-vs-change		ready	
+scope-negotiation-moment	The right moment to renegotiate project scope	20	risk-low-vs-risk-high|consensus-vs-contrarian|visibility-vs-focus|shortterm-vs-longterm|stability-vs-change		ready	
+bug-triage-rule	The best rule for triaging incoming bugs	20	depth-vs-speed|risk-low-vs-risk-high|individual-vs-collective|stability-vs-change|practical-vs-aspirational		ready	
+handoff-between-teams	The cleanest way to hand off work between teams	20	high-context-vs-low-context|individual-vs-collective|async-vs-live|structured-vs-flexible|ceremony-vs-autonomy		ready	
+best-pairing-session	What makes a pairing session worth it	20	depth-vs-speed|comfort-vs-challenge|classic-vs-experimental|individual-vs-collective|risk-low-vs-risk-high		ready	
+office-social-event	The best low-awkwardness office social event	10	budget-vs-premium|playful-vs-serious|personal-vs-team|comfort-vs-challenge|classic-vs-experimental		ready	
+team-chat-channel-health	What keeps a team chat channel healthy	20	high-context-vs-low-context|visibility-vs-focus|depth-vs-speed|stability-vs-change|individual-vs-collective		ready	
+incident-retro-style	The best style for an incident retrospective	20	risk-low-vs-risk-high|comfort-vs-challenge|depth-vs-speed|individual-vs-collective|stability-vs-change		ready	
+best-way-to-unblock	The best way to ask for help when blocked	20	personal-vs-team|comfort-vs-challenge|async-vs-live|high-context-vs-low-context|visibility-vs-focus		ready	
+scope-cut-vs-date-slip	When to cut scope versus slip the date	20	risk-low-vs-risk-high|practical-vs-aspirational|consensus-vs-contrarian|shortterm-vs-longterm|stability-vs-change		ready	
+best-oncall-handoff	What makes an on-call handoff excellent	20	structured-vs-flexible|high-context-vs-low-context|depth-vs-speed|risk-low-vs-risk-high|individual-vs-collective		ready	
+decision-doc-style	The most useful style for a decision document	20	high-context-vs-low-context|depth-vs-speed|visibility-vs-focus|practical-vs-aspirational|consensus-vs-contrarian		ready	
+best-remote-collab-window	The best time window for remote collaboration	10	async-vs-live|structured-vs-flexible|personal-vs-team|visibility-vs-focus|depth-vs-speed		ready	
+new-tool-adoption	The right way to roll out a new team tool	20	stability-vs-change|risk-low-vs-risk-high|high-context-vs-low-context|individual-vs-collective|ceremony-vs-autonomy		ready	
+best-way-to-set-priorities	The best way to set quarterly priorities	20	practical-vs-aspirational|consensus-vs-contrarian|visibility-vs-focus|shortterm-vs-longterm|individual-vs-collective		ready	
+teammate-appreciation-ritual	A teammate appreciation ritual that actually works	10	playful-vs-serious|personal-vs-team|visibility-vs-focus|classic-vs-experimental|comfort-vs-challenge		ready	
+best-knowledge-base-style	The best style for a team knowledge base	20	high-context-vs-low-context|depth-vs-speed|stability-vs-change|ceremony-vs-autonomy|individual-vs-collective		ready	
+sync-with-execs	The best way to run a sync with leadership	20	high-context-vs-low-context|playful-vs-serious|depth-vs-speed|risk-low-vs-risk-high|visibility-vs-focus		ready	
+postmortem-readout	The best way to present postmortem findings	20	high-context-vs-low-context|playful-vs-serious|depth-vs-speed|risk-low-vs-risk-high|comfort-vs-challenge		ready	
+best-way-to-end-week	The best way for a team to end the week	10	playful-vs-serious|visibility-vs-focus|personal-vs-team|budget-vs-premium|comfort-vs-challenge		ready	
+feature-flag-cleanup	The best policy for cleaning up feature flags	20	stability-vs-change|risk-low-vs-risk-high|ceremony-vs-autonomy|depth-vs-speed|individual-vs-collective		ready	
+best-team-lunch-format	The best format for a team lunch	10	budget-vs-premium|playful-vs-serious|personal-vs-team|structured-vs-flexible|classic-vs-experimental		ready	
+meeting-facilitation	The strongest meeting facilitation move	20	ceremony-vs-autonomy|consensus-vs-contrarian|depth-vs-speed|comfort-vs-challenge|individual-vs-collective		ready	
+best-scope-clarification-question	The best question to clarify project scope early	20	high-context-vs-low-context|risk-low-vs-risk-high|depth-vs-speed|practical-vs-aspirational|visibility-vs-focus		ready	
+best-async-update-style	The most readable async project update	20	high-context-vs-low-context|depth-vs-speed|visibility-vs-focus|structured-vs-flexible|playful-vs-serious		ready	
+qa-collaboration-model	The best model for QA and engineering collaboration	20	individual-vs-collective|ceremony-vs-autonomy|risk-low-vs-risk-high|stability-vs-change|depth-vs-speed		ready	
+design-eng-handoff	The strongest design-to-engineering handoff	20	high-context-vs-low-context|depth-vs-speed|structured-vs-flexible|stability-vs-change|individual-vs-collective		ready	
+team-values-ritual	A team values ritual that does not feel forced	20	playful-vs-serious|personal-vs-team|classic-vs-experimental|comfort-vs-challenge|consensus-vs-contrarian		ready	
+best-way-to-ship-friday	The right way to handle Friday production releases	20	risk-low-vs-risk-high|stability-vs-change|consensus-vs-contrarian|visibility-vs-focus|practical-vs-aspirational		ready	
+healthy-pr-review-style	The healthiest pull request review style	20	comfort-vs-challenge|depth-vs-speed|high-context-vs-low-context|individual-vs-collective|ceremony-vs-autonomy		ready	
+best-customer-story-sharing	The best way to share customer stories internally	20	high-context-vs-low-context|playful-vs-serious|visibility-vs-focus|practical-vs-aspirational|personal-vs-team		ready	
+healthy-urgent-request-process	A healthy process for handling urgent requests	20	risk-low-vs-risk-high|stability-vs-change|consensus-vs-contrarian|depth-vs-speed|individual-vs-collective		ready	
+best-way-to-share-wins	The best way to share team wins without cringe	10	playful-vs-serious|personal-vs-team|visibility-vs-focus|budget-vs-premium|classic-vs-experimental		ready	
+best-new-feature-kickoff	The best way to kick off a new feature initiative	20	consensus-vs-contrarian|practical-vs-aspirational|depth-vs-speed|individual-vs-collective|stability-vs-change		ready	
+team-charter-refresh	The right cadence for refreshing a team charter	20	stability-vs-change|ceremony-vs-autonomy|individual-vs-collective|playful-vs-serious|depth-vs-speed		ready	
+weekend-breakfast-spread	The best kind of breakfast spread for a mixed group	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+rainy-day-group-plan	The best rainy-day activity for a mixed group	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+roadtrip-snack-draft	The ideal strategy for building a road trip snack lineup	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+family-game-night-rule	The one rule that makes family game night better	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+movie-marathon-setup	The best setup for a movie marathon that people actually enjoy	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+neighborhood-walk-detour	The best kind of detour to add to a neighborhood walk	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+birthday-party-theme	The best birthday party theme for adults who do not want a kiddie vibe	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+picnic-spot-choice	What makes a picnic spot actually worth the effort	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+vacation-souvenir-style	The best kind of souvenir to bring back from a trip	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+playlist-for-long-drive	The best playlist strategy for a long drive with friends	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+sunday-reset-routine	The best Sunday reset routine before a busy week	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+best-potluck-contribution	The best thing to bring to a potluck if you want people to remember it	10	budget-vs-premium|playful-vs-serious|structured-vs-flexible|classic-vs-experimental|async-vs-live		ready	
+dinner-party-seating-plan	The best way to arrange seating at a dinner party	20	personal-vs-team|structured-vs-flexible|playful-vs-serious|consensus-vs-contrarian|comfort-vs-challenge		ready	
+vacation-planning-style	The best style for planning a group vacation	20	structured-vs-flexible|budget-vs-premium|consensus-vs-contrarian|shortterm-vs-longterm|risk-low-vs-risk-high		ready	
+friend-group-chat-norm	The healthiest norm for a friend group chat	20	high-context-vs-low-context|visibility-vs-focus|playful-vs-serious|individual-vs-collective|stability-vs-change		ready	
+wedding-toast-style	The best wedding toast style	20	playful-vs-serious|depth-vs-speed|high-context-vs-low-context|comfort-vs-challenge|classic-vs-experimental		ready	
+hosting-out-of-town-guests	The best way to host out-of-town guests	20	personal-vs-team|structured-vs-flexible|budget-vs-premium|visibility-vs-focus|comfort-vs-challenge		ready	
+gym-buddy-rhythm	The best rhythm for sticking with a workout partner	20	async-vs-live|structured-vs-flexible|comfort-vs-challenge|stability-vs-change|individual-vs-collective		ready	
+hobby-you-stick-with	The kind of hobby people are most likely to stick with	20	practical-vs-aspirational|comfort-vs-challenge|budget-vs-premium|structured-vs-flexible|playful-vs-serious		ready	
+make-new-friends-as-adult	The best way to make new friends as an adult	20	comfort-vs-challenge|async-vs-live|individual-vs-collective|high-context-vs-low-context|consensus-vs-contrarian		ready	
+split-the-bill-etiquette	The best etiquette for splitting a bill in a group	20	personal-vs-team|high-context-vs-low-context|consensus-vs-contrarian|playful-vs-serious|risk-low-vs-risk-high		ready	
+ideal-board-game-night	What makes a board game night actually great	20	consensus-vs-contrarian|budget-vs-premium|structured-vs-flexible|playful-vs-serious|comfort-vs-challenge		ready	
+neighborhood-third-place	What makes a neighborhood spot a true third place	20	visibility-vs-focus|playful-vs-serious|budget-vs-premium|personal-vs-team|stability-vs-change		ready	
+household-chores-system	The best system for dividing household chores	20	individual-vs-collective|structured-vs-flexible|visibility-vs-focus|stability-vs-change|consensus-vs-contrarian		ready	
+travel-day-comfort-strategy	The best strategy for surviving a long travel day	20	budget-vs-premium|practical-vs-aspirational|depth-vs-speed|risk-low-vs-risk-high|structured-vs-flexible		ready	
+social-calendar-balance	The best way to balance a social calendar without burnout	20	visibility-vs-focus|comfort-vs-challenge|structured-vs-flexible|shortterm-vs-longterm|personal-vs-team		ready	
+reunion-icebreaker	The best way to break the ice at a reunion	20	playful-vs-serious|high-context-vs-low-context|comfort-vs-challenge|classic-vs-experimental|depth-vs-speed		ready	
+group-trip-decision-rule	The best rule for making decisions on a group trip	20	consensus-vs-contrarian|structured-vs-flexible|individual-vs-collective|risk-low-vs-risk-high|stability-vs-change		ready	
+apology-that-rebuilds-trust	What makes an apology actually rebuild trust	20	high-context-vs-low-context|comfort-vs-challenge|personal-vs-team|playful-vs-serious|depth-vs-speed		ready	
+personal-goal-tracking	The best way to track a personal goal without obsessing over it	20	visibility-vs-focus|structured-vs-flexible|shortterm-vs-longterm|practical-vs-aspirational|depth-vs-speed		ready	
+date-night-planning-style	The best style for planning date night	20	structured-vs-flexible|budget-vs-premium|classic-vs-experimental|playful-vs-serious|personal-vs-team		ready	
+healthy-phone-boundary	The most useful phone boundary for protecting your attention	20	visibility-vs-focus|stability-vs-change|comfort-vs-challenge|practical-vs-aspirational|consensus-vs-contrarian		ready	
+gift-giving-style	The best gift-giving style	20	practical-vs-aspirational|budget-vs-premium|personal-vs-team|classic-vs-experimental|playful-vs-serious		ready	
+moving-city-first-step	The best first step after moving to a new city	20	comfort-vs-challenge|async-vs-live|visibility-vs-focus|shortterm-vs-longterm|risk-low-vs-risk-high		ready	
+party-exit-timing	The ideal moment to leave a party	20	playful-vs-serious|visibility-vs-focus|comfort-vs-challenge|consensus-vs-contrarian|depth-vs-speed		ready	
+first-date-chemistry-test	The clearest sign there is real chemistry on a first date	30	playful-vs-serious|high-context-vs-low-context|comfort-vs-challenge|risk-low-vs-risk-high|classic-vs-experimental		ready	
+flirting-style-that-lands	The flirting style most likely to land well	30	playful-vs-serious|high-context-vs-low-context|comfort-vs-challenge|consensus-vs-contrarian|risk-low-vs-risk-high		ready	
+relationship-boundary-talk	The best way to start a relationship boundary conversation	30	high-context-vs-low-context|comfort-vs-challenge|personal-vs-team|depth-vs-speed|risk-low-vs-risk-high		ready	
+jealousy-in-friend-group	The best way to handle jealousy inside a friend group	30	personal-vs-team|high-context-vs-low-context|comfort-vs-challenge|consensus-vs-contrarian|stability-vs-change		ready	
+conversation-turnoff	The biggest conversation turnoff on a date	30	playful-vs-serious|high-context-vs-low-context|risk-low-vs-risk-high|comfort-vs-challenge|depth-vs-speed		ready	
+money-transparency-in-dating	The right level of money transparency early in dating	30	high-context-vs-low-context|comfort-vs-challenge|risk-low-vs-risk-high|practical-vs-aspirational|shortterm-vs-longterm		ready	
+ex-story-first-date	When talking about an ex on a first date is fine	30	risk-low-vs-risk-high|comfort-vs-challenge|high-context-vs-low-context|depth-vs-speed|playful-vs-serious		ready	
+commitment-signal-that-matters	The strongest signal someone is serious about a relationship	30	visibility-vs-focus|shortterm-vs-longterm|playful-vs-serious|personal-vs-team|stability-vs-change		ready	
+romantic-gesture-worth-it	A bold romantic gesture that is actually worth doing	30	risk-low-vs-risk-high|budget-vs-premium|classic-vs-experimental|playful-vs-serious|comfort-vs-challenge		ready	
+honest-feedback-in-relationship	The best way to give honest feedback in a relationship	30	comfort-vs-challenge|high-context-vs-low-context|personal-vs-team|depth-vs-speed|consensus-vs-contrarian		ready	
+friend-hookup-drama-response	The best way to handle friend group drama after two friends hook up	30	personal-vs-team|consensus-vs-contrarian|high-context-vs-low-context|stability-vs-change|comfort-vs-challenge		ready	
+text-back-timing	How much text-back timing actually matters in dating	30	playful-vs-serious|risk-low-vs-risk-high|high-context-vs-low-context|visibility-vs-focus|comfort-vs-challenge		ready	
+green-flag-underrated	The most underrated green flag in a partner	30	practical-vs-aspirational|playful-vs-serious|personal-vs-team|visibility-vs-focus|shortterm-vs-longterm		ready	
+breakup-closure-approach	The best approach to breakup closure	30	high-context-vs-low-context|comfort-vs-challenge|stability-vs-change|depth-vs-speed|risk-low-vs-risk-high		ready	
+party-flirtation-etiquette	The best etiquette for flirting at a party where everyone knows each other	30	playful-vs-serious|high-context-vs-low-context|personal-vs-team|risk-low-vs-risk-high|comfort-vs-challenge		ready	

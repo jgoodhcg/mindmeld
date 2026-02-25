@@ -45,14 +45,13 @@ func usage() {
 	fmt.Println("Cluster Content Tool")
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  go run ./cmd/cluster-content build -prompts-dir content/cluster/prompts [-file content/cluster/library.v1.json]")
-	fmt.Println("  go run ./cmd/cluster-content validate -file content/cluster/library.v1.json")
-	fmt.Println("  go run ./cmd/cluster-content import -file content/cluster/library.v1.json [flags]")
+	fmt.Println("  go run ./cmd/cluster-content build [-source-dir content/cluster/source] [-file content/cluster/library.v1.json]")
+	fmt.Println("  go run ./cmd/cluster-content validate [-source-dir content/cluster/source] [-file content/cluster/library.v1.json]")
+	fmt.Println("  go run ./cmd/cluster-content import [-source-dir content/cluster/source | -file content/cluster/library.v1.json] [flags]")
 	fmt.Println()
 	fmt.Println("Build Flags:")
 	fmt.Println("  -file string           Output library JSON path (default content/cluster/library.v1.json)")
-	fmt.Println("  -axis-file string      JSON file to read version/created_by_label/axis_sets from (default -file)")
-	fmt.Println("  -prompts-dir string    Directory containing CSV/TSV prompt source files")
+	fmt.Println("  -source-dir string     Canonical source directory (meta.json, axes.tsv, prompts.tsv)")
 	fmt.Println()
 	fmt.Println("Import Flags:")
 	fmt.Println("  -database-url string   Explicit DB URL (fallback: DATABASE_URL env)")
@@ -64,28 +63,18 @@ func usage() {
 func runBuild(args []string) error {
 	fs := flag.NewFlagSet("build", flag.ContinueOnError)
 	file := fs.String("file", "content/cluster/library.v1.json", "Output cluster library JSON path")
-	axisFile := fs.String("axis-file", "", "JSON file used for version/created_by_label/axis_sets (default: -file)")
-	promptsDir := fs.String("prompts-dir", "content/cluster/prompts", "Directory containing CSV/TSV prompt source files")
+	sourceDir := fs.String("source-dir", "content/cluster/source", "Source directory containing meta.json, axes.tsv, and prompts.tsv")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
 
-	axisTemplatePath := strings.TrimSpace(*axisFile)
-	if axisTemplatePath == "" {
-		axisTemplatePath = strings.TrimSpace(*file)
-	}
-
-	axisTemplate, err := clustercontent.Load(axisTemplatePath)
-	if err != nil {
-		return fmt.Errorf("load axis template %q: %w", axisTemplatePath, err)
-	}
-
-	rows, promptLoadReport, err := clustercontent.LoadPromptSourceRows(strings.TrimSpace(*promptsDir))
+	lib, sourceReport, err := clustercontent.LoadSourceDir(strings.TrimSpace(*sourceDir))
 	if err != nil {
 		return err
 	}
+	promptLoadReport := sourceReport.PromptRows
+	axisRowCount := sourceReport.AxisRows
 
-	lib := clustercontent.BuildLibraryFromPromptRows(axisTemplate, rows)
 	report, _, err := clustercontent.Validate(lib)
 	if err != nil {
 		return err
@@ -95,7 +84,8 @@ func runBuild(args []string) error {
 		return err
 	}
 
-	fmt.Printf("Prompt source files: %d\n", promptLoadReport.SourceFiles)
+	fmt.Printf("Source dir: %s\n", strings.TrimSpace(*sourceDir))
+	fmt.Printf("Axis rows read: %d\n", axisRowCount)
 	fmt.Printf("Prompt rows read: %d (ready=%d, draft=%d)\n", promptLoadReport.RowsRead, promptLoadReport.RowsReady, promptLoadReport.RowsDraft)
 	fmt.Printf("Generated prompts: %d\n", len(lib.Prompts))
 	fmt.Printf("Wrote: %s\n", strings.TrimSpace(*file))
@@ -108,11 +98,12 @@ func runBuild(args []string) error {
 func runValidate(args []string) error {
 	fs := flag.NewFlagSet("validate", flag.ContinueOnError)
 	file := fs.String("file", "content/cluster/library.v1.json", "Path to cluster library JSON")
+	sourceDir := fs.String("source-dir", "", "Source directory containing meta.json, axes.tsv, and prompts.tsv")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
 
-	lib, report, _, err := loadAndValidate(*file)
+	lib, report, _, err := loadAndValidate(*file, *sourceDir)
 	if err != nil {
 		return err
 	}
@@ -128,6 +119,7 @@ func runValidate(args []string) error {
 func runImport(args []string) error {
 	fs := flag.NewFlagSet("import", flag.ContinueOnError)
 	file := fs.String("file", "content/cluster/library.v1.json", "Path to cluster library JSON")
+	sourceDir := fs.String("source-dir", "", "Source directory containing meta.json, axes.tsv, and prompts.tsv")
 	databaseURLFlag := fs.String("database-url", "", "Explicit database URL (fallback: DATABASE_URL)")
 	targetEnv := fs.String("env", "dev", "Target environment: dev|prod")
 	dryRun := fs.Bool("dry-run", false, "Preview change plan without DB writes")
@@ -144,7 +136,7 @@ func runImport(args []string) error {
 		return err
 	}
 
-	lib, report, pairs, err := loadAndValidate(*file)
+	lib, report, pairs, err := loadAndValidate(*file, *sourceDir)
 	if err != nil {
 		return err
 	}
@@ -184,8 +176,16 @@ func runImport(args []string) error {
 	return nil
 }
 
-func loadAndValidate(path string) (clustercontent.Library, clustercontent.Report, []clustercontent.Pair, error) {
-	lib, err := clustercontent.Load(path)
+func loadAndValidate(path string, sourceDir string) (clustercontent.Library, clustercontent.Report, []clustercontent.Pair, error) {
+	var (
+		lib clustercontent.Library
+		err error
+	)
+	if strings.TrimSpace(sourceDir) != "" {
+		lib, _, err = clustercontent.LoadSourceDir(strings.TrimSpace(sourceDir))
+	} else {
+		lib, err = clustercontent.Load(path)
+	}
 	if err != nil {
 		return clustercontent.Library{}, clustercontent.Report{}, nil, err
 	}
