@@ -58,13 +58,38 @@ If attention cost is high and discussion lift is low, defer it.
   - AI-generated optional cluster labels
   - session-level trend analysis summaries
 
+### Phase 5: Labeled Points & Cross-Session Visibility
+
+**User point labels:**
+- Players optionally attach a short text label to their coordinate submission.
+- Labels appear on hover/tap during reveal, giving context for placement choices.
+- Evaluation: Does labeling increase discussion ("Why did you put X there?") or add typing overhead?
+
+**Cross-session point overlays:**
+- Reveal phase can optionally show anonymized points from previous sessions for the same prompt-axis pair.
+- Creates "social benchmark" context: "Here's where others placed this" without live players.
+- Session-level toggle (off by default) to avoid confusing new players.
+- Requires data model for historical submissions with opt-in sharing.
+
+**Opt-in consent for anonymous cross-session sharing:**
+- Players (or host) explicitly opt-in during game setup to allow their submissions to be shared anonymously with future sessions.
+- Default is opt-out: no data leaves the session unless consented.
+- Consent scope options:
+  - Per-session: "Share our anonymous placements with future groups"
+  - Per-player (account-level): "Always share my anonymous placements" (if accounts exist)
+- Stored consent flag tied to submission records for audit/compliance.
+- Clear UI explaining what's shared: coordinates only, no names, no labels unless separately consented.
+
+**Discussion starter potential:**
+- Compare your placement to historical consensus/outliers.
+- "You're in the 90th percentile for uniqueness on this prompt."
+
 ## Candidate Features Moved from Prior Combined Roadmap
 
 - Benchmark mode (AI or historical anchor points).
 - 1-2 player support variants.
 - Alternate scoring models (outlier bonus, weighted/hybrid scoring).
 - Team mode and longitudinal trend analysis.
-- Per-round free-text rationale paired with coordinate submission.
 
 ## Evaluation Matrix Template (Per Feature)
 
