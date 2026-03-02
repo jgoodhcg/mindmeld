@@ -4,6 +4,7 @@ This directory contains the source files and generated artifacts for Cluster con
 
 ## Files
 
+- `studio.v1.json` - review-first local UI source (JSON, prompt + axis metadata in one file)
 - `source/` - canonical editable source files (`meta.json`, `axes.tsv`, `prompts.tsv`)
 - `library.v1.json` - generated/import-compatible library snapshot (optional build artifact)
 
@@ -22,9 +23,26 @@ This directory contains the source files and generated artifacts for Cluster con
 5. Optional: generate/update JSON snapshot artifact:
    - `go run ./cmd/cluster-content build -source-dir content/cluster/source -file content/cluster/library.v1.json`
 
+## Review UI (Local Only)
+
+Bootstrap the review source JSON from the existing TSV source (one-time or as needed):
+
+- `go run ./cmd/cluster-content bootstrap-studio -source-dir content/cluster/source -file content/cluster/studio.v1.json`
+
+Run the local review UI (binds `127.0.0.1` by default):
+
+- `go run ./cmd/cluster-content review -file content/cluster/studio.v1.json`
+
+Review-first CLI flow (JSON source):
+
+- `go run ./cmd/cluster-content validate -studio-file content/cluster/studio.v1.json`
+- `go run ./cmd/cluster-content import -studio-file content/cluster/studio.v1.json -dry-run -env dev`
+- `go run ./cmd/cluster-content build -studio-file content/cluster/studio.v1.json -file content/cluster/library.v1.json`
+
 Notes:
 
 - `build`, `validate`, and `import` all support `-source-dir` (canonical TSV source pipeline).
+- `build`, `validate`, and `import` also support `-studio-file` for the review-first JSON source.
 - Prompt rows with `status=draft` are excluded from the generated library.
 
 ## Dev vs Prod Imports

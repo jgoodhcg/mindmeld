@@ -1,0 +1,1483 @@
+{
+  "version": "v1",
+  "created_by_label": "cluster-library-v1",
+  "axis_sets": [
+    {
+      "slug": "consensus-vs-contrarian",
+      "x_min_label": "Consensus-first",
+      "x_max_label": "Contrarian",
+      "y_min_label": "Low stakes",
+      "y_max_label": "High stakes",
+      "min_rating": 20
+    },
+    {
+      "slug": "personal-vs-team",
+      "x_min_label": "Personal preference",
+      "x_max_label": "Team impact",
+      "y_min_label": "Immediate",
+      "y_max_label": "Long-term",
+      "min_rating": 20
+    },
+    {
+      "slug": "async-vs-live",
+      "x_min_label": "Async-friendly",
+      "x_max_label": "Live collaboration",
+      "y_min_label": "Structured",
+      "y_max_label": "Flexible",
+      "min_rating": 10
+    },
+    {
+      "slug": "structured-vs-flexible",
+      "x_min_label": "Structured",
+      "x_max_label": "Flexible",
+      "y_min_label": "Clear protocol",
+      "y_max_label": "Adaptive protocol",
+      "min_rating": 10
+    },
+    {
+      "slug": "budget-vs-premium",
+      "x_min_label": "Budget-friendly",
+      "x_max_label": "Premium",
+      "y_min_label": "Calm energy",
+      "y_max_label": "High energy",
+      "min_rating": 10
+    },
+    {
+      "slug": "classic-vs-experimental",
+      "x_min_label": "Classic approach",
+      "x_max_label": "Experimental approach",
+      "y_min_label": "Independent work",
+      "y_max_label": "Pair or group work",
+      "min_rating": 10
+    },
+    {
+      "slug": "practical-vs-aspirational",
+      "x_min_label": "Practical",
+      "x_max_label": "Aspirational",
+      "y_min_label": "Immediate payoff",
+      "y_max_label": "Long-term payoff",
+      "min_rating": 20
+    },
+    {
+      "slug": "risk-low-vs-risk-high",
+      "x_min_label": "Risk-averse",
+      "x_max_label": "Bold bet",
+      "y_min_label": "Evidence-first",
+      "y_max_label": "Intuition-first",
+      "min_rating": 20
+    },
+    {
+      "slug": "depth-vs-speed",
+      "x_min_label": "Deep dive",
+      "x_max_label": "Quick pass",
+      "y_min_label": "Solo prep",
+      "y_max_label": "Group synthesis",
+      "min_rating": 20
+    },
+    {
+      "slug": "playful-vs-serious",
+      "x_min_label": "Playful",
+      "x_max_label": "Serious",
+      "y_min_label": "Lightweight",
+      "y_max_label": "Mission-critical",
+      "min_rating": 10
+    },
+    {
+      "slug": "visibility-vs-focus",
+      "x_min_label": "Visible output",
+      "x_max_label": "Behind-the-scenes",
+      "y_min_label": "Short horizon",
+      "y_max_label": "Strategic horizon",
+      "min_rating": 20
+    },
+    {
+      "slug": "shortterm-vs-longterm",
+      "x_min_label": "Short-term",
+      "x_max_label": "Long-term",
+      "y_min_label": "Immediate value",
+      "y_max_label": "Compounding value",
+      "min_rating": 20
+    },
+    {
+      "slug": "individual-vs-collective",
+      "x_min_label": "Individual ownership",
+      "x_max_label": "Collective ownership",
+      "y_min_label": "Clear boundaries",
+      "y_max_label": "Shared boundaries",
+      "min_rating": 20
+    },
+    {
+      "slug": "stability-vs-change",
+      "x_min_label": "Stability",
+      "x_max_label": "Change",
+      "y_min_label": "Incremental",
+      "y_max_label": "Step-change",
+      "min_rating": 20
+    },
+    {
+      "slug": "high-context-vs-low-context",
+      "x_min_label": "High context",
+      "x_max_label": "Low context",
+      "y_min_label": "Insider language",
+      "y_max_label": "Universal language",
+      "min_rating": 20
+    },
+    {
+      "slug": "ceremony-vs-autonomy",
+      "x_min_label": "Ceremony-heavy",
+      "x_max_label": "Autonomy-heavy",
+      "y_min_label": "Predictable",
+      "y_max_label": "Adaptive",
+      "min_rating": 20
+    },
+    {
+      "slug": "comfort-vs-challenge",
+      "x_min_label": "Comfort zone",
+      "x_max_label": "Stretch zone",
+      "y_min_label": "Low pressure",
+      "y_max_label": "Performance pressure",
+      "min_rating": 20
+    }
+  ],
+  "prompts": [
+    {
+      "slug": "monday-sync-start",
+      "text": "The best way to start a Monday team sync",
+      "min_rating": 20,
+      "axis_slugs": [
+        "consensus-vs-contrarian",
+        "async-vs-live",
+        "depth-vs-speed",
+        "ceremony-vs-autonomy",
+        "playful-vs-serious"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "retro-after-rough-sprint",
+      "text": "The most useful retro move after a rough sprint",
+      "min_rating": 20,
+      "axis_slugs": [
+        "classic-vs-experimental",
+        "practical-vs-aspirational",
+        "risk-low-vs-risk-high",
+        "comfort-vs-challenge",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "project-update-format",
+      "text": "An ideal format for weekly project updates",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "depth-vs-speed",
+        "visibility-vs-focus",
+        "async-vs-live",
+        "ceremony-vs-autonomy"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "onboarding-first-week",
+      "text": "The strongest onboarding moment in a teammate's first week",
+      "min_rating": 20,
+      "axis_slugs": [
+        "personal-vs-team",
+        "practical-vs-aspirational",
+        "playful-vs-serious",
+        "individual-vs-collective",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "cross-team-disagreement",
+      "text": "The best way to resolve a cross-team disagreement",
+      "min_rating": 20,
+      "axis_slugs": [
+        "consensus-vs-contrarian",
+        "risk-low-vs-risk-high",
+        "individual-vs-collective",
+        "stability-vs-change",
+        "high-context-vs-low-context"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "post-launch-celebration",
+      "text": "A perfect celebration after shipping a major release",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "personal-vs-team",
+        "practical-vs-aspirational",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "focus-reset-break",
+      "text": "The best 15-minute reset during a high-stress day",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "visibility-vs-focus",
+        "comfort-vs-challenge",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "meeting-should-have-been-async",
+      "text": "The clearest sign a meeting should have been async",
+      "min_rating": 20,
+      "axis_slugs": [
+        "async-vs-live",
+        "depth-vs-speed",
+        "high-context-vs-low-context",
+        "ceremony-vs-autonomy",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "recognition-that-motivates",
+      "text": "Recognition that motivates people the most",
+      "min_rating": 10,
+      "axis_slugs": [
+        "personal-vs-team",
+        "playful-vs-serious",
+        "visibility-vs-focus",
+        "individual-vs-collective",
+        "practical-vs-aspirational"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "ritual-worth-protecting",
+      "text": "A team ritual worth protecting as the company grows",
+      "min_rating": 20,
+      "axis_slugs": [
+        "stability-vs-change",
+        "ceremony-vs-autonomy",
+        "playful-vs-serious",
+        "individual-vs-collective",
+        "consensus-vs-contrarian"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-way-to-give-feedback",
+      "text": "The best way to give constructive feedback",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "personal-vs-team",
+        "async-vs-live",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "deadline-under-pressure",
+      "text": "The most effective way to recover a slipping deadline",
+      "min_rating": 20,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "depth-vs-speed",
+        "individual-vs-collective",
+        "stability-vs-change",
+        "practical-vs-aspirational"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "new-idea-socialization",
+      "text": "How to socialize a bold new idea",
+      "min_rating": 20,
+      "axis_slugs": [
+        "consensus-vs-contrarian",
+        "high-context-vs-low-context",
+        "risk-low-vs-risk-high",
+        "visibility-vs-focus",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-team-offsite-shape",
+      "text": "The best shape for a team offsite",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "personal-vs-team",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "note-taking-default",
+      "text": "The best default for shared meeting notes",
+      "min_rating": 10,
+      "axis_slugs": [
+        "async-vs-live",
+        "high-context-vs-low-context",
+        "visibility-vs-focus",
+        "depth-vs-speed",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "sprint-goal-quality",
+      "text": "What makes a sprint goal actually useful",
+      "min_rating": 20,
+      "axis_slugs": [
+        "practical-vs-aspirational",
+        "depth-vs-speed",
+        "ceremony-vs-autonomy",
+        "consensus-vs-contrarian",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-demo-format",
+      "text": "The best format for a product demo",
+      "min_rating": 10,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "high-context-vs-low-context",
+        "visibility-vs-focus",
+        "depth-vs-speed",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "great-mentorship-move",
+      "text": "A mentorship move that makes the biggest difference",
+      "min_rating": 20,
+      "axis_slugs": [
+        "comfort-vs-challenge",
+        "personal-vs-team",
+        "individual-vs-collective",
+        "practical-vs-aspirational",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "daily-standup-style",
+      "text": "The most useful daily standup style",
+      "min_rating": 20,
+      "axis_slugs": [
+        "depth-vs-speed",
+        "ceremony-vs-autonomy",
+        "async-vs-live",
+        "high-context-vs-low-context",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "scope-negotiation-moment",
+      "text": "The right moment to renegotiate project scope",
+      "min_rating": 20,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "consensus-vs-contrarian",
+        "visibility-vs-focus",
+        "shortterm-vs-longterm",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "bug-triage-rule",
+      "text": "The best rule for triaging incoming bugs",
+      "min_rating": 20,
+      "axis_slugs": [
+        "depth-vs-speed",
+        "risk-low-vs-risk-high",
+        "individual-vs-collective",
+        "stability-vs-change",
+        "practical-vs-aspirational"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "handoff-between-teams",
+      "text": "The cleanest way to hand off work between teams",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "individual-vs-collective",
+        "async-vs-live",
+        "structured-vs-flexible",
+        "ceremony-vs-autonomy"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-pairing-session",
+      "text": "What makes a pairing session worth it",
+      "min_rating": 20,
+      "axis_slugs": [
+        "depth-vs-speed",
+        "comfort-vs-challenge",
+        "classic-vs-experimental",
+        "individual-vs-collective",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "office-social-event",
+      "text": "The best low-awkwardness office social event",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "personal-vs-team",
+        "comfort-vs-challenge",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "team-chat-channel-health",
+      "text": "What keeps a team chat channel healthy",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "visibility-vs-focus",
+        "depth-vs-speed",
+        "stability-vs-change",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "incident-retro-style",
+      "text": "The best style for an incident retrospective",
+      "min_rating": 20,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "comfort-vs-challenge",
+        "depth-vs-speed",
+        "individual-vs-collective",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-way-to-unblock",
+      "text": "The best way to ask for help when blocked",
+      "min_rating": 20,
+      "axis_slugs": [
+        "personal-vs-team",
+        "comfort-vs-challenge",
+        "async-vs-live",
+        "high-context-vs-low-context",
+        "visibility-vs-focus"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "scope-cut-vs-date-slip",
+      "text": "When to cut scope versus slip the date",
+      "min_rating": 20,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "practical-vs-aspirational",
+        "consensus-vs-contrarian",
+        "shortterm-vs-longterm",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-oncall-handoff",
+      "text": "What makes an on-call handoff excellent",
+      "min_rating": 20,
+      "axis_slugs": [
+        "structured-vs-flexible",
+        "high-context-vs-low-context",
+        "depth-vs-speed",
+        "risk-low-vs-risk-high",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "decision-doc-style",
+      "text": "The most useful style for a decision document",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "depth-vs-speed",
+        "visibility-vs-focus",
+        "practical-vs-aspirational",
+        "consensus-vs-contrarian"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-remote-collab-window",
+      "text": "The best time window for remote collaboration",
+      "min_rating": 10,
+      "axis_slugs": [
+        "async-vs-live",
+        "structured-vs-flexible",
+        "personal-vs-team",
+        "visibility-vs-focus",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "new-tool-adoption",
+      "text": "The right way to roll out a new team tool",
+      "min_rating": 20,
+      "axis_slugs": [
+        "stability-vs-change",
+        "risk-low-vs-risk-high",
+        "high-context-vs-low-context",
+        "individual-vs-collective",
+        "ceremony-vs-autonomy"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-way-to-set-priorities",
+      "text": "The best way to set quarterly priorities",
+      "min_rating": 20,
+      "axis_slugs": [
+        "practical-vs-aspirational",
+        "consensus-vs-contrarian",
+        "visibility-vs-focus",
+        "shortterm-vs-longterm",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "teammate-appreciation-ritual",
+      "text": "A teammate appreciation ritual that actually works",
+      "min_rating": 10,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "personal-vs-team",
+        "visibility-vs-focus",
+        "classic-vs-experimental",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-knowledge-base-style",
+      "text": "The best style for a team knowledge base",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "depth-vs-speed",
+        "stability-vs-change",
+        "ceremony-vs-autonomy",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "sync-with-execs",
+      "text": "The best way to run a sync with leadership",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "playful-vs-serious",
+        "depth-vs-speed",
+        "risk-low-vs-risk-high",
+        "visibility-vs-focus"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "postmortem-readout",
+      "text": "The best way to present postmortem findings",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "playful-vs-serious",
+        "depth-vs-speed",
+        "risk-low-vs-risk-high",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-way-to-end-week",
+      "text": "The best way for a team to end the week",
+      "min_rating": 10,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "visibility-vs-focus",
+        "personal-vs-team",
+        "budget-vs-premium",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "feature-flag-cleanup",
+      "text": "The best policy for cleaning up feature flags",
+      "min_rating": 20,
+      "axis_slugs": [
+        "stability-vs-change",
+        "risk-low-vs-risk-high",
+        "ceremony-vs-autonomy",
+        "depth-vs-speed",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-team-lunch-format",
+      "text": "The best format for a team lunch",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "personal-vs-team",
+        "structured-vs-flexible",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "meeting-facilitation",
+      "text": "The strongest meeting facilitation move",
+      "min_rating": 20,
+      "axis_slugs": [
+        "ceremony-vs-autonomy",
+        "consensus-vs-contrarian",
+        "depth-vs-speed",
+        "comfort-vs-challenge",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-scope-clarification-question",
+      "text": "The best question to clarify project scope early",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "risk-low-vs-risk-high",
+        "depth-vs-speed",
+        "practical-vs-aspirational",
+        "visibility-vs-focus"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-async-update-style",
+      "text": "The most readable async project update",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "depth-vs-speed",
+        "visibility-vs-focus",
+        "structured-vs-flexible",
+        "playful-vs-serious"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "qa-collaboration-model",
+      "text": "The best model for QA and engineering collaboration",
+      "min_rating": 20,
+      "axis_slugs": [
+        "individual-vs-collective",
+        "ceremony-vs-autonomy",
+        "risk-low-vs-risk-high",
+        "stability-vs-change",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "design-eng-handoff",
+      "text": "The strongest design-to-engineering handoff",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "depth-vs-speed",
+        "structured-vs-flexible",
+        "stability-vs-change",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "team-values-ritual",
+      "text": "A team values ritual that does not feel forced",
+      "min_rating": 20,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "personal-vs-team",
+        "classic-vs-experimental",
+        "comfort-vs-challenge",
+        "consensus-vs-contrarian"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-way-to-ship-friday",
+      "text": "The right way to handle Friday production releases",
+      "min_rating": 20,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "stability-vs-change",
+        "consensus-vs-contrarian",
+        "visibility-vs-focus",
+        "practical-vs-aspirational"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "healthy-pr-review-style",
+      "text": "The healthiest pull request review style",
+      "min_rating": 20,
+      "axis_slugs": [
+        "comfort-vs-challenge",
+        "depth-vs-speed",
+        "high-context-vs-low-context",
+        "individual-vs-collective",
+        "ceremony-vs-autonomy"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-customer-story-sharing",
+      "text": "The best way to share customer stories internally",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "playful-vs-serious",
+        "visibility-vs-focus",
+        "practical-vs-aspirational",
+        "personal-vs-team"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "healthy-urgent-request-process",
+      "text": "A healthy process for handling urgent requests",
+      "min_rating": 20,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "stability-vs-change",
+        "consensus-vs-contrarian",
+        "depth-vs-speed",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-way-to-share-wins",
+      "text": "The best way to share team wins without cringe",
+      "min_rating": 10,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "personal-vs-team",
+        "visibility-vs-focus",
+        "budget-vs-premium",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-new-feature-kickoff",
+      "text": "The best way to kick off a new feature initiative",
+      "min_rating": 20,
+      "axis_slugs": [
+        "consensus-vs-contrarian",
+        "practical-vs-aspirational",
+        "depth-vs-speed",
+        "individual-vs-collective",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "team-charter-refresh",
+      "text": "The right cadence for refreshing a team charter",
+      "min_rating": 20,
+      "axis_slugs": [
+        "stability-vs-change",
+        "ceremony-vs-autonomy",
+        "individual-vs-collective",
+        "playful-vs-serious",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "weekend-breakfast-spread",
+      "text": "The best kind of breakfast spread for a mixed group",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "rainy-day-group-plan",
+      "text": "The best rainy-day activity for a mixed group",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "roadtrip-snack-draft",
+      "text": "The ideal strategy for building a road trip snack lineup",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "family-game-night-rule",
+      "text": "The one rule that makes family game night better",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "movie-marathon-setup",
+      "text": "The best setup for a movie marathon that people actually enjoy",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "neighborhood-walk-detour",
+      "text": "The best kind of detour to add to a neighborhood walk",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "birthday-party-theme",
+      "text": "The best birthday party theme for adults who do not want a kiddie vibe",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "picnic-spot-choice",
+      "text": "What makes a picnic spot actually worth the effort",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "vacation-souvenir-style",
+      "text": "The best kind of souvenir to bring back from a trip",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "playlist-for-long-drive",
+      "text": "The best playlist strategy for a long drive with friends",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "sunday-reset-routine",
+      "text": "The best Sunday reset routine before a busy week",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "best-potluck-contribution",
+      "text": "The best thing to bring to a potluck if you want people to remember it",
+      "min_rating": 10,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "playful-vs-serious",
+        "structured-vs-flexible",
+        "classic-vs-experimental",
+        "async-vs-live"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "dinner-party-seating-plan",
+      "text": "The best way to arrange seating at a dinner party",
+      "min_rating": 20,
+      "axis_slugs": [
+        "personal-vs-team",
+        "structured-vs-flexible",
+        "playful-vs-serious",
+        "consensus-vs-contrarian",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "vacation-planning-style",
+      "text": "The best style for planning a group vacation",
+      "min_rating": 20,
+      "axis_slugs": [
+        "structured-vs-flexible",
+        "budget-vs-premium",
+        "consensus-vs-contrarian",
+        "shortterm-vs-longterm",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "friend-group-chat-norm",
+      "text": "The healthiest norm for a friend group chat",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "visibility-vs-focus",
+        "playful-vs-serious",
+        "individual-vs-collective",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "wedding-toast-style",
+      "text": "The best wedding toast style",
+      "min_rating": 20,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "depth-vs-speed",
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "hosting-out-of-town-guests",
+      "text": "The best way to host out-of-town guests",
+      "min_rating": 20,
+      "axis_slugs": [
+        "personal-vs-team",
+        "structured-vs-flexible",
+        "budget-vs-premium",
+        "visibility-vs-focus",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "gym-buddy-rhythm",
+      "text": "The best rhythm for sticking with a workout partner",
+      "min_rating": 20,
+      "axis_slugs": [
+        "async-vs-live",
+        "structured-vs-flexible",
+        "comfort-vs-challenge",
+        "stability-vs-change",
+        "individual-vs-collective"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "hobby-you-stick-with",
+      "text": "The kind of hobby people are most likely to stick with",
+      "min_rating": 20,
+      "axis_slugs": [
+        "practical-vs-aspirational",
+        "comfort-vs-challenge",
+        "budget-vs-premium",
+        "structured-vs-flexible",
+        "playful-vs-serious"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "make-new-friends-as-adult",
+      "text": "The best way to make new friends as an adult",
+      "min_rating": 20,
+      "axis_slugs": [
+        "comfort-vs-challenge",
+        "async-vs-live",
+        "individual-vs-collective",
+        "high-context-vs-low-context",
+        "consensus-vs-contrarian"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "split-the-bill-etiquette",
+      "text": "The best etiquette for splitting a bill in a group",
+      "min_rating": 20,
+      "axis_slugs": [
+        "personal-vs-team",
+        "high-context-vs-low-context",
+        "consensus-vs-contrarian",
+        "playful-vs-serious",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "ideal-board-game-night",
+      "text": "What makes a board game night actually great",
+      "min_rating": 20,
+      "axis_slugs": [
+        "consensus-vs-contrarian",
+        "budget-vs-premium",
+        "structured-vs-flexible",
+        "playful-vs-serious",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "neighborhood-third-place",
+      "text": "What makes a neighborhood spot a true third place",
+      "min_rating": 20,
+      "axis_slugs": [
+        "visibility-vs-focus",
+        "playful-vs-serious",
+        "budget-vs-premium",
+        "personal-vs-team",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "household-chores-system",
+      "text": "The best system for dividing household chores",
+      "min_rating": 20,
+      "axis_slugs": [
+        "individual-vs-collective",
+        "structured-vs-flexible",
+        "visibility-vs-focus",
+        "stability-vs-change",
+        "consensus-vs-contrarian"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "travel-day-comfort-strategy",
+      "text": "The best strategy for surviving a long travel day",
+      "min_rating": 20,
+      "axis_slugs": [
+        "budget-vs-premium",
+        "practical-vs-aspirational",
+        "depth-vs-speed",
+        "risk-low-vs-risk-high",
+        "structured-vs-flexible"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "social-calendar-balance",
+      "text": "The best way to balance a social calendar without burnout",
+      "min_rating": 20,
+      "axis_slugs": [
+        "visibility-vs-focus",
+        "comfort-vs-challenge",
+        "structured-vs-flexible",
+        "shortterm-vs-longterm",
+        "personal-vs-team"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "reunion-icebreaker",
+      "text": "The best way to break the ice at a reunion",
+      "min_rating": 20,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "classic-vs-experimental",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "group-trip-decision-rule",
+      "text": "The best rule for making decisions on a group trip",
+      "min_rating": 20,
+      "axis_slugs": [
+        "consensus-vs-contrarian",
+        "structured-vs-flexible",
+        "individual-vs-collective",
+        "risk-low-vs-risk-high",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "apology-that-rebuilds-trust",
+      "text": "What makes an apology actually rebuild trust",
+      "min_rating": 20,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "personal-vs-team",
+        "playful-vs-serious",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "personal-goal-tracking",
+      "text": "The best way to track a personal goal without obsessing over it",
+      "min_rating": 20,
+      "axis_slugs": [
+        "visibility-vs-focus",
+        "structured-vs-flexible",
+        "shortterm-vs-longterm",
+        "practical-vs-aspirational",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "date-night-planning-style",
+      "text": "The best style for planning date night",
+      "min_rating": 20,
+      "axis_slugs": [
+        "structured-vs-flexible",
+        "budget-vs-premium",
+        "classic-vs-experimental",
+        "playful-vs-serious",
+        "personal-vs-team"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "healthy-phone-boundary",
+      "text": "The most useful phone boundary for protecting your attention",
+      "min_rating": 20,
+      "axis_slugs": [
+        "visibility-vs-focus",
+        "stability-vs-change",
+        "comfort-vs-challenge",
+        "practical-vs-aspirational",
+        "consensus-vs-contrarian"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "gift-giving-style",
+      "text": "The best gift-giving style",
+      "min_rating": 20,
+      "axis_slugs": [
+        "practical-vs-aspirational",
+        "budget-vs-premium",
+        "personal-vs-team",
+        "classic-vs-experimental",
+        "playful-vs-serious"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "moving-city-first-step",
+      "text": "The best first step after moving to a new city",
+      "min_rating": 20,
+      "axis_slugs": [
+        "comfort-vs-challenge",
+        "async-vs-live",
+        "visibility-vs-focus",
+        "shortterm-vs-longterm",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "party-exit-timing",
+      "text": "The ideal moment to leave a party",
+      "min_rating": 20,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "visibility-vs-focus",
+        "comfort-vs-challenge",
+        "consensus-vs-contrarian",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "first-date-chemistry-test",
+      "text": "The clearest sign there is real chemistry on a first date",
+      "min_rating": 30,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "risk-low-vs-risk-high",
+        "classic-vs-experimental"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "flirting-style-that-lands",
+      "text": "The flirting style most likely to land well",
+      "min_rating": 30,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "consensus-vs-contrarian",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "relationship-boundary-talk",
+      "text": "The best way to start a relationship boundary conversation",
+      "min_rating": 30,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "personal-vs-team",
+        "depth-vs-speed",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "jealousy-in-friend-group",
+      "text": "The best way to handle jealousy inside a friend group",
+      "min_rating": 30,
+      "axis_slugs": [
+        "personal-vs-team",
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "consensus-vs-contrarian",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "conversation-turnoff",
+      "text": "The biggest conversation turnoff on a date",
+      "min_rating": 30,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "high-context-vs-low-context",
+        "risk-low-vs-risk-high",
+        "comfort-vs-challenge",
+        "depth-vs-speed"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "money-transparency-in-dating",
+      "text": "The right level of money transparency early in dating",
+      "min_rating": 30,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "risk-low-vs-risk-high",
+        "practical-vs-aspirational",
+        "shortterm-vs-longterm"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "ex-story-first-date",
+      "text": "When talking about an ex on a first date is fine",
+      "min_rating": 30,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "comfort-vs-challenge",
+        "high-context-vs-low-context",
+        "depth-vs-speed",
+        "playful-vs-serious"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "commitment-signal-that-matters",
+      "text": "The strongest signal someone is serious about a relationship",
+      "min_rating": 30,
+      "axis_slugs": [
+        "visibility-vs-focus",
+        "shortterm-vs-longterm",
+        "playful-vs-serious",
+        "personal-vs-team",
+        "stability-vs-change"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "romantic-gesture-worth-it",
+      "text": "A bold romantic gesture that is actually worth doing",
+      "min_rating": 30,
+      "axis_slugs": [
+        "risk-low-vs-risk-high",
+        "budget-vs-premium",
+        "classic-vs-experimental",
+        "playful-vs-serious",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "honest-feedback-in-relationship",
+      "text": "The best way to give honest feedback in a relationship",
+      "min_rating": 30,
+      "axis_slugs": [
+        "comfort-vs-challenge",
+        "high-context-vs-low-context",
+        "personal-vs-team",
+        "depth-vs-speed",
+        "consensus-vs-contrarian"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "friend-hookup-drama-response",
+      "text": "The best way to handle friend group drama after two friends hook up",
+      "min_rating": 30,
+      "axis_slugs": [
+        "personal-vs-team",
+        "consensus-vs-contrarian",
+        "high-context-vs-low-context",
+        "stability-vs-change",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "text-back-timing",
+      "text": "How much text-back timing actually matters in dating",
+      "min_rating": 30,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "risk-low-vs-risk-high",
+        "high-context-vs-low-context",
+        "visibility-vs-focus",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "green-flag-underrated",
+      "text": "The most underrated green flag in a partner",
+      "min_rating": 30,
+      "axis_slugs": [
+        "practical-vs-aspirational",
+        "playful-vs-serious",
+        "personal-vs-team",
+        "visibility-vs-focus",
+        "shortterm-vs-longterm"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "breakup-closure-approach",
+      "text": "The best approach to breakup closure",
+      "min_rating": 30,
+      "axis_slugs": [
+        "high-context-vs-low-context",
+        "comfort-vs-challenge",
+        "stability-vs-change",
+        "depth-vs-speed",
+        "risk-low-vs-risk-high"
+      ],
+      "status": "ready"
+    },
+    {
+      "slug": "party-flirtation-etiquette",
+      "text": "The best etiquette for flirting at a party where everyone knows each other",
+      "min_rating": 30,
+      "axis_slugs": [
+        "playful-vs-serious",
+        "high-context-vs-low-context",
+        "personal-vs-team",
+        "risk-low-vs-risk-high",
+        "comfort-vs-challenge"
+      ],
+      "status": "ready"
+    }
+  ]
+}
