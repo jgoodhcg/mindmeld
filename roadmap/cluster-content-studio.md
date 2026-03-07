@@ -105,3 +105,10 @@ Not included:
 - CSV vs TSV vs Markdown table as the source format (TSV may be safer for punctuation-heavy prompt text)?
 - Should the review UI be implemented inside `cluster-content` (single binary) or as a separate helper executable?
 - Do we want a generated static HTML report artifact for async review in git/PRs?
+
+## User Feedback (2026-03-07)
+
+Positive feedback on current review page design. Improvement ideas:
+
+- **Client-side search**: Current search is server-driven (page reload). Client-driven filtering would feel smoother for large libraries.
+- **Pair display formatting**: Each prompt-axis pair should render on a new line for easier scanning.
