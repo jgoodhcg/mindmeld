@@ -84,11 +84,73 @@ If attention cost is high and discussion lift is low, defer it.
 - Compare your placement to historical consensus/outliers.
 - "You're in the 90th percentile for uniqueness on this prompt."
 
+## Game Modes
+
+Alternate scoring/target modes that change the objective while keeping the same coordinate-plane interaction.
+
+### Core Modes
+
+**Centroid (current default)**
+- Goal: Place closest to the group's centroid.
+- Scoring: Inverse distance to centroid (0-100 pts).
+- Discussion: "Why did the group center here?"
+
+**Follow**
+- Goal: Place closest to a designated target player each round.
+- Target rotates each round (or random/host-picked).
+- Scoring: Inverse distance to target's coordinate.
+- Discussion: "Why did [target] place there?" + target explains their reasoning.
+
+**Avoid**
+- Goal: Place furthest from a designated target player.
+- Target rotates each round (or random/host-picked).
+- Scoring: Direct distance from target (further = more points).
+- Discussion: "Where did you think [target] would go to avoid them?"
+
+### Extended Modes
+
+**Scatter**
+- Goal: Maximize distance from all other players (anti-centroid).
+- Scoring: Sum of distances to all other points, or distance from centroid.
+- Discussion: "Who went rogue and why?"
+
+**Chase**
+- Goal: Place closest to a moving target that shifts mid-round.
+- Target starts at one position, shifts to another after X seconds.
+- Scoring: Distance to final target position.
+- Discussion: "Did you chase the shift or hold your ground?"
+
+**Mirror**
+- Goal: Match a hidden AI-generated "ideal" point for the prompt.
+- AI places a point based on semantic interpretation of the prompt.
+- Scoring: Inverse distance to AI point.
+- Discussion: "Do we agree with the AI's interpretation?"
+
+**Pairs**
+- Goal: Secret partners try to place close to each other.
+- Each player is assigned a secret partner at game start.
+- Scoring: Combined score from centroid + partner proximity.
+- Discussion: "Did you find your partner?"
+
+### Mode Selection UX
+
+- Host selects mode at lobby creation (default: Centroid).
+- Mode displayed on game screen and in lobby list.
+- Some modes require minimum players (e.g., Pairs needs even count).
+- Consider mode-specific prompt filtering (some prompts work better for certain modes).
+
+### Evaluation Criteria
+
+For each mode, assess:
+- Discussion lift: Does the reveal spark conversation?
+- Cognitive overhead: Is the objective clear without explanation?
+- Social dynamics: Does it create fun tension or just confusion?
+- Implementation: Data model changes, scoring logic, UI updates.
+
 ## Candidate Features Moved from Prior Combined Roadmap
 
 - Benchmark mode (AI or historical anchor points).
 - 1-2 player support variants.
-- Alternate scoring models (outlier bonus, weighted/hybrid scoring).
 - Team mode and longitudinal trend analysis.
 
 ## Evaluation Matrix Template (Per Feature)
