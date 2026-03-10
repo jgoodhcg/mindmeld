@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -38,7 +39,7 @@ func (g *ClusterGame) handleStartGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to load lobby players", http.StatusInternalServerError)
 		return
 	}
-	if len(players) < minPlayersToStart {
+	if g.countActivePlayers(code, players, time.Now()) < minPlayersToStart {
 		http.Error(w, "Cluster needs at least 3 players to start", http.StatusBadRequest)
 		return
 	}
@@ -167,7 +168,8 @@ func (g *ClusterGame) handleSubmitCoordinate(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	revealed := submissionCount >= len(players) && len(players) > 0
+	expectedPlayers := g.countActivePlayers(code, players, time.Now())
+	revealed := submissionCount >= expectedPlayers && expectedPlayers > 0
 	if revealed {
 		submissions, subErr := g.getRoundSubmissions(ctx, tx, round.ID)
 		if subErr != nil {
@@ -202,7 +204,7 @@ func (g *ClusterGame) handleSubmitCoordinate(w http.ResponseWriter, r *http.Requ
 	eventType := events.EventClusterSubmissionUpdated
 	var payload any = events.ClusterSubmissionUpdatedPayload{
 		SubmittedCount: submissionCount,
-		TotalPlayers:   len(players),
+		TotalPlayers:   expectedPlayers,
 	}
 	if revealed {
 		eventType = events.EventClusterRoundRevealed

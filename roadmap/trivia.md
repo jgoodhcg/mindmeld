@@ -5,7 +5,7 @@ description: "Core trivia game MVP with real-time play and polish tasks."
 tags: [area/game, type/feature, tech/websocket]
 priority: medium
 created: 2025-12-14
-updated: 2026-02-19
+updated: 2026-03-10
 effort: L
 depends-on: []
 ---
@@ -26,7 +26,7 @@ Build the first playable game on the Mindmeld platform. Players submit questions
 - **Real-time:** Use HTMX WebSockets for live updates (no manual refreshing).
 - **Shuffle:** Answers must be shuffled so "A" isn't always correct. Questions shuffled for playback.
 - **Styling:** Basic Tailwind CSS polish.
-- No session reconnection handling (beyond basic cookie)
+- WebSocket reconnects resync lobby/game content; disconnected players get a grace window before they stop blocking progress
 - No host configuration UI beyond starting the game
 
 **Proposed Approach:**
@@ -34,12 +34,12 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 
 **Open Questions:**
 - ~~How should question order be determined when the game starts?~~ → Random shuffle implemented
-- What happens if a player disconnects mid-game?
-- How should host transfer work if host leaves?
+- ~~What happens if a player disconnects mid-game?~~ -> Mark disconnected immediately, allow a short reconnect window, then stop counting them toward blocking actions
+- ~~How should host transfer work if host leaves?~~ -> After the disconnect grace window, transfer host to the earliest still-connected player
 
 ## TODO (Host & Players)
 
-- [ ] **Host transfer on disconnect**: If host leaves mid-game, automatically transfer host to another player (longest-joined or random)
+- [x] **Host transfer on disconnect**: If host leaves mid-game, automatically transfer host to the earliest still-connected player after the reconnect grace window
 - [ ] **Manual host transfer**: Allow host to transfer host role to another player via UI
 
 ---
@@ -59,6 +59,7 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 - [x] Audience rating inheritance for authored questions (`trivia_questions.min_rating` from lobby setting)
 - [x] Curated question packs in template modal (pack-based grouping, work-safe-first ordering, content-rating filtering)
 - [x] AI Question Assist button in submit flow (OpenAI when explicitly configured, local fallback otherwise)
+- [x] Disconnect handling baseline: reconnects resync the lobby automatically, disconnected players surface in the player list, and stalled questions unblock after the grace window
 
 ---
 

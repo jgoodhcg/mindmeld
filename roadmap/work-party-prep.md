@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-02-19
+updated: 2026-03-10
 effort: L
 depends-on: []
 ---
@@ -23,6 +23,12 @@ depends-on: []
 
 - [x] **Answer Status Polish**:
     - Smooth "Who has answered" updates via `hx-swap-oob="true"`.
+
+- [x] **Disconnect handling baseline**:
+    - WebSocket reconnects now trigger an automatic lobby/game resync.
+    - Player list shows disconnected/reconnecting participants.
+    - Trivia and Cluster stop waiting forever once a disconnected player exceeds the reconnect grace window.
+    - Host role transfers automatically after the grace window if the current host never returns.
 
 ## Phase 2: Trivia Question Friction
 **Objective:** Remove "writer's block" so games start fast and questions are good.

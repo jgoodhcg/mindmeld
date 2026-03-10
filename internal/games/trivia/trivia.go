@@ -3,6 +3,7 @@ package trivia
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
@@ -11,6 +12,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/internal/games"
+	"github.com/jgoodhcg/mindmeld/internal/ws"
 	triviatmpl "github.com/jgoodhcg/mindmeld/templates/trivia"
 )
 
@@ -19,14 +21,16 @@ type TriviaGame struct {
 	queries  *db.Queries
 	dbPool   *pgxpool.Pool
 	eventBus events.Bus
+	hub      *ws.Hub
 }
 
 // New creates a new TriviaGame.
-func New(queries *db.Queries, dbPool *pgxpool.Pool, eventBus events.Bus) *TriviaGame {
+func New(queries *db.Queries, dbPool *pgxpool.Pool, eventBus events.Bus, hub *ws.Hub) *TriviaGame {
 	return &TriviaGame{
 		queries:  queries,
 		dbPool:   dbPool,
 		eventBus: eventBus,
+		hub:      hub,
 	}
 }
 
@@ -54,6 +58,8 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 	var distribution []events.AnswerStat
 	var totalAnswers int
 	var totalExpectedAnswers int
+	var submissionExpectedCount int
+	now := time.Now()
 
 	if lobby.Phase == "playing" {
 		var err error
@@ -65,6 +71,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 				questions, err := g.queries.GetQuestionsForRound(ctx, activeRound.ID)
 				if err == nil {
 					submittedCount = len(questions)
+					submissionExpectedCount = g.countActivePlayers(lobby.Code, players, now, "")
 					for _, q := range questions {
 						if q.Author == player.ID {
 							hasSubmitted = true
@@ -91,7 +98,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 						}
 
 						for _, lobbyPlayer := range players {
-							if lobbyPlayer.PlayerID != currentQuestion.Author {
+							if lobbyPlayer.PlayerID != currentQuestion.Author && g.hub.Presence(lobby.Code, lobbyPlayer.PlayerID.String()).IsActiveAt(now) {
 								totalExpectedAnswers++
 							}
 						}
@@ -128,7 +135,20 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 		}
 	}
 
-	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers, totalExpectedAnswers)
+	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, submissionExpectedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers, totalExpectedAnswers)
+}
+
+func (g *TriviaGame) countActivePlayers(lobbyCode string, players []db.GetLobbyPlayersRow, now time.Time, excludedPlayerID string) int {
+	count := 0
+	for _, lobbyPlayer := range players {
+		if excludedPlayerID != "" && lobbyPlayer.PlayerID.String() == excludedPlayerID {
+			continue
+		}
+		if g.hub.Presence(lobbyCode, lobbyPlayer.PlayerID.String()).IsActiveAt(now) {
+			count++
+		}
+	}
+	return count
 }
 
 // RegisterRoutes registers trivia-specific HTTP routes.

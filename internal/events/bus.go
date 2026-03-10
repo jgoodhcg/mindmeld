@@ -74,6 +74,7 @@ func (b *InMemoryBus) Subscribe(handler EventHandler) {
 const (
 	EventPlayerJoined      = "player.joined"
 	EventPlayerLeft        = "player.left"
+	EventPlayerPresence    = "player.presence"
 	EventGameStarted       = "game.started"
 	EventQuestionSubmitted = "question.submitted"
 	EventAnswerSubmitted   = "answer.submitted"
@@ -91,6 +92,13 @@ const (
 type PlayerJoinedPayload struct {
 	PlayerID string
 	Nickname string
+}
+
+// PlayerPresencePayload is the payload for EventPlayerPresence.
+type PlayerPresencePayload struct {
+	PlayerID     string
+	Connected    bool
+	GraceExpired bool
 }
 
 // GameStartedPayload is the payload for EventGameStarted.

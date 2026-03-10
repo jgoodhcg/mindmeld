@@ -2,13 +2,13 @@ package templates
 
 import (
 	"fmt"
-	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/lobbyview"
 )
 
 // PlayerList renders the player list panel.
 // This partial is used both in the initial page render and for WebSocket updates.
 // The id="player-list" is required for HTMX WebSocket OOB swaps.
-templ PlayerList(players []db.GetLobbyPlayersRow, isUpdate bool) {
+templ PlayerList(players []lobbyview.Player, isUpdate bool) {
 	<div
 		id="player-list"
 		class="bg-elevated border border-border rounded p-5 sm:p-6"
@@ -22,13 +22,28 @@ templ PlayerList(players []db.GetLobbyPlayersRow, isUpdate bool) {
 		</h2>
 		<ul class="space-y-2">
 			for _, p := range players {
-				<li class="flex items-center justify-between bg-base rounded px-4 py-3 border border-border">
+				{{
+					itemClass := "flex items-center justify-between bg-base rounded px-4 py-3 border border-border"
+					if p.Disconnected {
+						itemClass += " opacity-70"
+					}
+				}}
+				<li class={ itemClass }>
 					<div class="flex items-center gap-2">
 						<span class="text-text">{ p.Nickname }</span>
 						if p.IsHost {
 							<span class="text-xs bg-amber/20 border border-amber/50 text-amber px-2 py-0.5 rounded font-mono uppercase">Host</span>
 						}
 					</div>
+					if p.Disconnected {
+						<span class="text-xs bg-base border border-border text-text-muted px-2 py-0.5 rounded font-mono uppercase">
+							if p.GraceExpired {
+								Disconnected
+							} else {
+								Reconnecting
+							}
+						</span>
+					}
 				</li>
 			}
 		</ul>

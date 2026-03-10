@@ -5,9 +5,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
+	"github.com/jgoodhcg/mindmeld/internal/lobbyview"
 	"github.com/jgoodhcg/mindmeld/templates"
 )
 
@@ -27,14 +30,16 @@ type Subscriber struct {
 	hub      *Hub
 	queries  *db.Queries
 	registry GameRegistry
+	dbPool   *pgxpool.Pool
 }
 
 // NewSubscriber creates a new event subscriber.
-func NewSubscriber(hub *Hub, queries *db.Queries, registry GameRegistry) *Subscriber {
+func NewSubscriber(hub *Hub, queries *db.Queries, registry GameRegistry, dbPool *pgxpool.Pool) *Subscriber {
 	return &Subscriber{
 		hub:      hub,
 		queries:  queries,
 		registry: registry,
+		dbPool:   dbPool,
 	}
 }
 
@@ -46,24 +51,35 @@ func (s *Subscriber) HandleEvent(ctx context.Context, event events.Event) {
 		// Player changes can affect game-content state (e.g. minimum players/start button).
 		// Trigger a full content refresh in addition to the player-list OOB swap.
 		BroadcastUpdateTrigger(ctx, event.LobbyCode, s.hub)
+	case events.EventPlayerPresence:
+		payload, ok := event.Payload.(events.PlayerPresencePayload)
+		if ok && payload.GraceExpired {
+			s.maybeTransferHost(ctx, event.LobbyCode)
+		}
+		s.broadcastPlayerList(ctx, event.LobbyCode)
+		s.delegateToGame(ctx, event)
+		BroadcastUpdateTrigger(ctx, event.LobbyCode, s.hub)
 	default:
-		// Look up the lobby's game type and delegate to the game handler
-		lobby, err := s.queries.GetLobbyByCode(ctx, event.LobbyCode)
-		if err != nil {
-			log.Printf("[ws-subscriber] Failed to get lobby %s: %v", event.LobbyCode, err)
-			return
-		}
-
-		handler, ok := s.registry.GetHandler(lobby.GameType)
-		if !ok {
-			log.Printf("[ws-subscriber] No handler for game type: %s", lobby.GameType)
-			return
-		}
-
-		if !handler.HandleEvent(ctx, event, s.hub, s.queries) {
+		if !s.delegateToGame(ctx, event) {
 			log.Printf("[ws-subscriber] Unhandled event type: %s", event.Type)
 		}
 	}
+}
+
+func (s *Subscriber) delegateToGame(ctx context.Context, event events.Event) bool {
+	lobby, err := s.queries.GetLobbyByCode(ctx, event.LobbyCode)
+	if err != nil {
+		log.Printf("[ws-subscriber] Failed to get lobby %s: %v", event.LobbyCode, err)
+		return false
+	}
+
+	handler, ok := s.registry.GetHandler(lobby.GameType)
+	if !ok {
+		log.Printf("[ws-subscriber] No handler for game type: %s", lobby.GameType)
+		return false
+	}
+
+	return handler.HandleEvent(ctx, event, s.hub, s.queries)
 }
 
 // BroadcastUpdateTrigger sends an OOB swap that triggers the client to fetch updated game content.
@@ -88,11 +104,86 @@ func (s *Subscriber) broadcastPlayerList(ctx context.Context, lobbyCode string) 
 	}
 
 	var buf bytes.Buffer
-	err = templates.PlayerList(players, true).Render(ctx, &buf)
+	now := time.Now()
+	rawPresence := s.hub.Snapshot(lobbyCode)
+	presence := make(map[string]lobbyview.Presence, len(rawPresence))
+	for playerID, state := range rawPresence {
+		presence[playerID] = lobbyview.Presence{
+			Disconnected: state.IsDisconnected(),
+			GraceExpired: state.GraceExpiredAt(now),
+		}
+	}
+	playerViews := lobbyview.Build(players, presence)
+	err = templates.PlayerList(playerViews, true).Render(ctx, &buf)
 	if err != nil {
 		log.Printf("[ws-subscriber] Failed to render player list: %v", err)
 		return
 	}
 
 	s.hub.Broadcast(ctx, lobbyCode, buf.Bytes())
+}
+
+func (s *Subscriber) maybeTransferHost(ctx context.Context, lobbyCode string) {
+	lobby, err := s.queries.GetLobbyByCode(ctx, lobbyCode)
+	if err != nil {
+		log.Printf("[ws-subscriber] Failed to load lobby %s for host transfer: %v", lobbyCode, err)
+		return
+	}
+
+	players, err := s.queries.GetLobbyPlayers(ctx, lobby.ID)
+	if err != nil {
+		log.Printf("[ws-subscriber] Failed to load players for host transfer in lobby %s: %v", lobbyCode, err)
+		return
+	}
+
+	now := time.Now()
+	var currentHost *db.GetLobbyPlayersRow
+	for i := range players {
+		if players[i].IsHost {
+			currentHost = &players[i]
+			break
+		}
+	}
+	if currentHost == nil {
+		return
+	}
+	if s.hub.Presence(lobbyCode, currentHost.PlayerID.String()).IsActiveAt(now) {
+		return
+	}
+
+	var nextHost *db.GetLobbyPlayersRow
+	for i := range players {
+		if players[i].PlayerID == currentHost.PlayerID {
+			continue
+		}
+		if s.hub.Presence(lobbyCode, players[i].PlayerID.String()).IsConnected() {
+			nextHost = &players[i]
+			break
+		}
+	}
+	if nextHost == nil {
+		return
+	}
+
+	tx, err := s.dbPool.Begin(ctx)
+	if err != nil {
+		log.Printf("[ws-subscriber] Failed to begin host transfer for lobby %s: %v", lobbyCode, err)
+		return
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err = tx.Exec(ctx, `UPDATE lobby_players SET is_host = false WHERE lobby_id = $1`, lobby.ID); err != nil {
+		log.Printf("[ws-subscriber] Failed clearing host in lobby %s: %v", lobbyCode, err)
+		return
+	}
+	if _, err = tx.Exec(ctx, `UPDATE lobby_players SET is_host = true WHERE lobby_id = $1 AND player_id = $2`, lobby.ID, nextHost.PlayerID); err != nil {
+		log.Printf("[ws-subscriber] Failed assigning host in lobby %s: %v", lobbyCode, err)
+		return
+	}
+	if err = tx.Commit(ctx); err != nil {
+		log.Printf("[ws-subscriber] Failed committing host transfer in lobby %s: %v", lobbyCode, err)
+		return
+	}
+
+	log.Printf("[ws-subscriber] Transferred host in lobby %s from %s to %s", lobbyCode, currentHost.Nickname, nextHost.Nickname)
 }

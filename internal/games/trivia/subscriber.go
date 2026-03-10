@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"log"
+	"time"
 
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
@@ -33,6 +34,12 @@ func (g *TriviaGame) HandleEvent(ctx context.Context, event events.Event, hub *w
 	case events.EventNewRoundCreated:
 		g.broadcastNewRoundCreated(ctx, event.LobbyCode, event.Payload.(events.NewRoundCreatedPayload), hub)
 		return true
+	case events.EventPlayerPresence:
+		payload, ok := event.Payload.(events.PlayerPresencePayload)
+		if !ok || !payload.GraceExpired {
+			return false
+		}
+		return g.handleGraceExpired(ctx, event.LobbyCode)
 	default:
 		return false
 	}
@@ -72,6 +79,7 @@ func (g *TriviaGame) broadcastGameStarted(ctx context.Context, lobbyCode string,
 		false,
 		false,
 		0,
+		g.countActivePlayers(lobbyCode, players, time.Now(), ""),
 		false,
 		emptyScoreboard,
 		emptyRoundScoreboard,
@@ -196,4 +204,71 @@ func (g *TriviaGame) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 func (g *TriviaGame) broadcastNewRoundCreated(ctx context.Context, lobbyCode string, payload events.NewRoundCreatedPayload, hub *ws.Hub) {
 	log.Printf("[trivia-subscriber] New round created for lobby %s, round %d", lobbyCode, payload.RoundNumber)
 	ws.BroadcastUpdateTrigger(ctx, lobbyCode, hub)
+}
+
+func (g *TriviaGame) handleGraceExpired(ctx context.Context, lobbyCode string) bool {
+	lobby, err := g.queries.GetLobbyByCode(ctx, lobbyCode)
+	if err != nil || lobby.Phase != "playing" {
+		return false
+	}
+
+	round, err := g.queries.GetActiveRound(ctx, lobby.ID)
+	if err != nil || round.Phase != "playing" || round.QuestionState != "answering" || !round.CurrentQuestionID.Valid {
+		return false
+	}
+
+	questions, err := g.queries.GetQuestionsForRound(ctx, round.ID)
+	if err != nil {
+		return false
+	}
+
+	var currentQuestion db.TriviaQuestion
+	found := false
+	for _, question := range questions {
+		if question.ID == round.CurrentQuestionID {
+			currentQuestion = question
+			found = true
+			break
+		}
+	}
+	if !found {
+		return false
+	}
+
+	players, err := g.queries.GetLobbyPlayers(ctx, lobby.ID)
+	if err != nil {
+		return false
+	}
+	expected := g.countActivePlayers(lobbyCode, players, time.Now(), currentQuestion.Author.String())
+	currentCount, err := g.queries.CountAnswersForQuestion(ctx, currentQuestion.ID)
+	if err != nil || int(currentCount) < expected {
+		return false
+	}
+
+	rawStats, err := g.queries.GetAnswerStats(ctx, currentQuestion.ID)
+	if err != nil {
+		return false
+	}
+	distribution := make([]events.AnswerStat, 0, len(rawStats))
+	for _, stat := range rawStats {
+		distribution = append(distribution, events.AnswerStat{Answer: stat.SelectedAnswer, Count: int(stat.Count)})
+	}
+
+	if err = g.queries.UpdateRoundQuestionState(ctx, db.UpdateRoundQuestionStateParams{
+		ID:                round.ID,
+		CurrentQuestionID: currentQuestion.ID,
+		QuestionState:     "revealed",
+	}); err != nil {
+		return false
+	}
+
+	g.eventBus.Publish(ctx, events.Event{
+		Type:      events.EventQuestionRevealed,
+		LobbyCode: lobbyCode,
+		Payload: events.QuestionRevealedPayload{
+			QuestionID:   currentQuestion.ID.String(),
+			Distribution: distribution,
+		},
+	})
+	return true
 }

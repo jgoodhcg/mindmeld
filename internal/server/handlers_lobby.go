@@ -4,12 +4,14 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jgoodhcg/mindmeld/internal/auth"
 	"github.com/jgoodhcg/mindmeld/internal/contentrating"
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
+	"github.com/jgoodhcg/mindmeld/internal/lobbyview"
 	"github.com/jgoodhcg/mindmeld/templates"
 )
 
@@ -118,7 +120,17 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gameContent := game.RenderContent(r.Context(), lobby, players, player, participation.IsHost)
-	templates.LobbyRoom(lobby, players, participation.IsHost, gameContent).Render(r.Context(), w)
+	rawPresence := s.hub.Snapshot(code)
+	now := time.Now()
+	presence := make(map[string]lobbyview.Presence, len(rawPresence))
+	for playerID, state := range rawPresence {
+		presence[playerID] = lobbyview.Presence{
+			Disconnected: state.IsDisconnected(),
+			GraceExpired: state.GraceExpiredAt(now),
+		}
+	}
+	playerViews := lobbyview.Build(players, presence)
+	templates.LobbyRoom(lobby, playerViews, participation.IsHost, gameContent).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {

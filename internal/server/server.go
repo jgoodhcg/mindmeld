@@ -1,6 +1,8 @@
 package server
 
 import (
+	"context"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jgoodhcg/mindmeld/internal/db"
@@ -27,8 +29,8 @@ func NewServer(pool *pgxpool.Pool) *Server {
 
 	// Create game registry and register games
 	registry := games.NewRegistry()
-	triviaGame := trivia.New(queries, pool, eventBus)
-	clusterGame := cluster.New(queries, pool, eventBus)
+	triviaGame := trivia.New(queries, pool, eventBus, hub)
+	clusterGame := cluster.New(queries, pool, eventBus, hub)
 	registry.Register(triviaGame)
 	registry.Register(clusterGame)
 
@@ -46,8 +48,20 @@ func NewServer(pool *pgxpool.Pool) *Server {
 		games:    registry,
 	}
 
+	hub.SetPresenceHandler(func(lobbyCode string, update ws.PresenceUpdate) {
+		eventBus.Publish(context.Background(), events.Event{
+			Type:      events.EventPlayerPresence,
+			LobbyCode: lobbyCode,
+			Payload: events.PlayerPresencePayload{
+				PlayerID:     update.PlayerID,
+				Connected:    update.Connected,
+				GraceExpired: update.GraceExpired,
+			},
+		})
+	})
+
 	// Wire up event subscriber to broadcast updates
-	subscriber := ws.NewSubscriber(hub, queries, registry)
+	subscriber := ws.NewSubscriber(hub, queries, registry, pool)
 	eventBus.Subscribe(subscriber.HandleEvent)
 
 	s.routes()

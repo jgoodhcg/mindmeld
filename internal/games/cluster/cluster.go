@@ -6,6 +6,7 @@ import (
 	"log"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
@@ -15,6 +16,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/internal/games"
+	"github.com/jgoodhcg/mindmeld/internal/ws"
 	clustertmpl "github.com/jgoodhcg/mindmeld/templates/cluster"
 )
 
@@ -23,14 +25,16 @@ type ClusterGame struct {
 	queries  *db.Queries
 	dbPool   *pgxpool.Pool
 	eventBus events.Bus
+	hub      *ws.Hub
 }
 
 // New creates a new ClusterGame.
-func New(queries *db.Queries, dbPool *pgxpool.Pool, eventBus events.Bus) *ClusterGame {
+func New(queries *db.Queries, dbPool *pgxpool.Pool, eventBus events.Bus, hub *ws.Hub) *ClusterGame {
 	return &ClusterGame{
 		queries:  queries,
 		dbPool:   dbPool,
 		eventBus: eventBus,
+		hub:      hub,
 	}
 }
 
@@ -52,7 +56,7 @@ func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players
 		prompt         clustertmpl.PromptAxisView
 		hasSubmitted   bool
 		submittedCount int
-		expectedCount  = len(players)
+		expectedCount  int
 		revealed       bool
 		dots           []clustertmpl.DotView
 		centroidX      float64
@@ -62,6 +66,8 @@ func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players
 		outliers       []string
 		discussionHint string
 	)
+	now := time.Now()
+	expectedCount = g.countActivePlayers(lobby.Code, players, now)
 
 	remainingPairs, err := g.countRemainingPromptAxisSets(ctx, g.dbPool, lobby.ID, lobby.ContentRating)
 	if err != nil {
@@ -140,6 +146,16 @@ func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players
 		remainingPairs,
 		exhausted,
 	)
+}
+
+func (g *ClusterGame) countActivePlayers(lobbyCode string, players []db.GetLobbyPlayersRow, now time.Time) int {
+	count := 0
+	for _, player := range players {
+		if g.hub.Presence(lobbyCode, player.PlayerID.String()).IsActiveAt(now) {
+			count++
+		}
+	}
+	return count
 }
 
 // RegisterRoutes registers Cluster-specific HTTP routes.

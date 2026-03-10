@@ -3,6 +3,7 @@ package trivia
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -203,7 +204,7 @@ func (g *TriviaGame) handleSubmitQuestion(w http.ResponseWriter, r *http.Request
 		LobbyCode: code,
 		Payload: events.QuestionSubmittedPayload{
 			SubmittedCount: len(roundQuestions),
-			TotalPlayers:   len(players),
+			TotalPlayers:   g.countActivePlayers(code, players, time.Now(), ""),
 			HostPlayerID:   hostPlayerID,
 		},
 	})
@@ -511,8 +512,7 @@ func (g *TriviaGame) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err == nil {
-		numPlayers := len(lobbyPlayers)
-		targetPerQuestion := int64(numPlayers - 1) // Minus author
+		targetPerQuestion := int64(g.countActivePlayers(code, lobbyPlayers, time.Now(), targetQuestion.Author.String()))
 		if targetPerQuestion < 0 {
 			targetPerQuestion = 0
 		}
@@ -550,7 +550,7 @@ func (g *TriviaGame) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) 
 	answeredCount := 0
 	totalExpected := 0
 	if len(lobbyPlayers) > 0 {
-		totalExpected = len(lobbyPlayers) - 1 // minus author
+		totalExpected = g.countActivePlayers(code, lobbyPlayers, time.Now(), targetQuestion.Author.String())
 		if cnt, err := g.queries.CountAnswersForQuestion(r.Context(), questionID); err == nil {
 			answeredCount = int(cnt)
 		}

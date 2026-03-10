@@ -1,8 +1,11 @@
 package templates
 
-import "github.com/jgoodhcg/mindmeld/internal/db"
+import (
+	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/lobbyview"
+)
 
-templ LobbyRoom(lobby db.Lobby, players []db.GetLobbyPlayersRow, isHost bool, gameContent templ.Component) {
+templ LobbyRoom(lobby db.Lobby, players []lobbyview.Player, isHost bool, gameContent templ.Component) {
 	@Layout(gameLabel(lobby.GameType) + " - " + lobby.Name) {
 		<div class="max-w-4xl mx-auto space-y-6">
 			<!-- Platform brand -->
