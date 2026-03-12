@@ -28,9 +28,10 @@ templ PlayerList(players []lobbyview.Player, isUpdate bool) {
 						itemClass += " opacity-70"
 					}
 				}}
-				<li class={ itemClass }>
+				<li class={ itemClass } data-player-id={ p.PlayerID }>
 					<div class="flex items-center gap-2">
 						<span class="text-text">{ p.Nickname }</span>
+						<span data-player-badge="current" class="hidden text-xs bg-cyan/15 border border-cyan/40 text-cyan px-2 py-0.5 rounded font-mono uppercase">You</span>
 						if p.IsHost {
 							<span class="text-xs bg-amber/20 border border-amber/50 text-amber px-2 py-0.5 rounded font-mono uppercase">Host</span>
 						}

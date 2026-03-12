@@ -5,9 +5,9 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/lobbyview"
 )
 
-templ LobbyRoom(lobby db.Lobby, players []lobbyview.Player, isHost bool, gameContent templ.Component) {
+templ LobbyRoom(lobby db.Lobby, players []lobbyview.Player, isHost bool, currentPlayerID string, gameContent templ.Component) {
 	@Layout(gameLabel(lobby.GameType) + " - " + lobby.Name) {
-		<div class="max-w-4xl mx-auto space-y-6">
+		<div id="lobby-room" class="max-w-4xl mx-auto space-y-6" data-current-player-id={ currentPlayerID }>
 			<!-- Platform brand -->
 			<div class="text-center pt-2">
 				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">{ gameLabel(lobby.GameType) }</span></span>
@@ -29,32 +29,34 @@ templ LobbyRoom(lobby db.Lobby, players []lobbyview.Player, isHost bool, gameCon
 								</button>
 							</div>
 						</div>
-						<div class="pt-3">
-							<p class="text-text-muted text-xs uppercase tracking-wide mb-1">Prompt Filter</p>
-							if isHost && lobby.Phase == "waiting" {
-								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/content-rating") } method="POST" class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-									<label class="flex items-center gap-2 rounded border border-border bg-base px-3 py-2 cursor-pointer hover:border-cyan/50 transition-colors">
-										<input
-											type="checkbox"
-											name="polite_mode"
-											class="h-4 w-4 accent-cyan"
-											if politeModeEnabled(lobby.ContentRating) {
-												checked
-											}
-										/>
-										<span class="text-sm font-mono tracking-wide text-text">Polite mode</span>
-									</label>
-									<button type="submit" class="text-xs uppercase tracking-wide border border-border bg-base px-3 py-2 rounded text-text-muted hover:text-text hover:border-cyan/50 transition-colors">
-										Apply
-									</button>
-								</form>
-								<p class="text-[11px] text-text-muted mt-2">On for coworker-safe prompts. Turn off to include more provocative prompts.</p>
-							} else {
-								<span class="inline-flex items-center rounded border border-border bg-base px-3 py-1.5 text-sm font-mono tracking-wide text-text-muted">
-									{ contentRatingLabel(lobby.ContentRating) }
-								</span>
-							}
-						</div>
+						if isHost {
+							<div class="pt-3">
+								<p class="text-text-muted text-xs uppercase tracking-wide mb-1">Prompt Filter</p>
+								if lobby.Phase == "waiting" {
+									<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/content-rating") } method="POST" class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+										<label class="flex items-center gap-2 rounded border border-border bg-base px-3 py-2 cursor-pointer hover:border-cyan/50 transition-colors">
+											<input
+												type="checkbox"
+												name="polite_mode"
+												class="h-4 w-4 accent-cyan"
+												if politeModeEnabled(lobby.ContentRating) {
+													checked
+												}
+											/>
+											<span class="text-sm font-mono tracking-wide text-text">Polite mode</span>
+										</label>
+										<button type="submit" class="text-xs uppercase tracking-wide border border-border bg-base px-3 py-2 rounded text-text-muted hover:text-text hover:border-cyan/50 transition-colors">
+											Apply
+										</button>
+									</form>
+									<p class="text-[11px] text-text-muted mt-2">On for coworker-safe prompts. Turn off to include more provocative prompts.</p>
+								} else {
+									<span class="inline-flex items-center rounded border border-border bg-base px-3 py-1.5 text-sm font-mono tracking-wide text-text-muted">
+										{ contentRatingLabel(lobby.ContentRating) }
+									</span>
+								}
+							</div>
+						}
 					</div>
 				</div>
 			</div>
@@ -65,6 +67,32 @@ templ LobbyRoom(lobby db.Lobby, players []lobbyview.Player, isHost bool, gameCon
 				<!-- Players List (updates via WebSocket) -->
 				@PlayerList(players, false)
 			</div>
+			<script>
+				(function() {
+					const room = document.getElementById('lobby-room');
+					if (!room || room.dataset.currentPlayerBound === 'true') {
+						return;
+					}
+					room.dataset.currentPlayerBound = 'true';
+
+					function syncCurrentPlayerBadge() {
+						const currentPlayerId = room.dataset.currentPlayerId || '';
+						const rows = room.querySelectorAll('[data-player-id]');
+						rows.forEach(function(row) {
+							const badge = row.querySelector('[data-player-badge="current"]');
+							if (!badge) {
+								return;
+							}
+							const isCurrent = row.dataset.playerId === currentPlayerId;
+							badge.classList.toggle('hidden', !isCurrent);
+						});
+					}
+
+					syncCurrentPlayerBadge();
+					document.body.addEventListener('htmx:afterSwap', syncCurrentPlayerBadge);
+					document.body.addEventListener('htmx:oobAfterSwap', syncCurrentPlayerBadge);
+				})();
+			</script>
 		</div>
 	}
 }

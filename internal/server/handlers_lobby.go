@@ -130,7 +130,7 @@ func (s *Server) handleLobbyRoom(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	playerViews := lobbyview.Build(players, presence)
-	templates.LobbyRoom(lobby, playerViews, participation.IsHost, gameContent).Render(r.Context(), w)
+	templates.LobbyRoom(lobby, playerViews, participation.IsHost, player.ID.String(), gameContent).Render(r.Context(), w)
 }
 
 func (s *Server) handleJoinLobby(w http.ResponseWriter, r *http.Request) {

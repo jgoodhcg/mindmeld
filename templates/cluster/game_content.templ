@@ -76,6 +76,7 @@ templ GameContent(
 						<p class="text-text-muted text-sm mt-1">Active now: <span class="text-cyan font-mono">{ fmt.Sprintf("%d", expectedCount) }</span></p>
 					</div>
 					if isHost {
+						<p class="text-center text-text-muted">Start when the group is ready.</p>
 						<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/start") } method="POST">
 							if expectedCount >= minPlayers {
 								<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors">START CLUSTER</button>
@@ -87,7 +88,7 @@ templ GameContent(
 							<p class="text-center text-sm text-text-muted">Waiting for at least { fmt.Sprintf("%d", minPlayers) } players.</p>
 						}
 					} else {
-						<p class="text-center text-text-muted">Waiting for host to start the game.</p>
+						<p class="text-center text-text-muted">Waiting for host to start...</p>
 					}
 				</div>
 			</div>

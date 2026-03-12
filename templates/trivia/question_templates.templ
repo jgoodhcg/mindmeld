@@ -5,7 +5,7 @@ import "github.com/jgoodhcg/mindmeld/internal/questions"
 // QuestionTemplatesModal renders the modal content with available templates grouped by pack/category.
 // This is returned by the /lobbies/{code}/trivia/question-templates endpoint.
 templ QuestionTemplatesModal(sections []questions.PackSection) {
-	<div id="templates-content">
+	<div id="templates-content" aria-live="polite">
 		if len(sections) == 0 {
 			<div class="text-center py-8">
 				<p class="text-text-muted">All templates have been used in this game!</p>
@@ -75,4 +75,10 @@ script fillTemplate(t questions.Template) {
 	document.getElementById('wrong_answer_3').value = t.WrongAnswer3;
 	document.getElementById('template_id').value = t.ID;
 	document.getElementById('templates-modal').classList.add('hidden');
+	document.getElementById('templates-modal').setAttribute('aria-hidden', 'true');
+	const openButton = document.getElementById('open-templates-modal');
+	if (openButton) {
+		openButton.setAttribute('aria-expanded', 'false');
+		openButton.focus();
+	}
 }

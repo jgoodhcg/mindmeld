@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-10
+updated: 2026-03-11
 effort: L
 depends-on: []
 ---
@@ -87,6 +87,7 @@ depends-on: []
 - [x] **Audience control styling pass**: radio options and lobby audience controls aligned with existing UI visual language.
 - [x] **Baseline analytics wiring**: Plausible script loaded in shared layout for site-wide pageview capture.
 - [x] **Game instructions** ([game-instructions.md](./game-instructions.md)): pre-game rules screen.
+- [x] **Accessibility baseline pass**: added skip link/main landmark, AI assist live status messaging, and keyboard/screen-reader-friendly question-pack dialog behavior.
 
 ## Phase 6: Flavor Expansion (Planned)
 **Objective:** Add conversation-first "juice" moments without drifting from the north star.

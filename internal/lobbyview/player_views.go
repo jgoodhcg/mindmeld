@@ -12,6 +12,7 @@ type Presence struct {
 
 // Player is the UI-facing representation of one lobby participant.
 type Player struct {
+	PlayerID     string
 	Nickname     string
 	IsHost       bool
 	Disconnected bool
@@ -23,6 +24,7 @@ func Build(players []db.GetLobbyPlayersRow, presence map[string]Presence) []Play
 	for _, player := range players {
 		state := presence[player.PlayerID.String()]
 		views = append(views, Player{
+			PlayerID:     player.PlayerID.String(),
 			Nickname:     player.Nickname,
 			IsHost:       player.IsHost,
 			Disconnected: state.Disconnected,

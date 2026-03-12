@@ -15,28 +15,6 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 		</div>
 		<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/questions") } method="POST" class="space-y-5">
 			<input type="hidden" name="template_id" id="template_id" value=""/>
-			<div class="rounded border border-cyan/30 bg-cyan/10 p-4 space-y-3">
-				<p class="font-mono text-[11px] uppercase tracking-widest text-cyan">AI Assist</p>
-				<p class="text-text-muted text-sm">Generate a draft question and answers, then edit as needed.</p>
-				<div class="grid sm:grid-cols-[1fr_auto] gap-2">
-					<input
-						type="text"
-						id="assist_topic"
-						placeholder="Optional topic (e.g., history, movies, tech)"
-						class="w-full bg-base border border-border rounded px-4 py-2 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
-					/>
-					<button
-						type="button"
-						id="assist_generate_button"
-						data-lobby-code={ lobby.Code }
-						class="bg-cyan hover:bg-cyan/80 text-base px-4 py-2 rounded font-mono font-bold tracking-wide transition-colors disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
-						onclick="generateQuestionAssistFromButton(this)"
-					>
-						GENERATE QUESTION
-					</button>
-				</div>
-				<p id="assist_status" class="text-xs text-text-muted min-h-4"></p>
-			</div>
 			<div>
 				<label class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">Question</label>
 				<textarea
@@ -88,6 +66,33 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 					/>
 				</div>
 			</div>
+			<details id="assist-panel" class="rounded border border-border bg-base/70">
+				<summary class="cursor-pointer list-none px-4 py-3 font-mono text-xs uppercase tracking-widest text-text-muted">
+					Stuck? Generate a draft question
+				</summary>
+				<div class="border-t border-border px-4 py-4 space-y-3">
+					<p class="text-text-muted text-sm">Use this only if you need a starting point. You can edit everything before submitting.</p>
+					<div class="grid sm:grid-cols-[1fr_auto] gap-2">
+						<input
+							type="text"
+							id="assist_topic"
+							placeholder="Optional topic (e.g., history, movies, tech)"
+							class="w-full bg-base border border-border rounded px-4 py-2 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
+						/>
+						<button
+							type="button"
+							id="assist_generate_button"
+							data-lobby-code={ lobby.Code }
+							aria-describedby="assist_status"
+							class="bg-base hover:bg-border border border-border text-text px-4 py-2 rounded font-mono font-bold tracking-wide transition-colors disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
+							onclick="generateQuestionAssistFromButton(this)"
+						>
+							GENERATE DRAFT
+						</button>
+					</div>
+					<p id="assist_status" aria-live="polite" class="text-xs text-text-muted min-h-4"></p>
+				</div>
+			</details>
 			<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors mt-6">
 				SUBMIT QUESTION
 			</button>
@@ -96,6 +101,10 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 		<div class="mt-4 text-center">
 			<button
 				type="button"
+				id="open-templates-modal"
+				aria-haspopup="dialog"
+				aria-controls="templates-modal"
+				aria-expanded="false"
 				class="text-text-muted hover:text-cyan text-sm font-mono transition-colors"
 				onclick="openTemplatesModal()"
 			>
@@ -107,18 +116,28 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 	<div
 		id="templates-modal"
 		class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+		role="dialog"
+		aria-modal="true"
+		aria-hidden="true"
+		aria-labelledby="templates-modal-title"
+		aria-describedby="templates-modal-description"
 	>
 		<!-- Backdrop -->
 		<div
 			class="absolute inset-0 bg-base/80 backdrop-blur-sm"
+			aria-hidden="true"
 			onclick="closeTemplatesModal()"
 		></div>
 		<!-- Modal content -->
-		<div class="relative bg-elevated border border-border rounded-lg w-full max-w-lg p-6 shadow-xl">
+		<div class="relative bg-elevated border border-border rounded-lg w-full max-w-lg p-6 shadow-xl" data-modal-panel>
 			<div class="flex items-center justify-between mb-4">
-				<h2 class="font-mono text-lg font-bold text-text">Question Packs</h2>
+				<div>
+					<h2 id="templates-modal-title" class="font-mono text-lg font-bold text-text">Question Packs</h2>
+					<p id="templates-modal-description" class="text-sm text-text-muted mt-1">Choose a pack to fill the form with a starter question.</p>
+				</div>
 				<button
 					type="button"
+					aria-label="Close question packs dialog"
 					class="text-text-muted hover:text-text transition-colors"
 					onclick="closeTemplatesModal()"
 				>
@@ -141,6 +160,35 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 		</div>
 	</div>
 	<script>
+		let templatesModalLastFocusedElement = null;
+		function getTemplatesModalElements() {
+			const modal = document.getElementById('templates-modal');
+			if (!modal) {
+				return {};
+			}
+			return {
+				modal,
+				panel: modal.querySelector('[data-modal-panel]'),
+				openButton: document.getElementById('open-templates-modal'),
+				templatesContainer: document.getElementById('templates-container'),
+			};
+		}
+		function getTemplatesModalFocusableElements() {
+			const { modal } = getTemplatesModalElements();
+			if (!modal || modal.classList.contains('hidden')) {
+				return [];
+			}
+			return Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+				.filter(function(element) {
+					return !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true';
+				});
+		}
+		function focusTemplatesModalFirstElement() {
+			const focusable = getTemplatesModalFocusableElements();
+			if (focusable.length > 0) {
+				focusable[0].focus();
+			}
+		}
 		function updateAssistStatus(message, tone) {
 			const status = document.getElementById('assist_status');
 			if (!status) {
@@ -207,17 +255,77 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 			}
 		}
 		function openTemplatesModal() {
-			document.getElementById('templates-modal').classList.remove('hidden');
+			const { modal, openButton, templatesContainer } = getTemplatesModalElements();
+			if (!modal) {
+				return;
+			}
+			templatesModalLastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : openButton;
+			modal.classList.remove('hidden');
+			modal.setAttribute('aria-hidden', 'false');
+			if (openButton) {
+				openButton.setAttribute('aria-expanded', 'true');
+			}
 			// Trigger HTMX to reload templates (in case some were used since page load)
-			htmx.trigger('#templates-container', 'load');
+			if (templatesContainer) {
+				htmx.trigger(templatesContainer, 'load');
+			}
+			window.requestAnimationFrame(focusTemplatesModalFirstElement);
 		}
 		function closeTemplatesModal() {
-			document.getElementById('templates-modal').classList.add('hidden');
+			const { modal, openButton } = getTemplatesModalElements();
+			if (!modal) {
+				return;
+			}
+			modal.classList.add('hidden');
+			modal.setAttribute('aria-hidden', 'true');
+			if (openButton) {
+				openButton.setAttribute('aria-expanded', 'false');
+			}
+			if (templatesModalLastFocusedElement && typeof templatesModalLastFocusedElement.focus === 'function') {
+				templatesModalLastFocusedElement.focus();
+				return;
+			}
+			if (openButton) {
+				openButton.focus();
+			}
 		}
 		// Close modal on escape key
 		document.addEventListener('keydown', function(e) {
+			const { modal } = getTemplatesModalElements();
+			if (!modal || modal.classList.contains('hidden')) {
+				return;
+			}
 			if (e.key === 'Escape') {
 				closeTemplatesModal();
+				return;
+			}
+			if (e.key !== 'Tab') {
+				return;
+			}
+			const focusable = getTemplatesModalFocusableElements();
+			if (focusable.length === 0) {
+				e.preventDefault();
+				return;
+			}
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+			if (e.shiftKey && document.activeElement === first) {
+				e.preventDefault();
+				last.focus();
+				return;
+			}
+			if (!e.shiftKey && document.activeElement === last) {
+				e.preventDefault();
+				first.focus();
+			}
+		});
+		document.body.addEventListener('htmx:afterSwap', function(event) {
+			if (!event.target || event.target.id !== 'templates-container') {
+				return;
+			}
+			const { modal } = getTemplatesModalElements();
+			if (modal && !modal.classList.contains('hidden')) {
+				window.requestAnimationFrame(focusTemplatesModalFirstElement);
 			}
 		});
 	</script>

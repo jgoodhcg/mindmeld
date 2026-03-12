@@ -16,7 +16,11 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 				<div class="bg-elevated border border-border rounded p-5 sm:p-6">
 					<div class="space-y-4">
 						<div class="text-center py-6">
-							<p class="text-text-muted">Waiting for players to join...</p>
+							if isHost {
+								<p class="text-text-muted">Share the code, then start when the group is ready.</p>
+							} else {
+								<p class="text-text-muted">Waiting for host to start...</p>
+							}
 						</div>
 						if isHost {
 							<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/start") } method="POST">
@@ -24,8 +28,6 @@ templ GameContent(lobby db.Lobby, players []db.GetLobbyPlayersRow, activeRound d
 									START GAME
 								</button>
 							</form>
-						} else {
-							<p class="text-center text-text-muted py-4">Waiting for host to start...</p>
 						}
 					</div>
 				</div>

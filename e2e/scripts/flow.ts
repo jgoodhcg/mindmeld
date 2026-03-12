@@ -307,6 +307,12 @@ async function templatesFlow(page: Page) {
     await page.waitForTimeout(200);
   }
 
+  const assistSummary = page.locator('#assist-panel summary');
+  if (await assistSummary.isVisible().catch(() => false)) {
+    await assistSummary.click();
+    await page.waitForTimeout(150);
+  }
+
   const aiAssistButton = page.locator('#assist_generate_button');
   if (await aiAssistButton.isVisible().catch(() => false)) {
     await aiAssistButton.click();
