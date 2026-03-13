@@ -18,6 +18,17 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/questions"
 )
 
+const (
+	defaultOpenAIModel     = "gpt-4.1-mini"
+	defaultOpenRouterModel = "openai/gpt-5.1-chat"
+	defaultOpenRouterTitle = "Mindmeld"
+)
+
+var (
+	openAIChatCompletionsURL     = "https://api.openai.com/v1/chat/completions"
+	openRouterChatCompletionsURL = "https://openrouter.ai/api/v1/chat/completions"
+)
+
 type generatedQuestion struct {
 	QuestionText  string
 	CorrectAnswer string
@@ -37,34 +48,36 @@ type generateQuestionResponse struct {
 	Error         string `json:"error,omitempty"`
 }
 
-type openAIChatCompletionRequest struct {
+type chatCompletionRequest struct {
 	Model          string                 `json:"model"`
-	Messages       []openAIChatMessage    `json:"messages"`
+	Messages       []chatMessage          `json:"messages"`
 	Temperature    float64                `json:"temperature"`
 	ResponseFormat map[string]interface{} `json:"response_format,omitempty"`
 }
 
-type openAIChatMessage struct {
+type chatMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
-type openAIChatCompletionResponse struct {
+type chatCompletionResponse struct {
 	Choices []struct {
-		Message openAIChatMessage `json:"message"`
+		Message chatMessage `json:"message"`
 	} `json:"choices"`
 }
 
-func generateAssistedQuestion(ctx context.Context, lobbyRating int16, topic string) (generatedQuestion, error) {
-	provider := strings.ToLower(strings.TrimSpace(os.Getenv("AI_QUESTION_ASSIST_PROVIDER")))
-	key := strings.TrimSpace(os.Getenv("OPENAI_API_KEY"))
-	model := strings.TrimSpace(os.Getenv("OPENAI_MODEL"))
-	if model == "" {
-		model = "gpt-4.1-mini"
-	}
+type aiProviderConfig struct {
+	Name      string
+	APIKey    string
+	Model     string
+	Endpoint  string
+	Headers   map[string]string
+	SourceTag string
+}
 
-	if provider == "openai" && key != "" {
-		q, err := generateQuestionWithOpenAI(ctx, key, model, lobbyRating, topic)
+func generateAssistedQuestion(ctx context.Context, lobbyRating int16, topic string) (generatedQuestion, error) {
+	if cfg := loadAIProviderConfig(); cfg != nil {
+		q, err := generateQuestionWithProvider(ctx, *cfg, lobbyRating, topic)
 		if err == nil {
 			return q, nil
 		}
@@ -77,7 +90,85 @@ func generateAssistedQuestion(ctx context.Context, lobbyRating int16, topic stri
 	return q, nil
 }
 
-func generateQuestionWithOpenAI(ctx context.Context, apiKey string, model string, lobbyRating int16, topic string) (generatedQuestion, error) {
+func loadAIProviderConfig() *aiProviderConfig {
+	provider := strings.ToLower(strings.TrimSpace(os.Getenv("AI_QUESTION_ASSIST_PROVIDER")))
+
+	openRouterKey := strings.TrimSpace(os.Getenv("OPEN_ROUTER_KEY"))
+	openRouterModel := strings.TrimSpace(os.Getenv("OPEN_ROUTER_MODEL"))
+	if openRouterModel == "" {
+		openRouterModel = defaultOpenRouterModel
+	}
+
+	openAIKey := strings.TrimSpace(os.Getenv("OPENAI_API_KEY"))
+	openAIModel := strings.TrimSpace(os.Getenv("OPENAI_MODEL"))
+	if openAIModel == "" {
+		openAIModel = defaultOpenAIModel
+	}
+
+	switch provider {
+	case "openrouter":
+		if openRouterKey == "" {
+			return nil
+		}
+		return &aiProviderConfig{
+			Name:      "openrouter",
+			APIKey:    openRouterKey,
+			Model:     openRouterModel,
+			Endpoint:  openRouterChatCompletionsURL,
+			Headers:   openRouterHeadersFromEnv(),
+			SourceTag: "openrouter",
+		}
+	case "openai":
+		if openAIKey == "" {
+			return nil
+		}
+		return &aiProviderConfig{
+			Name:      "openai",
+			APIKey:    openAIKey,
+			Model:     openAIModel,
+			Endpoint:  openAIChatCompletionsURL,
+			SourceTag: "openai",
+		}
+	default:
+		if openRouterKey != "" {
+			return &aiProviderConfig{
+				Name:      "openrouter",
+				APIKey:    openRouterKey,
+				Model:     openRouterModel,
+				Endpoint:  openRouterChatCompletionsURL,
+				Headers:   openRouterHeadersFromEnv(),
+				SourceTag: "openrouter",
+			}
+		}
+		if openAIKey != "" {
+			return &aiProviderConfig{
+				Name:      "openai",
+				APIKey:    openAIKey,
+				Model:     openAIModel,
+				Endpoint:  openAIChatCompletionsURL,
+				SourceTag: "openai",
+			}
+		}
+		return nil
+	}
+}
+
+func openRouterHeadersFromEnv() map[string]string {
+	headers := map[string]string{
+		"X-Title": defaultOpenRouterTitle,
+	}
+
+	if referer := strings.TrimSpace(os.Getenv("OPEN_ROUTER_HTTP_REFERER")); referer != "" {
+		headers["HTTP-Referer"] = referer
+	}
+	if title := strings.TrimSpace(os.Getenv("OPEN_ROUTER_TITLE")); title != "" {
+		headers["X-Title"] = title
+	}
+
+	return headers
+}
+
+func generateQuestionWithProvider(ctx context.Context, cfg aiProviderConfig, lobbyRating int16, topic string) (generatedQuestion, error) {
 	systemPrompt := strings.Join([]string{
 		"You generate one multiple-choice trivia question for a social party game.",
 		"Return strict JSON only with keys: question_text, correct_answer, wrong_answer_1, wrong_answer_2, wrong_answer_3.",
@@ -92,9 +183,9 @@ func generateQuestionWithOpenAI(ctx context.Context, apiKey string, model string
 		userPrompt = fmt.Sprintf("Generate a fresh trivia question about: %s.", topic)
 	}
 
-	reqBody := openAIChatCompletionRequest{
-		Model: model,
-		Messages: []openAIChatMessage{
+	reqBody := chatCompletionRequest{
+		Model: cfg.Model,
+		Messages: []chatMessage{
 			{Role: "system", Content: systemPrompt},
 			{Role: "user", Content: userPrompt},
 		},
@@ -112,12 +203,15 @@ func generateQuestionWithOpenAI(ctx context.Context, apiKey string, model string
 	reqCtx, cancel := context.WithTimeout(ctx, 12*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(reqCtx, http.MethodPost, "https://api.openai.com/v1/chat/completions", bytes.NewReader(payload))
+	req, err := http.NewRequestWithContext(reqCtx, http.MethodPost, cfg.Endpoint, bytes.NewReader(payload))
 	if err != nil {
 		return generatedQuestion{}, err
 	}
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Authorization", "Bearer "+cfg.APIKey)
 	req.Header.Set("Content-Type", "application/json")
+	for key, value := range cfg.Headers {
+		req.Header.Set(key, value)
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -130,15 +224,15 @@ func generateQuestionWithOpenAI(ctx context.Context, apiKey string, model string
 		return generatedQuestion{}, err
 	}
 	if resp.StatusCode >= 400 {
-		return generatedQuestion{}, fmt.Errorf("openai status %d", resp.StatusCode)
+		return generatedQuestion{}, fmt.Errorf("%s status %d", cfg.Name, resp.StatusCode)
 	}
 
-	var openAIResp openAIChatCompletionResponse
-	if err := json.Unmarshal(body, &openAIResp); err != nil {
+	var completionResp chatCompletionResponse
+	if err := json.Unmarshal(body, &completionResp); err != nil {
 		return generatedQuestion{}, err
 	}
-	if len(openAIResp.Choices) == 0 {
-		return generatedQuestion{}, errors.New("openai returned no choices")
+	if len(completionResp.Choices) == 0 {
+		return generatedQuestion{}, fmt.Errorf("%s returned no choices", cfg.Name)
 	}
 
 	var parsed struct {
@@ -148,7 +242,7 @@ func generateQuestionWithOpenAI(ctx context.Context, apiKey string, model string
 		WrongAnswer2  string `json:"wrong_answer_2"`
 		WrongAnswer3  string `json:"wrong_answer_3"`
 	}
-	if err := json.Unmarshal([]byte(openAIResp.Choices[0].Message.Content), &parsed); err != nil {
+	if err := json.Unmarshal([]byte(completionResp.Choices[0].Message.Content), &parsed); err != nil {
 		return generatedQuestion{}, err
 	}
 
@@ -158,7 +252,7 @@ func generateQuestionWithOpenAI(ctx context.Context, apiKey string, model string
 		WrongAnswer1:  trimToLen(strings.TrimSpace(parsed.WrongAnswer1), 80),
 		WrongAnswer2:  trimToLen(strings.TrimSpace(parsed.WrongAnswer2), 80),
 		WrongAnswer3:  trimToLen(strings.TrimSpace(parsed.WrongAnswer3), 80),
-		Source:        "openai",
+		Source:        cfg.SourceTag,
 	}
 
 	if err := validateGeneratedQuestion(q); err != nil {

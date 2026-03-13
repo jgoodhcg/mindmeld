@@ -246,7 +246,7 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 					throw new Error(data.error || 'Request failed');
 				}
 				fillGeneratedQuestion(data);
-				const source = data.source === 'openai' ? 'AI model' : 'fallback generator';
+				const source = data.source === 'local-fallback' ? 'fallback generator' : 'AI model';
 				updateAssistStatus(`Draft generated from ${source}. Edit before submitting.`, 'success');
 			} catch (error) {
 				updateAssistStatus('Unable to generate right now. Try again or use a question pack.', 'error');
