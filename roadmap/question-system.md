@@ -5,7 +5,7 @@ description: "Expand question types, pools, and AI-assisted creation for trivia.
 tags: [area/game, type/feature, tech/ai]
 priority: medium
 created: 2026-01-19
-updated: 2026-02-07
+updated: 2026-03-12
 effort: L
 depends-on: []
 ---
@@ -118,6 +118,12 @@ Expand beyond "each player writes one multiple-choice question" to support varie
 - **Wrong answers: Optional AI assist** (user can request plausible wrong answers or write their own)
 - Harder for AI to know personal facts, so default to manual entry
 
+**C. Familiarity Prompt Shells**
+- User can write seed prompts like `Justin's favorite movie is Princess Mononoke` or `A personal question about Justin`.
+- AI should normalize these into clean player-facing questions such as `What is Justin's favorite movie?`
+- If the user provides the fact directly, the system should keep that fact as the correct answer and focus the assist on phrasing + believable distractors.
+- If the user asks for a personal question without providing the fact, the system should produce a question shell with the correct-answer slot intentionally blank rather than fabricating a fact.
+
 #### What AI Can Help With
 
 | Task | Trivia Mode | Personal Mode |
@@ -162,6 +168,25 @@ For when you want to skip question writing entirely:
 **Hybrid Modes:**
 - "3 player questions + 2 AI questions per round"
 - "AI writes questions, players write wrong answers" (Fibbage-style)
+
+### 5. Host-Seeded Familiarity Mode (Future)
+
+**Concept:** The host provides a few starter facts, themes, or relationship prompts, and the game turns those seeds into a longer familiarity-building session.
+
+**Possible inputs:**
+- "Questions about our team traditions"
+- "Facts about Justin, Maya, and Chris"
+- "Make this feel like a new-team icebreaker"
+
+**Desired feel:**
+- Less like trivia night, more like a guided "learn the room" experience
+- Repeatedly surfaces names, preferences, habits, and shared context
+- Works even when only the host has enough context to seed the game at the start
+
+**Open design questions:**
+- Should generated questions stay multiple-choice, or mix in prediction / match-the-person formats?
+- How many host seeds are needed before the game feels personal instead of generic?
+- Should the game reveal the host-provided fact directly after each round, or keep some ambiguity for discussion?
 
 ---
 
