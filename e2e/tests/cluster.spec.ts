@@ -78,7 +78,7 @@ test.describe('Cluster Multiplayer', () => {
       await joinLobby(player3Page, code, 'Player3');
 
       await expect(hostPage.locator('#player-list li')).toHaveCount(3, { timeout: 10000 });
-      await expect(hostPage.getByText(/Connected now:\s*3/i)).toBeVisible({ timeout: 10000 });
+      await expect(hostPage.getByText(/Active now:\s*3/i)).toBeVisible({ timeout: 10000 });
 
       const startButton = hostPage.locator('form[action$="/cluster/start"] button:has-text("START CLUSTER")');
       await expect(startButton).toBeVisible({ timeout: 10000 });

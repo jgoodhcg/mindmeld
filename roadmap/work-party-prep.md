@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-12
+updated: 2026-03-14
 effort: L
 depends-on: []
 ---
@@ -51,7 +51,7 @@ depends-on: []
     - OpenRouter-enabled when explicitly configured; local fallback generator keeps flow working without network/API key.
 
 - [ ] **AI assist quality + UX follow-up**:
-    - Add an e2e path that exercises LLM generation safely and deterministically (no accidental billable live call during normal validation).
+    - [x] Add an e2e path that exercises LLM generation safely and deterministically (no accidental billable live call during normal validation).
     - Visually pair "Question pack" and "AI draft" so players can immediately see one is curated/manual and the other is AI-assisted.
     - Improve prompt handling for personal/familiarity prompts so named subjects are preserved (`Justin` stays `Justin`) and the system can generate question shells with placeholders instead of inventing fake facts.
     - Upgrade distractor generation so personal questions yield convincing alternatives when the user already knows the correct answer.

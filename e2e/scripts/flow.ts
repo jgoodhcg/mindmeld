@@ -15,6 +15,10 @@
 import { chromium, Page, BrowserContext } from '@playwright/test';
 import { mkdir } from 'fs/promises';
 import { join } from 'path';
+import {
+  installTriviaAiAssistMock,
+  triviaAiAssistMockTopic,
+} from '../support/trivia-ai-assist-mock.js';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const SCREENSHOTS_DIR = join(import.meta.dirname, '..', 'screenshots');
@@ -248,6 +252,7 @@ async function coordinatesFlow(page: Page, lobbyCode: string) {
 async function templatesFlow(page: Page) {
   flowName = 'templates';
   console.log('\n=== Templates Modal Flow ===\n');
+  const aiAssistMock = await installTriviaAiAssistMock(page);
 
   await page.goto(`${BASE_URL}/trivia`, { waitUntil: 'networkidle' });
   await capture(page, 'homepage');
@@ -313,10 +318,16 @@ async function templatesFlow(page: Page) {
     await page.waitForTimeout(150);
   }
 
+  const assistTopic = page.locator('#assist_topic');
+  if (await assistTopic.isVisible().catch(() => false)) {
+    await assistTopic.fill(triviaAiAssistMockTopic);
+  }
+
   const aiAssistButton = page.locator('#assist_generate_button');
   if (await aiAssistButton.isVisible().catch(() => false)) {
     await aiAssistButton.click();
     await page.waitForTimeout(800);
+    console.log(`  AI assist mock topic: ${aiAssistMock.lastTopic}`);
     await capture(page, 'ai-assist-generated');
   }
 
