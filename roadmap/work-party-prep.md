@@ -57,9 +57,12 @@ depends-on: []
     - [x] Add an e2e path that exercises LLM generation safely and deterministically (no accidental billable live call during normal validation).
     - [x] Add a visible busy state while AI draft generation is running.
     - [x] Fix keyboard flow so tabbing from the AI topic input reaches the generate button reliably.
-    - Visually pair "Question pack" and "AI draft" so players can immediately see one is curated/manual and the other is AI-assisted.
+    - [x] Visually pair "Question pack" and "AI draft" so players can immediately see one is curated/manual and the other is AI-assisted.
+    - [x] Add clearer prompt-writing guidance and examples for the AI draft input.
     - Improve prompt handling for personal/familiarity prompts so named subjects are preserved (`Justin` stays `Justin`) and the system can generate question shells with placeholders instead of inventing fake facts.
     - Upgrade distractor generation so personal questions yield convincing alternatives when the user already knows the correct answer.
+    - Allow iterative AI refinement on a drafted trivia question instead of forcing a full regenerate from scratch each time.
+    - Save authored or AI-assisted trivia questions into a personal question bank so players can reuse and adapt them in future games.
     - Local env loading now uses shell-compatible `.env.local` semantics in `make` targets and startup, avoiding stale or malformed inherited provider credentials during local runs.
     - Current live-provider blocker after auth is OpenRouter timeout with Gemini.
 

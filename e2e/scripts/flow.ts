@@ -289,7 +289,15 @@ async function templatesFlow(page: Page) {
   const submitForm = page.locator('form[action$="/questions"]').first();
   await submitForm.waitFor({ state: 'visible', timeout: 10000 });
 
-  const templatesButton = page.locator('button', { hasText: /Need help\? Use a question pack|Need help\? Use a template/ }).first();
+  const jumpStartSummary = page.locator('#jump-start-panel summary');
+  if (await jumpStartSummary.isVisible().catch(() => false)) {
+    await capture(page, 'jump-start-collapsed');
+    await jumpStartSummary.click();
+    await page.waitForTimeout(150);
+    await capture(page, 'jump-start-expanded');
+  }
+
+  const templatesButton = page.locator('#open-templates-modal');
   await templatesButton.click();
 
   const templatesModal = page.locator('#templates-modal');
@@ -310,12 +318,6 @@ async function templatesFlow(page: Page) {
   if (await closeButton.isVisible().catch(() => false)) {
     await closeButton.click();
     await page.waitForTimeout(200);
-  }
-
-  const assistSummary = page.locator('#assist-panel summary');
-  if (await assistSummary.isVisible().catch(() => false)) {
-    await assistSummary.click();
-    await page.waitForTimeout(150);
   }
 
   const assistTopic = page.locator('#assist_topic');

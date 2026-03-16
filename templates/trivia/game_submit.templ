@@ -6,118 +6,161 @@ import (
 )
 
 templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
-	<div class="bg-elevated border border-border rounded p-5 sm:p-6">
-		<div class="text-center mb-6">
-			<div class="inline-block px-4 py-2 bg-base rounded border border-border mb-3">
-				<h2 class="font-mono text-lg sm:text-xl font-bold text-cyan">ROUND { fmt.Sprintf("%d", round.RoundNumber) }</h2>
-			</div>
-			<p class="text-text-muted text-sm">Write a question to challenge the group</p>
-		</div>
-		<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/questions") } method="POST" class="space-y-5">
-			<input type="hidden" name="template_id" id="template_id" value=""/>
-			<div>
-				<label class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">Question</label>
-				<textarea
-					name="question_text"
-					id="question_text"
-					required
-					rows="3"
-					placeholder="Enter your question..."
-					class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors resize-none"
-				></textarea>
-			</div>
-			<div>
-				<label class="block font-mono text-xs tracking-widest uppercase text-success mb-2">Correct Answer</label>
-				<input
-					type="text"
-					name="correct_answer"
-					id="correct_answer"
-					required
-					placeholder="The right answer"
-					class="w-full bg-base border border-success/30 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-success transition-colors"
-				/>
-			</div>
-			<div class="space-y-3">
-				<label class="block font-mono text-xs tracking-widest uppercase text-danger mb-2">Wrong Answers</label>
-				<div class="space-y-3">
-					<input
-						type="text"
-						name="wrong_answer_1"
-						id="wrong_answer_1"
-						required
-						placeholder="Wrong answer 1"
-						class="w-full bg-base border border-danger/20 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-danger transition-colors"
-					/>
-					<input
-						type="text"
-						name="wrong_answer_2"
-						id="wrong_answer_2"
-						required
-						placeholder="Wrong answer 2"
-						class="w-full bg-base border border-danger/20 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-danger transition-colors"
-					/>
-					<input
-						type="text"
-						name="wrong_answer_3"
-						id="wrong_answer_3"
-						required
-						placeholder="Wrong answer 3"
-						class="w-full bg-base border border-danger/20 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-danger transition-colors"
-					/>
-				</div>
-			</div>
-			<details id="assist-panel" class="rounded border border-border bg-base/70">
-				<summary class="cursor-pointer list-none px-4 py-3 font-mono text-xs uppercase tracking-widest text-text-muted">
-					Stuck? Generate a draft question
-				</summary>
-				<div class="border-t border-border px-4 py-4 space-y-3">
-					<p class="text-text-muted text-sm">Use this only if you need a starting point. You can edit everything before submitting.</p>
-					<div class="grid sm:grid-cols-[1fr_auto] gap-2">
-						<input
-							type="text"
-							id="assist_topic"
-							placeholder="Optional topic (e.g., history, movies, tech)"
-							class="w-full bg-base border border-border rounded px-4 py-2 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
-							onkeydown="handleAssistTopicKeydown(event)"
-						/>
+	<div class="space-y-4">
+		<details id="jump-start-panel" class="bg-elevated border border-border rounded p-4 sm:p-5">
+			<summary class="cursor-pointer list-none font-mono text-xs tracking-widest uppercase text-cyan">
+				Need A Jump Start?
+			</summary>
+			<div class="space-y-4 mt-4">
+				<p class="text-sm text-text-muted">Optional helpers if you get stuck. They both fill the form below, and you can still rewrite everything before submitting.</p>
+				<div class="grid gap-3 lg:grid-cols-2">
+					<div class="rounded border border-border/80 bg-base/70 p-4 space-y-4">
+						<div class="space-y-2">
+							<div class="flex items-center justify-between gap-3">
+								<h3 class="font-mono text-sm uppercase tracking-[0.2em] text-cyan">Question Pack</h3>
+								<span class="rounded border border-cyan/30 bg-cyan/10 px-2 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-cyan">Curated</span>
+							</div>
+							<p class="text-sm text-text-muted">Browse ready-made prompts when you want fast, work-safe questions with no waiting.</p>
+						</div>
+						<div class="grid grid-cols-2 gap-2 text-[11px] text-text-muted font-mono uppercase tracking-wide">
+							<div class="rounded border border-border bg-base/70 px-3 py-2">Instant</div>
+							<div class="rounded border border-border bg-base/70 px-3 py-2">No guesswork</div>
+							<div class="rounded border border-border bg-base/70 px-3 py-2">Themed decks</div>
+							<div class="rounded border border-border bg-base/70 px-3 py-2">Always editable</div>
+						</div>
 						<button
 							type="button"
-							id="assist_generate_button"
-							data-lobby-code={ lobby.Code }
-							aria-describedby="assist_status"
-							class="inline-flex items-center justify-center gap-2 bg-base hover:bg-border border border-border text-text px-4 py-2 rounded font-mono font-bold tracking-wide transition-colors disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
-							onclick="generateQuestionAssistFromButton(this)"
+							id="open-templates-modal"
+							aria-haspopup="dialog"
+							aria-controls="templates-modal"
+							aria-expanded="false"
+							class="w-full inline-flex items-center justify-center rounded border border-cyan/30 bg-cyan/10 px-4 py-3 font-mono text-sm font-bold tracking-wide text-cyan transition-colors hover:bg-cyan/15"
+							onclick="openTemplatesModal()"
 						>
-							<span id="assist_generate_button_label">GENERATE DRAFT</span>
-							<span id="assist_generate_button_busy" class="hidden items-center gap-2">
-								<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
-								WORKING...
-							</span>
+							OPEN QUESTION PACKS
 						</button>
 					</div>
-					<div class="min-h-4 flex items-center gap-2">
-						<span id="assist_status_spinner" class="hidden h-3.5 w-3.5 animate-spin rounded-full border-2 border-cyan/60 border-t-transparent" aria-hidden="true"></span>
-						<p id="assist_status" aria-live="polite" class="text-xs text-text-muted"></p>
+					<div id="assist-panel" class="rounded border border-border/80 bg-base/70 p-4 space-y-4">
+						<div class="space-y-2">
+							<div class="flex items-center justify-between gap-3">
+								<h3 class="font-mono text-sm uppercase tracking-[0.2em] text-amber">AI Draft</h3>
+								<span class="rounded border border-amber/30 bg-amber/10 px-2 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-amber">Flexible</span>
+							</div>
+							<p class="text-sm text-text-muted">Give the model a topic, a fact to turn into a question, or a personal-question shell. It will draft a full question and answers for you to edit.</p>
+						</div>
+						<div class="space-y-2">
+							<label for="assist_topic" class="block font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">What To Generate</label>
+							<input
+								type="text"
+								id="assist_topic"
+								placeholder="Try: world capitals, Priya's favorite snack is popcorn, or a personal question about Sam I can answer"
+								class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
+								onkeydown="handleAssistTopicKeydown(event)"
+							/>
+						</div>
+						<div class="space-y-2">
+							<p class="font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">Example Prompts</p>
+							<div class="flex flex-wrap gap-2">
+								<button type="button" class="rounded border border-border bg-base/70 px-3 py-2 text-left text-xs text-text-muted transition-colors hover:border-cyan/40 hover:text-text" onclick="setAssistTopicExample(this.dataset.example)" data-example="world capitals">
+									Topic: world capitals
+								</button>
+								<button type="button" class="rounded border border-border bg-base/70 px-3 py-2 text-left text-xs text-text-muted transition-colors hover:border-cyan/40 hover:text-text" onclick="setAssistTopicExample(this.dataset.example)" data-example="Jess's go-to karaoke song is Mr. Brightside">
+									Fact: Jess's go-to karaoke song is Mr. Brightside
+								</button>
+								<button type="button" class="rounded border border-border bg-base/70 px-3 py-2 text-left text-xs text-text-muted transition-colors hover:border-cyan/40 hover:text-text" onclick="setAssistTopicExample(this.dataset.example)" data-example="a personal question about Justin that I can answer">
+									Shell: a personal question about Justin that I can answer
+								</button>
+							</div>
+						</div>
+						<p class="text-xs text-text-muted">Tip: if you already know the fact you want to test, paste the fact directly. The AI will try to preserve names and turn it into a cleaner player-facing question.</p>
+						<div class="grid sm:grid-cols-[1fr_auto] gap-2">
+							<button
+								type="button"
+								id="assist_generate_button"
+								data-lobby-code={ lobby.Code }
+								aria-describedby="assist_status"
+								class="inline-flex items-center justify-center gap-2 bg-base hover:bg-border border border-border text-text px-4 py-3 rounded font-mono font-bold tracking-wide transition-colors disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed sm:order-2"
+								onclick="generateQuestionAssistFromButton(this)"
+							>
+								<span id="assist_generate_button_label">GENERATE DRAFT</span>
+								<span id="assist_generate_button_busy" class="hidden items-center gap-2">
+									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+									WORKING...
+								</span>
+							</button>
+							<div class="min-h-4 flex items-center gap-2 sm:order-1">
+								<span id="assist_status_spinner" class="hidden h-3.5 w-3.5 animate-spin rounded-full border-2 border-cyan/60 border-t-transparent" aria-hidden="true"></span>
+								<p id="assist_status" aria-live="polite" class="text-xs text-text-muted"></p>
+							</div>
+						</div>
 					</div>
 				</div>
-			</details>
-			<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors mt-6">
-				SUBMIT QUESTION
-			</button>
-		</form>
-		<!-- Help button -->
-		<div class="mt-4 text-center">
-			<button
-				type="button"
-				id="open-templates-modal"
-				aria-haspopup="dialog"
-				aria-controls="templates-modal"
-				aria-expanded="false"
-				class="text-text-muted hover:text-cyan text-sm font-mono transition-colors"
-				onclick="openTemplatesModal()"
-			>
-				Need help? Use a question pack
-			</button>
+			</div>
+		</details>
+		<div class="bg-elevated border border-border rounded p-5 sm:p-6">
+			<div class="text-center mb-6">
+				<div class="inline-block px-4 py-2 bg-base rounded border border-border mb-3">
+					<h2 class="font-mono text-lg sm:text-xl font-bold text-cyan">ROUND { fmt.Sprintf("%d", round.RoundNumber) }</h2>
+				</div>
+				<p class="text-text-muted text-sm">Write a question to challenge the group</p>
+			</div>
+			<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/trivia/questions") } method="POST" class="space-y-5">
+				<input type="hidden" name="template_id" id="template_id" value=""/>
+				<div>
+					<label class="block font-mono text-xs tracking-widest uppercase text-text-muted mb-2">Question</label>
+					<textarea
+						name="question_text"
+						id="question_text"
+						required
+						rows="3"
+						placeholder="Enter your question..."
+						class="w-full bg-base border border-border rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors resize-none"
+					></textarea>
+				</div>
+				<div>
+					<label class="block font-mono text-xs tracking-widest uppercase text-success mb-2">Correct Answer</label>
+					<input
+						type="text"
+						name="correct_answer"
+						id="correct_answer"
+						required
+						placeholder="The right answer"
+						class="w-full bg-base border border-success/30 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-success transition-colors"
+					/>
+				</div>
+				<div class="space-y-3">
+					<label class="block font-mono text-xs tracking-widest uppercase text-danger mb-2">Wrong Answers</label>
+					<div class="space-y-3">
+						<input
+							type="text"
+							name="wrong_answer_1"
+							id="wrong_answer_1"
+							required
+							placeholder="Wrong answer 1"
+							class="w-full bg-base border border-danger/20 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-danger transition-colors"
+						/>
+						<input
+							type="text"
+							name="wrong_answer_2"
+							id="wrong_answer_2"
+							required
+							placeholder="Wrong answer 2"
+							class="w-full bg-base border border-danger/20 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-danger transition-colors"
+						/>
+						<input
+							type="text"
+							name="wrong_answer_3"
+							id="wrong_answer_3"
+							required
+							placeholder="Wrong answer 3"
+							class="w-full bg-base border border-danger/20 rounded px-4 py-3 text-text placeholder-text-muted focus:outline-none focus:border-danger transition-colors"
+						/>
+					</div>
+				</div>
+				<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors mt-6">
+					SUBMIT QUESTION
+				</button>
+			</form>
 		</div>
 	</div>
 	<!-- Templates Modal -->
@@ -247,6 +290,15 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 			}
 			event.preventDefault();
 			button.focus();
+		}
+		function setAssistTopicExample(example) {
+			const topicInput = document.getElementById('assist_topic');
+			if (!topicInput || !example) {
+				return;
+			}
+			topicInput.value = example;
+			topicInput.focus();
+			updateAssistStatus('', 'default');
 		}
 		function fillGeneratedQuestion(payload) {
 			document.getElementById('question_text').value = payload.question_text || '';

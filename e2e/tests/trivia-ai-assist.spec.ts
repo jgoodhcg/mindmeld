@@ -36,9 +36,16 @@ test.describe('Trivia AI Assist', () => {
     await createTriviaLobby(page);
     await startTriviaGame(page);
 
-    const assistSummary = page.locator('#assist-panel summary');
-    await expect(assistSummary).toBeVisible({ timeout: 10000 });
-    await assistSummary.click();
+    const jumpStartSummary = page.locator('#jump-start-panel summary');
+    await expect(jumpStartSummary).toBeVisible({ timeout: 10000 });
+    await jumpStartSummary.click();
+
+    await expect(page.locator('#open-templates-modal')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Question Pack' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'AI Draft' })).toBeVisible();
+    await expect(page.locator('#assist-panel').getByText('Example Prompts')).toBeVisible();
+    await page.click('button[data-example="world capitals"]');
+    await expect(page.locator('#assist_topic')).toHaveValue('world capitals');
 
     await page.fill('#assist_topic', triviaAiAssistMockTopic);
     await page.locator('#assist_topic').focus();
