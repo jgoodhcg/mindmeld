@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-14
+updated: 2026-03-16
 effort: L
 depends-on: []
 ---
@@ -49,12 +49,17 @@ depends-on: []
     - AI generates 1 question + answers, constrained by lobby content rating.
     - Player can edit before submitting. AI enhances, doesn't replace.
     - OpenRouter-enabled when explicitly configured; local fallback generator keeps flow working without network/API key.
+    - Deterministic mocked e2e coverage added for AI assist so normal validation does not spend money or depend on live provider behavior.
+    - Default OpenRouter model updated to `google/gemini-3.1-pro-preview`.
+    - Prompt contract upgraded to handle generic topics, stated facts, and personal-question shells in one path.
 
 - [ ] **AI assist quality + UX follow-up**:
     - [x] Add an e2e path that exercises LLM generation safely and deterministically (no accidental billable live call during normal validation).
     - Visually pair "Question pack" and "AI draft" so players can immediately see one is curated/manual and the other is AI-assisted.
     - Improve prompt handling for personal/familiarity prompts so named subjects are preserved (`Justin` stays `Justin`) and the system can generate question shells with placeholders instead of inventing fake facts.
     - Upgrade distractor generation so personal questions yield convincing alternatives when the user already knows the correct answer.
+    - Local env loading now uses shell-compatible `.env.local` semantics in `make` targets and startup, avoiding stale or malformed inherited provider credentials during local runs.
+    - Current live-provider blocker after auth is OpenRouter timeout with Gemini.
 
 ## Phase 3: Cluster Content Overhaul
 **Objective:** Make Cluster rounds provoke opinions and split the room.

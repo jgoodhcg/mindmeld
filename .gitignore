@@ -27,6 +27,7 @@
 # Go
 /bin
 /tmp
+/.gocache
 
 # Generated files
 # Built at deploy time via Dockerfile

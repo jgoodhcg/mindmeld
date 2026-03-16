@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -20,8 +21,11 @@ import (
 
 const (
 	defaultOpenAIModel     = "gpt-4.1-mini"
-	defaultOpenRouterModel = "openai/gpt-5.1-chat"
+	defaultOpenRouterModel = "google/gemini-3.1-pro-preview"
 	defaultOpenRouterTitle = "Mindmeld"
+	maxAssistInputLen      = 240
+	openAIRequestTimeout   = 12 * time.Second
+	openRouterTimeout      = 30 * time.Second
 )
 
 var (
@@ -53,6 +57,7 @@ type chatCompletionRequest struct {
 	Messages       []chatMessage          `json:"messages"`
 	Temperature    float64                `json:"temperature"`
 	ResponseFormat map[string]interface{} `json:"response_format,omitempty"`
+	Plugins        []map[string]string    `json:"plugins,omitempty"`
 }
 
 type chatMessage struct {
@@ -81,6 +86,7 @@ func generateAssistedQuestion(ctx context.Context, lobbyRating int16, topic stri
 		if err == nil {
 			return q, nil
 		}
+		log.Printf("[trivia-ai] provider %s failed, falling back to local generator: %v", cfg.Name, err)
 	}
 
 	q := generateLocalQuestion(lobbyRating, topic)
@@ -169,19 +175,7 @@ func openRouterHeadersFromEnv() map[string]string {
 }
 
 func generateQuestionWithProvider(ctx context.Context, cfg aiProviderConfig, lobbyRating int16, topic string) (generatedQuestion, error) {
-	systemPrompt := strings.Join([]string{
-		"You generate one multiple-choice trivia question for a social party game.",
-		"Return strict JSON only with keys: question_text, correct_answer, wrong_answer_1, wrong_answer_2, wrong_answer_3.",
-		"Answers must be short (max 80 chars), distinct, and plausible.",
-		"Question should have one unambiguous correct answer.",
-		"Keep content safe for audience: " + audiencePolicy(lobbyRating) + ".",
-	}, " ")
-
-	topic = cleanTopic(topic)
-	userPrompt := "Generate a fresh trivia question."
-	if topic != "" {
-		userPrompt = fmt.Sprintf("Generate a fresh trivia question about: %s.", topic)
-	}
+	systemPrompt, userPrompt := buildQuestionAssistPrompts(lobbyRating, topic)
 
 	reqBody := chatCompletionRequest{
 		Model: cfg.Model,
@@ -189,10 +183,13 @@ func generateQuestionWithProvider(ctx context.Context, cfg aiProviderConfig, lob
 			{Role: "system", Content: systemPrompt},
 			{Role: "user", Content: userPrompt},
 		},
-		Temperature: 0.8,
-		ResponseFormat: map[string]interface{}{
-			"type": "json_object",
-		},
+		Temperature:    0.8,
+		ResponseFormat: questionAssistResponseFormat(),
+	}
+	if cfg.Name == "openrouter" {
+		reqBody.Plugins = []map[string]string{
+			{"id": "response-healing"},
+		}
 	}
 
 	payload, err := json.Marshal(reqBody)
@@ -200,7 +197,7 @@ func generateQuestionWithProvider(ctx context.Context, cfg aiProviderConfig, lob
 		return generatedQuestion{}, err
 	}
 
-	reqCtx, cancel := context.WithTimeout(ctx, 12*time.Second)
+	reqCtx, cancel := context.WithTimeout(ctx, providerTimeout(cfg.Name))
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(reqCtx, http.MethodPost, cfg.Endpoint, bytes.NewReader(payload))
@@ -224,7 +221,7 @@ func generateQuestionWithProvider(ctx context.Context, cfg aiProviderConfig, lob
 		return generatedQuestion{}, err
 	}
 	if resp.StatusCode >= 400 {
-		return generatedQuestion{}, fmt.Errorf("%s status %d", cfg.Name, resp.StatusCode)
+		return generatedQuestion{}, fmt.Errorf("%s status %d: %s", cfg.Name, resp.StatusCode, strings.TrimSpace(string(body)))
 	}
 
 	var completionResp chatCompletionResponse
@@ -259,6 +256,80 @@ func generateQuestionWithProvider(ctx context.Context, cfg aiProviderConfig, lob
 		return generatedQuestion{}, err
 	}
 	return q, nil
+}
+
+func providerTimeout(provider string) time.Duration {
+	if provider == "openrouter" {
+		return openRouterTimeout
+	}
+	return openAIRequestTimeout
+}
+
+func questionAssistResponseFormat() map[string]interface{} {
+	return map[string]interface{}{
+		"type": "json_schema",
+		"json_schema": map[string]interface{}{
+			"name":   "trivia_question",
+			"strict": true,
+			"schema": map[string]interface{}{
+				"type":                 "object",
+				"additionalProperties": false,
+				"properties": map[string]interface{}{
+					"question_text": map[string]interface{}{
+						"type": "string",
+					},
+					"correct_answer": map[string]interface{}{
+						"type": "string",
+					},
+					"wrong_answer_1": map[string]interface{}{
+						"type": "string",
+					},
+					"wrong_answer_2": map[string]interface{}{
+						"type": "string",
+					},
+					"wrong_answer_3": map[string]interface{}{
+						"type": "string",
+					},
+				},
+				"required": []string{
+					"question_text",
+					"correct_answer",
+					"wrong_answer_1",
+					"wrong_answer_2",
+					"wrong_answer_3",
+				},
+			},
+		},
+	}
+}
+
+func buildQuestionAssistPrompts(lobbyRating int16, topic string) (string, string) {
+	systemPrompt := strings.Join([]string{
+		"You generate one multiple-choice question for a social party game.",
+		"Return strict JSON only with keys: question_text, correct_answer, wrong_answer_1, wrong_answer_2, wrong_answer_3.",
+		"Answers must be short (max 80 chars), distinct, and plausible.",
+		"Keep content safe for audience: " + audiencePolicy(lobbyRating) + ".",
+		"Do not add commentary, markdown, or code fences.",
+		"Output must be a single valid JSON object.",
+		"Interpret the input in one of three modes.",
+		"Mode 1: generic topic or category. Generate a normal trivia question about that topic with one correct answer and three plausible wrong answers.",
+		"Mode 2: stated fact. Rewrite the fact into a natural player-facing question, preserve the fact exactly as the correct answer, keep any named person or subject in the question text, and generate three plausible wrong answers in the same category.",
+		"Mode 3: personal question shell. If the input asks for a personal question but does not provide the fact, generate a clean question shell, do not invent any personal fact, and set correct_answer to exactly [fill in correct answer].",
+		"Never drift into adjacent trivia when the input is clearly about a specific person or stated fact.",
+		"Never fabricate personal facts.",
+		"Preserve names exactly and use natural possessive grammar.",
+		"If the input is noisy or misspelled, infer the likely intent conservatively without inventing facts.",
+		"If multiple facts are present, choose one clear fact and make one strong question from it.",
+		"Wrong answers should be similar in type, tone, and specificity to the correct answer.",
+		"Prefer simple, natural wording over embellished wording.",
+	}, " ")
+
+	cleanedTopic := cleanTopic(topic)
+	if cleanedTopic == "" {
+		return systemPrompt, "Now generate a question from this input:\ngeneral trivia"
+	}
+
+	return systemPrompt, fmt.Sprintf("Now generate a question from this input:\n%s", cleanedTopic)
 }
 
 func generateLocalQuestion(lobbyRating int16, topic string) generatedQuestion {
@@ -332,8 +403,8 @@ func validateGeneratedQuestion(q generatedQuestion) error {
 func cleanTopic(topic string) string {
 	cleaned := strings.TrimSpace(topic)
 	cleaned = regexp.MustCompile(`\s+`).ReplaceAllString(cleaned, " ")
-	if len(cleaned) > 60 {
-		cleaned = cleaned[:60]
+	if len(cleaned) > maxAssistInputLen {
+		cleaned = cleaned[:maxAssistInputLen]
 	}
 	return cleaned
 }

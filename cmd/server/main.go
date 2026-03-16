@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,9 +20,13 @@ import (
 )
 
 func main() {
-	// Load .env.local in development
-	if err := godotenv.Load(".env.local"); err != nil {
-		log.Println("No .env.local file found, using environment variables")
+	// Overload keeps local dev startup consistent even when the parent process already exported env vars.
+	if err := godotenv.Overload(".env.local"); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			log.Println("No .env.local file found, using environment variables")
+		} else {
+			log.Printf("Unable to load .env.local: %v", err)
+		}
 	}
 
 	// Compute CSS hash for cache busting

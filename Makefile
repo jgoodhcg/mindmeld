@@ -1,20 +1,19 @@
 .PHONY: dev build run generate templ sqlc css clean db-up db-down migrate migrate-down migrate-status fmt lint cluster-content-validate cluster-content-import e2e-install e2e-screenshot e2e-flow e2e-multiplayer e2e-test
 
-# Load environment variables
-include .env.local
-export
+# Source .env.local with shell semantics so `make` matches `source .env.local && ...`.
+WITH_DOTENV = if [ -f .env.local ]; then set -a; . ./.env.local; set +a; fi;
 
 # Development with live reload
 dev:
-	go run github.com/air-verse/air
+	@$(WITH_DOTENV) go run github.com/air-verse/air
 
 # Build production binary
 build: generate css
-	go build -o bin/server ./cmd/server
+	@$(WITH_DOTENV) go build -o bin/server ./cmd/server
 
 # Run the server directly
 run: generate css
-	go run ./cmd/server
+	@$(WITH_DOTENV) go run ./cmd/server
 
 # Generate all code (templ + sqlc)
 generate: templ sqlc
@@ -30,11 +29,11 @@ lint:
 
 # Validate cluster content library JSON without DB writes
 cluster-content-validate:
-	go run ./cmd/cluster-content validate -file content/cluster/library.v1.json
+	@$(WITH_DOTENV) go run ./cmd/cluster-content validate -file content/cluster/library.v1.json
 
 # Import cluster content library into database
 cluster-content-import:
-	go run ./cmd/cluster-content import -file content/cluster/library.v1.json
+	@$(WITH_DOTENV) go run ./cmd/cluster-content import -file content/cluster/library.v1.json
 
 # Generate templ templates
 templ:
@@ -58,15 +57,15 @@ db-down:
 
 # Run migrations
 migrate:
-	go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "$(DATABASE_URL)" up
+	@$(WITH_DOTENV) go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "$${DATABASE_URL}" up
 
 # Rollback last migration
 migrate-down:
-	go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "$(DATABASE_URL)" down
+	@$(WITH_DOTENV) go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "$${DATABASE_URL}" down
 
 # Migration status
 migrate-status:
-	go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "$(DATABASE_URL)" status
+	@$(WITH_DOTENV) go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "$${DATABASE_URL}" status
 
 # Clean build artifacts
 clean:

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/jgoodhcg/mindmeld/internal/contentrating"
@@ -38,6 +39,10 @@ func TestGenerateQuestionWithProviderUsesOpenRouterCompatibleRequest(t *testing.
 	var seenReferer string
 	var seenTitle string
 	var seenModel string
+	var seenSystemPrompt string
+	var seenUserPrompt string
+	var seenResponseFormat map[string]interface{}
+	var seenPlugins []map[string]string
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		seenAuthorization = r.Header.Get("Authorization")
@@ -49,6 +54,13 @@ func TestGenerateQuestionWithProviderUsesOpenRouterCompatibleRequest(t *testing.
 			t.Fatalf("decode request: %v", err)
 		}
 		seenModel = req.Model
+		if len(req.Messages) != 2 {
+			t.Fatalf("expected 2 messages, got %d", len(req.Messages))
+		}
+		seenSystemPrompt = req.Messages[0].Content
+		seenUserPrompt = req.Messages[1].Content
+		seenResponseFormat = req.ResponseFormat
+		seenPlugins = req.Plugins
 
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(chatCompletionResponse{
@@ -98,5 +110,46 @@ func TestGenerateQuestionWithProviderUsesOpenRouterCompatibleRequest(t *testing.
 	}
 	if seenModel != "openai/gpt-5.1-chat" {
 		t.Fatalf("expected model to be forwarded, got %q", seenModel)
+	}
+	if seenResponseFormat["type"] != "json_schema" {
+		t.Fatalf("expected json_schema response format, got %#v", seenResponseFormat)
+	}
+	if len(seenPlugins) != 1 || seenPlugins[0]["id"] != "response-healing" {
+		t.Fatalf("expected response-healing plugin, got %#v", seenPlugins)
+	}
+	if !strings.Contains(seenSystemPrompt, "Mode 2: stated fact.") {
+		t.Fatalf("expected stated-fact guidance in system prompt, got %q", seenSystemPrompt)
+	}
+	if !strings.Contains(seenSystemPrompt, "Never fabricate personal facts.") {
+		t.Fatalf("expected anti-fabrication guidance in system prompt, got %q", seenSystemPrompt)
+	}
+	if seenUserPrompt != "Now generate a question from this input:\ngeography" {
+		t.Fatalf("unexpected user prompt %q", seenUserPrompt)
+	}
+}
+
+func TestBuildQuestionAssistPromptsForPersonalShell(t *testing.T) {
+	systemPrompt, userPrompt := buildQuestionAssistPrompts(contentrating.Work, "A personal question about Justin that I can answer")
+
+	if !strings.Contains(systemPrompt, "Mode 3: personal question shell.") {
+		t.Fatalf("expected personal-shell guidance in system prompt, got %q", systemPrompt)
+	}
+	if !strings.Contains(systemPrompt, "set correct_answer to exactly [fill in correct answer].") {
+		t.Fatalf("expected placeholder guidance in system prompt, got %q", systemPrompt)
+	}
+	if userPrompt != "Now generate a question from this input:\nA personal question about Justin that I can answer" {
+		t.Fatalf("unexpected user prompt %q", userPrompt)
+	}
+}
+
+func TestCleanTopicAllowsLongerPromptInputs(t *testing.T) {
+	input := "Make a personal multiple-choice question from this fact: Jess' go-to karaoke song is Mr. Brightside and keep Jess in the question text."
+	cleaned := cleanTopic(input)
+
+	if cleaned != input {
+		t.Fatalf("expected topic to remain intact, got %q", cleaned)
+	}
+	if len(cleaned) > maxAssistInputLen {
+		t.Fatalf("expected cleaned topic to be at most %d chars, got %d", maxAssistInputLen, len(cleaned))
 	}
 }
