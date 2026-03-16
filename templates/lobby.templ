@@ -10,7 +10,7 @@ templ LobbyRoom(lobby db.Lobby, players []lobbyview.Player, isHost bool, current
 		<div id="lobby-room" class="max-w-4xl mx-auto space-y-6" data-current-player-id={ currentPlayerID }>
 			<!-- Platform brand -->
 			<div class="text-center pt-2">
-				<span class="text-text-muted text-xs tracking-widest uppercase"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">{ gameLabel(lobby.GameType) }</span></span>
+				<a href="/" class="text-text-muted text-xs tracking-widest uppercase transition-colors hover:text-text"><span class="font-display">Mindmeld</span> / <span class="font-mono font-bold">{ gameLabel(lobby.GameType) }</span></a>
 			</div>
 			<!-- Header -->
 			<div class="bg-elevated border border-border rounded p-5 sm:p-6">

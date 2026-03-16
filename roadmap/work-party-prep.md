@@ -42,7 +42,18 @@ depends-on: []
     - Pre-built themed decks (work essentials, product/tech, pop culture, quick brain boost, world snapshot).
     - Pack-first modal in question submission flow (players can still write their own).
     - Pack/template visibility filtered by lobby content rating.
+    - Submitted pack questions are already marked used per lobby so they do not reappear after selection is finalized.
     - Solves friction immediately — no API cost, no latency, works offline.
+
+- [ ] **Question pack collision control**:
+    - Decide whether duplicate pack picks within the same round are acceptable or should be actively discouraged before submission.
+    - Current gap: two players can still choose the same pack question concurrently before either one submits.
+    - Evaluate lightweight mitigation options:
+      - Randomize pack ordering per player.
+      - Show a rotating subset instead of the full pack.
+      - Reserve / temporarily hide a template once a player selects it.
+      - Assign non-overlapping suggestions per round or per player.
+    - Prefer solutions that reduce collisions without making the flow feel restrictive or confusing.
 
 - [x] **AI Question Assist** (optional layer on top of packs):
     - "Generate Question" button on the submit form.
@@ -59,7 +70,7 @@ depends-on: []
     - [x] Fix keyboard flow so tabbing from the AI topic input reaches the generate button reliably.
     - [x] Visually pair "Question pack" and "AI draft" so players can immediately see one is curated/manual and the other is AI-assisted.
     - [x] Add clearer prompt-writing guidance and examples for the AI draft input.
-    - Improve prompt handling for personal/familiarity prompts so named subjects are preserved (`Justin` stays `Justin`) and the system can generate question shells with placeholders instead of inventing fake facts.
+    - [x] Improve prompt handling for personal/familiarity prompts so named subjects are preserved (`Justin` stays `Justin`) and the system can generate question shells with placeholders instead of inventing fake facts.
     - Upgrade distractor generation so personal questions yield convincing alternatives when the user already knows the correct answer.
     - Allow iterative AI refinement on a drafted trivia question instead of forcing a full regenerate from scratch each time.
     - Save authored or AI-assisted trivia questions into a personal question bank so players can reuse and adapt them in future games.
@@ -101,6 +112,11 @@ depends-on: []
 
 - [x] **Trivia: show "unanswered" bar** in the revealed results distribution.
 - [x] **Audience control styling pass**: radio options and lobby audience controls aligned with existing UI visual language.
+- [x] **Home navigation affordance**: make the top-level `Mindmeld` branding clickable so players can return to the platform home page from lobby / join flows.
+- [ ] **Audience wording pass**:
+    - Replace shared `Polite mode` / `Prompt filter` copy with language that reads more clearly in both Trivia and Cluster.
+    - Proposed direction: position the toggle as an audience-safety setting, e.g. `Polite, professional, and safe for all audiences`.
+    - Keep one shared control if possible, since the same content rating already affects both Cluster prompts and Trivia packs / AI-generated trivia.
 - [x] **Baseline analytics wiring**: Plausible script loaded in shared layout for site-wide pageview capture.
 - [x] **Game instructions** ([game-instructions.md](./game-instructions.md)): pre-game rules screen.
 - [x] **Accessibility baseline pass**: added skip link/main landmark, AI assist live status messaging, and keyboard/screen-reader-friendly question-pack dialog behavior.

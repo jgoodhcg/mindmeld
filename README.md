@@ -83,6 +83,28 @@ mindmeld/
 | `DATABASE_URL` | PostgreSQL connection string |
 | `PORT` | Server port (default: 8080) |
 
+### Optional AI Question Assist
+
+Trivia question generation can use OpenRouter when configured. If these vars are not set, the app falls back to the local question generator.
+
+| Variable | Description |
+|----------|-------------|
+| `OPEN_ROUTER_KEY` | Required for live AI question generation via OpenRouter |
+| `AI_QUESTION_ASSIST_PROVIDER` | Optional explicit provider selector. Set to `openrouter` to force OpenRouter |
+| `OPEN_ROUTER_MODEL` | Optional model override. Current default is `google/gemini-3.1-pro-preview` |
+| `OPEN_ROUTER_HTTP_REFERER` | Optional but recommended app/site URL sent to OpenRouter |
+| `OPEN_ROUTER_TITLE` | Optional display name sent to OpenRouter. Defaults to `Mindmeld` |
+
+Local example:
+
+```bash
+AI_QUESTION_ASSIST_PROVIDER=openrouter
+OPEN_ROUTER_KEY=your-openrouter-key
+OPEN_ROUTER_MODEL=google/gemini-3.1-pro-preview
+OPEN_ROUTER_HTTP_REFERER=http://localhost:3000
+OPEN_ROUTER_TITLE=Mindmeld
+```
+
 ## Deployment
 
 ### Digital Ocean App Platform
@@ -105,7 +127,15 @@ docker run -p 8080:8080 -e DATABASE_URL="postgres://mindmeld:mindmeld@host.docke
 2. DO auto-detects the Dockerfile
 3. Add a managed Postgres database
 4. Set `DATABASE_URL` env var (auto-injected from managed Postgres)
-5. HTTP Port: `8080`
+5. If you want live AI trivia generation in production, set:
+   - `OPEN_ROUTER_KEY`
+   - `AI_QUESTION_ASSIST_PROVIDER=openrouter` (optional, but explicit)
+   - `OPEN_ROUTER_MODEL=google/gemini-3.1-pro-preview` if you want to pin the current default
+   - `OPEN_ROUTER_HTTP_REFERER=https://your-production-domain`
+   - `OPEN_ROUTER_TITLE=Mindmeld`
+6. HTTP Port: `8080`
+
+If `OPEN_ROUTER_KEY` is not configured in production, trivia AI assist still works through the built-in local fallback generator.
 
 ### Migrations:
 
