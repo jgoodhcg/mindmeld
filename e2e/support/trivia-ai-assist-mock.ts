@@ -16,7 +16,10 @@ export type TriviaAiAssistMockState = {
   callCount: number;
 };
 
-export async function installTriviaAiAssistMock(page: Page): Promise<TriviaAiAssistMockState> {
+export async function installTriviaAiAssistMock(
+  page: Page,
+  options?: { delayMs?: number },
+): Promise<TriviaAiAssistMockState> {
   const state: TriviaAiAssistMockState = {
     lastTopic: '',
     callCount: 0,
@@ -27,6 +30,9 @@ export async function installTriviaAiAssistMock(page: Page): Promise<TriviaAiAss
     const body = route.request().postData() ?? '';
     const params = new URLSearchParams(body);
     state.lastTopic = params.get('topic') ?? '';
+    if (options?.delayMs) {
+      await new Promise((resolve) => setTimeout(resolve, options.delayMs));
+    }
 
     await route.fulfill({
       status: 200,

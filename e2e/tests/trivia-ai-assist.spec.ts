@@ -30,8 +30,8 @@ async function startTriviaGame(page: Page) {
 }
 
 test.describe('Trivia AI Assist', () => {
-  test('uses a deterministic mocked AI response to populate the submit form', async ({ page }) => {
-    const aiAssistMock = await installTriviaAiAssistMock(page);
+  test('shows loading feedback, keeps keyboard focus usable, and populates the submit form', async ({ page }) => {
+    const aiAssistMock = await installTriviaAiAssistMock(page, { delayMs: 400 });
 
     await createTriviaLobby(page);
     await startTriviaGame(page);
@@ -41,17 +41,27 @@ test.describe('Trivia AI Assist', () => {
     await assistSummary.click();
 
     await page.fill('#assist_topic', triviaAiAssistMockTopic);
+    await page.locator('#assist_topic').focus();
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#assist_generate_button')).toBeFocused();
 
-    await Promise.all([
-      page.waitForResponse((response) => response.url().includes('/trivia/generate-question') && response.request().method() === 'POST'),
-      page.click('#assist_generate_button'),
-    ]);
+    const responsePromise = page.waitForResponse((response) => response.url().includes('/trivia/generate-question') && response.request().method() === 'POST');
+    await page.keyboard.press('Enter');
+
+    await expect(page.locator('#assist_generate_button')).toBeDisabled();
+    await expect(page.locator('#assist_generate_button_busy')).toBeVisible();
+    await expect(page.locator('#assist_status_spinner')).toBeVisible();
+    await expect(page.locator('#assist_status')).toContainText('Generating draft...');
+
+    await responsePromise;
 
     await expect(page.locator('#question_text')).toHaveValue(triviaAiAssistMockResponse.question_text);
     await expect(page.locator('#correct_answer')).toHaveValue(triviaAiAssistMockResponse.correct_answer);
     await expect(page.locator('#wrong_answer_1')).toHaveValue(triviaAiAssistMockResponse.wrong_answer_1);
     await expect(page.locator('#wrong_answer_2')).toHaveValue(triviaAiAssistMockResponse.wrong_answer_2);
     await expect(page.locator('#wrong_answer_3')).toHaveValue(triviaAiAssistMockResponse.wrong_answer_3);
+    await expect(page.locator('#assist_generate_button')).toBeEnabled();
+    await expect(page.locator('#assist_generate_button_busy')).toBeHidden();
     await expect(page.locator('#assist_status')).toContainText('Draft generated from AI model.');
 
     expect(aiAssistMock.callCount).toBe(1);

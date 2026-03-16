@@ -78,19 +78,27 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 							id="assist_topic"
 							placeholder="Optional topic (e.g., history, movies, tech)"
 							class="w-full bg-base border border-border rounded px-4 py-2 text-text placeholder-text-muted focus:outline-none focus:border-cyan transition-colors"
+							onkeydown="handleAssistTopicKeydown(event)"
 						/>
 						<button
 							type="button"
 							id="assist_generate_button"
 							data-lobby-code={ lobby.Code }
 							aria-describedby="assist_status"
-							class="bg-base hover:bg-border border border-border text-text px-4 py-2 rounded font-mono font-bold tracking-wide transition-colors disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
+							class="inline-flex items-center justify-center gap-2 bg-base hover:bg-border border border-border text-text px-4 py-2 rounded font-mono font-bold tracking-wide transition-colors disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
 							onclick="generateQuestionAssistFromButton(this)"
 						>
-							GENERATE DRAFT
+							<span id="assist_generate_button_label">GENERATE DRAFT</span>
+							<span id="assist_generate_button_busy" class="hidden items-center gap-2">
+								<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+								WORKING...
+							</span>
 						</button>
 					</div>
-					<p id="assist_status" aria-live="polite" class="text-xs text-text-muted min-h-4"></p>
+					<div class="min-h-4 flex items-center gap-2">
+						<span id="assist_status_spinner" class="hidden h-3.5 w-3.5 animate-spin rounded-full border-2 border-cyan/60 border-t-transparent" aria-hidden="true"></span>
+						<p id="assist_status" aria-live="polite" class="text-xs text-text-muted"></p>
+					</div>
 				</div>
 			</details>
 			<button type="submit" class="w-full bg-amber hover:bg-amber/80 text-base py-3 rounded font-mono font-bold tracking-wide transition-colors mt-6">
@@ -191,11 +199,15 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 		}
 		function updateAssistStatus(message, tone) {
 			const status = document.getElementById('assist_status');
+			const spinner = document.getElementById('assist_status_spinner');
 			if (!status) {
 				return;
 			}
 			status.textContent = message || '';
 			status.classList.remove('text-text-muted', 'text-danger', 'text-success');
+			if (spinner) {
+				spinner.classList.toggle('hidden', tone !== 'loading');
+			}
 			if (tone === 'error') {
 				status.classList.add('text-danger');
 			} else if (tone === 'success') {
@@ -203,6 +215,38 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 			} else {
 				status.classList.add('text-text-muted');
 			}
+		}
+		function setAssistLoadingState(isLoading) {
+			const button = document.getElementById('assist_generate_button');
+			const topicInput = document.getElementById('assist_topic');
+			const label = document.getElementById('assist_generate_button_label');
+			const busy = document.getElementById('assist_generate_button_busy');
+			if (button) {
+				button.disabled = isLoading;
+				button.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+			}
+			if (topicInput) {
+				topicInput.disabled = isLoading;
+				topicInput.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+			}
+			if (label) {
+				label.classList.toggle('hidden', isLoading);
+			}
+			if (busy) {
+				busy.classList.toggle('hidden', !isLoading);
+				busy.classList.toggle('inline-flex', isLoading);
+			}
+		}
+		function handleAssistTopicKeydown(event) {
+			if (!event || event.key !== 'Tab' || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+				return;
+			}
+			const button = document.getElementById('assist_generate_button');
+			if (!button || button.disabled) {
+				return;
+			}
+			event.preventDefault();
+			button.focus();
 		}
 		function fillGeneratedQuestion(payload) {
 			document.getElementById('question_text').value = payload.question_text || '';
@@ -229,8 +273,8 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 			if (!button || !topicInput) {
 				return;
 			}
-			button.disabled = true;
-			updateAssistStatus('Generating question...', 'default');
+			setAssistLoadingState(true);
+			updateAssistStatus('Generating draft...', 'loading');
 			try {
 				const body = new URLSearchParams();
 				body.set('topic', topicInput.value || '');
@@ -251,7 +295,7 @@ templ SubmitQuestion(lobby db.Lobby, round db.TriviaRound) {
 			} catch (error) {
 				updateAssistStatus('Unable to generate right now. Try again or use a question pack.', 'error');
 			} finally {
-				button.disabled = false;
+				setAssistLoadingState(false);
 			}
 		}
 		function openTemplatesModal() {
