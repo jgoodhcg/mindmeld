@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-16
+updated: 2026-03-17
 effort: L
 depends-on: []
 ---
@@ -113,6 +113,11 @@ depends-on: []
 - [x] **Trivia: show "unanswered" bar** in the revealed results distribution.
 - [x] **Audience control styling pass**: radio options and lobby audience controls aligned with existing UI visual language.
 - [x] **Home navigation affordance**: make the top-level `Mindmeld` branding clickable so players can return to the platform home page from lobby / join flows.
+- [ ] **Intentional host handoff**:
+    - Add a shared lobby-level control so the current host can explicitly pass host to another connected player.
+    - Scope the first version to the waiting lobby and between-round moments, not mid-question interaction.
+    - Keep automatic fallback on disconnect as the safety net; manual handoff is for intentional facilitation changes, not failure recovery.
+    - Validate both games with e2e coverage for auto-fallback and, when shipped, manual transfer.
 - [ ] **Audience wording pass**:
     - Replace shared `Polite mode` / `Prompt filter` copy with language that reads more clearly in both Trivia and Cluster.
     - Proposed direction: position the toggle as an audience-safety setting, e.g. `Polite, professional, and safe for all audiences`.

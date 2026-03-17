@@ -7,6 +7,8 @@ import {
   createPlayerSession,
   disconnectGracePeriodMs,
   disconnectPlayer,
+  hostBadge,
+  expectHostPlayer,
   expectLobbyPlayerCount,
   expectPlayerState,
   joinLobby,
@@ -251,6 +253,70 @@ test.describe('Trivia Resilience', () => {
       }
 
       await waitForRevealedResults(connectedPages(sessions), roundThreeQuestion);
+    } finally {
+      await safeCloseSessions(sessions);
+    }
+  });
+
+  test('transfers host after grace expiry and lets the fallback host advance trivia', async ({
+    browser,
+  }) => {
+    test.setTimeout(Math.max(150_000, disconnectGracePeriodMs() * 3));
+
+    const sessions = await Promise.all(
+      ['Host', 'Player2', 'Player3'].map((name) => createPlayerSession(browser, name)),
+    );
+
+    const [host, player2, player3] = sessions;
+    const hostPage = requirePage(host);
+
+    try {
+      const code = await createLobby(host, '/trivia', `Trivia Host Fallback ${Date.now()}`);
+
+      await joinLobby(player2, code);
+      await joinLobby(player3, code);
+
+      await clickAndWaitForIdle(hostPage, 'form[action$="/trivia/start"] button:has-text("START GAME")');
+
+      for (const session of sessions) {
+        const question = questionByAuthor.get(session.name);
+        if (!question) {
+          throw new Error(`missing trivia question for ${session.name}`);
+        }
+        await submitTriviaQuestion(session, question);
+      }
+
+      await clickAndWaitForIdle(hostPage, 'form[action$="/trivia/advance"] button:has-text("START ROUND")');
+
+      const player2Page = requirePage(player2);
+      const player3Page = requirePage(player3);
+      await waitForQuestionVisible([hostPage, player2Page, player3Page]);
+
+      const currentQuestion = await findVisibleQuestion(hostPage);
+      for (const session of answerersForQuestion(sessions, currentQuestion)) {
+        await answerTriviaQuestion(session, currentQuestion.wrongs[0]);
+      }
+      await waitForRevealedResults([hostPage, player2Page, player3Page], currentQuestion);
+
+      await disconnectPlayer(host);
+      await expectPlayerState(player2Page, host.name, 'reconnecting');
+      await expectPlayerState(player2Page, host.name, 'disconnected');
+      await expectHostPlayer(player2Page, player2.name);
+      await expectHostPlayer(player3Page, player2.name);
+
+      await expect(
+        player2Page.locator('form[action$="/trivia/next-question"] button:has-text("NEXT QUESTION")'),
+      ).toBeVisible({ timeout: 10_000 });
+      await clickAndWaitForIdle(
+        player2Page,
+        'form[action$="/trivia/next-question"] button:has-text("NEXT QUESTION")',
+      );
+
+      await waitForQuestionVisible([player2Page, player3Page]);
+
+      const reconnectedHost = await reconnectPlayer(host, code);
+      await expectHostPlayer(reconnectedHost, player2.name);
+      await expect(hostBadge(reconnectedHost, host.name)).not.toBeVisible();
     } finally {
       await safeCloseSessions(sessions);
     }

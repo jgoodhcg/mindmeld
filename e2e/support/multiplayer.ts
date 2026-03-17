@@ -9,6 +9,10 @@ export type PlayerSession = {
 const viewport = { width: 1280, height: 800 };
 const defaultDisconnectGracePeriodMs = 25_000;
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export async function createPlayerSession(browser: Browser, name: string): Promise<PlayerSession> {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
@@ -92,7 +96,26 @@ export async function expectLobbyPlayerCount(page: Page, count: number): Promise
 }
 
 export function playerRow(page: Page, playerName: string) {
-  return page.locator('#player-list li').filter({ hasText: playerName }).first();
+  return page
+    .locator('#player-list li')
+    .filter({
+      has: page.locator('span.text-text', {
+        hasText: new RegExp(`^${escapeRegex(playerName)}$`),
+      }),
+    })
+    .first();
+}
+
+export function hostBadge(page: Page, playerName: string) {
+  return playerRow(page, playerName).locator('span.text-xs').filter({ hasText: 'Host' }).first();
+}
+
+export async function expectHostPlayer(
+  page: Page,
+  playerName: string,
+  timeout = disconnectGracePeriodMs() + 10_000,
+): Promise<void> {
+  await expect(hostBadge(page, playerName)).toBeVisible({ timeout });
 }
 
 export async function expectPlayerState(

@@ -5,7 +5,7 @@ description: "Core trivia game MVP with real-time play and polish tasks."
 tags: [area/game, type/feature, tech/websocket]
 priority: medium
 created: 2025-12-14
-updated: 2026-03-10
+updated: 2026-03-17
 effort: L
 depends-on: []
 ---
@@ -41,6 +41,9 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 
 - [x] **Host transfer on disconnect**: If host leaves mid-game, automatically transfer host to the earliest still-connected player after the reconnect grace window
 - [ ] **Manual host transfer**: Allow host to transfer host role to another player via UI
+  - Implement as a shared lobby capability so Trivia and Cluster use the same handoff rules.
+  - First release should allow transfer while waiting and between rounds; avoid mid-question transfer until the control model is clearer.
+  - Limit choices to currently connected players and confirm the handoff before applying it.
 
 ---
 

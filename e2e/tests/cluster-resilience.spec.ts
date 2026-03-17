@@ -7,6 +7,8 @@ import {
   createPlayerSession,
   disconnectGracePeriodMs,
   disconnectPlayer,
+  hostBadge,
+  expectHostPlayer,
   expectLobbyPlayerCount,
   expectPlayerState,
   joinLobby,
@@ -176,6 +178,59 @@ test.describe('Cluster Resilience', () => {
 
       await submitCoordinate(player4, 3);
       await expect(hostPage.getByText(/1\s*\/\s*6 submitted/i)).toBeVisible({ timeout: 10_000 });
+    } finally {
+      await safeCloseSessions(sessions);
+    }
+  });
+
+  test('transfers host after grace expiry and lets the fallback host continue the session', async ({
+    browser,
+  }) => {
+    test.setTimeout(Math.max(120_000, disconnectGracePeriodMs() * 3));
+
+    const sessions = await Promise.all(
+      ['Host', 'Player2', 'Player3'].map((name) => createPlayerSession(browser, name)),
+    );
+
+    const [host, player2, player3] = sessions;
+
+    try {
+      const code = await createLobby(host, '/cluster', `Cluster Host Fallback ${Date.now()}`);
+
+      await joinLobby(player2, code);
+      await joinLobby(player3, code);
+
+      const hostPage = requirePage(host);
+      const player2Page = requirePage(player2);
+      const player3Page = requirePage(player3);
+
+      await clickAndWaitForIdle(
+        hostPage,
+        'form[action$="/cluster/start"] button:has-text("START CLUSTER")',
+      );
+      await waitForRound([hostPage, player2Page, player3Page], 1);
+
+      await submitCoordinate(host, 1);
+      await submitCoordinate(player2, 1);
+      await submitCoordinate(player3, 1);
+      await waitForReveal([hostPage, player2Page, player3Page]);
+
+      await disconnectPlayer(host);
+      await expectPlayerState(player2Page, host.name, 'reconnecting');
+      await expectPlayerState(player2Page, host.name, 'disconnected');
+      await expectHostPlayer(player2Page, player2.name);
+      await expectHostPlayer(player3Page, player2.name);
+
+      await expect(player2Page.locator('form[action$="/cluster/next"] button')).toBeVisible({
+        timeout: 10_000,
+      });
+      await clickAndWaitForIdle(player2Page, 'form[action$="/cluster/next"] button');
+
+      await waitForRound([player2Page, player3Page], 2);
+
+      const reconnectedHost = await reconnectPlayer(host, code);
+      await expectHostPlayer(reconnectedHost, player2.name);
+      await expect(hostBadge(reconnectedHost, host.name)).not.toBeVisible();
     } finally {
       await safeCloseSessions(sessions);
     }
