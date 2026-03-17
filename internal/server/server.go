@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -70,4 +71,8 @@ func NewServer(pool *pgxpool.Pool) *Server {
 
 func (s *Server) Router() *chi.Mux {
 	return s.router
+}
+
+func (s *Server) SetDisconnectGracePeriod(gracePeriod time.Duration) {
+	s.hub.SetDisconnectGracePeriod(gracePeriod)
 }

@@ -8,6 +8,7 @@
     "flow": "tsx scripts/flow.ts",
     "multiplayer": "tsx scripts/multiplayer-round.ts",
     "test:cluster": "playwright test tests/cluster.spec.ts",
+    "test:resilience": "playwright test tests/cluster-resilience.spec.ts tests/trivia-resilience.spec.ts",
     "test": "playwright test",
     "test:headed": "playwright test --headed"
   },

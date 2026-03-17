@@ -60,6 +60,14 @@ func main() {
 
 	// Create server
 	srvInstance := server.NewServer(pool)
+	if rawGracePeriod := os.Getenv("DISCONNECT_GRACE_PERIOD"); rawGracePeriod != "" {
+		gracePeriod, err := time.ParseDuration(rawGracePeriod)
+		if err != nil {
+			log.Fatalf("Invalid DISCONNECT_GRACE_PERIOD %q: %v", rawGracePeriod, err)
+		}
+		srvInstance.SetDisconnectGracePeriod(gracePeriod)
+		log.Printf("Disconnect grace period override: %s", gracePeriod)
+	}
 
 	// Create http server
 	srv := &http.Server{
