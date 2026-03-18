@@ -16,6 +16,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/internal/games"
+	"github.com/jgoodhcg/mindmeld/internal/lobbyview"
 	"github.com/jgoodhcg/mindmeld/internal/ws"
 	clustertmpl "github.com/jgoodhcg/mindmeld/templates/cluster"
 )
@@ -51,23 +52,29 @@ func (g *ClusterGame) Info() games.GameInfo {
 // RenderContent builds Cluster content from lobby state.
 func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players []db.GetLobbyPlayersRow, player db.Player, isHost bool) templ.Component {
 	var (
-		hasRound       bool
-		roundNumber    int32
-		prompt         clustertmpl.PromptAxisView
-		hasSubmitted   bool
-		submittedCount int
-		expectedCount  int
-		revealed       bool
-		dots           []clustertmpl.DotView
-		centroidX      float64
-		centroidY      float64
-		standings      []clustertmpl.StandingView
-		winners        []string
-		outliers       []string
-		discussionHint string
+		hasRound            bool
+		roundNumber         int32
+		prompt              clustertmpl.PromptAxisView
+		hasSubmitted        bool
+		submittedCount      int
+		expectedCount       int
+		revealed            bool
+		dots                []clustertmpl.DotView
+		centroidX           float64
+		centroidY           float64
+		standings           []clustertmpl.StandingView
+		winners             []string
+		outliers            []string
+		discussionHint      string
+		hostTransferOptions []lobbyview.HostTransferOption
 	)
 	now := time.Now()
 	expectedCount = g.countActivePlayers(lobby.Code, players, now)
+	if isHost {
+		hostTransferOptions = lobbyview.BuildHostTransferOptions(players, player.ID.String(), func(playerID string) bool {
+			return g.hub.Presence(lobby.Code, playerID).IsConnected()
+		})
+	}
 
 	remainingPairs, err := g.countRemainingPromptAxisSets(ctx, g.dbPool, lobby.ID, lobby.ContentRating)
 	if err != nil {
@@ -136,6 +143,7 @@ func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players
 		expectedCount,
 		hasSubmitted,
 		revealed,
+		hostTransferOptions,
 		dots,
 		centroidX,
 		centroidY,

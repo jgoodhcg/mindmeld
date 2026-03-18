@@ -15,6 +15,7 @@ import {
   reconnectPlayer,
   requirePage,
   safeCloseSessions,
+  transferHost,
   type PlayerSession,
 } from '../support/multiplayer.js';
 
@@ -317,6 +318,72 @@ test.describe('Trivia Resilience', () => {
       const reconnectedHost = await reconnectPlayer(host, code);
       await expectHostPlayer(reconnectedHost, player2.name);
       await expect(hostBadge(reconnectedHost, host.name)).not.toBeVisible();
+    } finally {
+      await safeCloseSessions(sessions);
+    }
+  });
+
+  test('allows the host to hand off control between revealed trivia questions', async ({
+    browser,
+  }) => {
+    test.setTimeout(120_000);
+
+    const sessions = await Promise.all(
+      ['Host', 'Player2', 'Player3'].map((name) => createPlayerSession(browser, name)),
+    );
+
+    const [host, player2, player3] = sessions;
+    const hostPage = requirePage(host);
+
+    try {
+      const code = await createLobby(host, '/trivia', `Trivia Manual Transfer ${Date.now()}`);
+
+      await joinLobby(player2, code);
+      await joinLobby(player3, code);
+
+      await clickAndWaitForIdle(hostPage, 'form[action$="/trivia/start"] button:has-text("START GAME")');
+
+      for (const session of sessions) {
+        const question = questionByAuthor.get(session.name);
+        if (!question) {
+          throw new Error(`missing trivia question for ${session.name}`);
+        }
+        await submitTriviaQuestion(session, question);
+      }
+
+      await clickAndWaitForIdle(hostPage, 'form[action$="/trivia/advance"] button:has-text("START ROUND")');
+
+      const player2Page = requirePage(player2);
+      const player3Page = requirePage(player3);
+      await waitForQuestionVisible([hostPage, player2Page, player3Page]);
+
+      const currentQuestion = await findVisibleQuestion(hostPage);
+      for (const session of answerersForQuestion(sessions, currentQuestion)) {
+        await answerTriviaQuestion(session, currentQuestion.wrongs[0]);
+      }
+      await waitForRevealedResults([hostPage, player2Page, player3Page], currentQuestion);
+
+      await expect(
+        hostPage.locator('form[action$="/host-transfer"] select[name="target_player_id"]'),
+      ).toBeVisible({ timeout: 10_000 });
+      await transferHost(hostPage, player2.name);
+
+      await expectHostPlayer(hostPage, player2.name);
+      await expectHostPlayer(player2Page, player2.name);
+      await expectHostPlayer(player3Page, player2.name);
+
+      await expect(
+        hostPage.locator('form[action$="/trivia/next-question"] button:has-text("NEXT QUESTION")'),
+      ).not.toBeVisible();
+      await expect(
+        player2Page.locator('form[action$="/trivia/next-question"] button:has-text("NEXT QUESTION")'),
+      ).toBeVisible({ timeout: 10_000 });
+
+      await clickAndWaitForIdle(
+        player2Page,
+        'form[action$="/trivia/next-question"] button:has-text("NEXT QUESTION")',
+      );
+      await waitForQuestionVisible([hostPage, player2Page, player3Page]);
     } finally {
       await safeCloseSessions(sessions);
     }

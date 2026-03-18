@@ -46,7 +46,7 @@ func NewSubscriber(hub *Hub, queries *db.Queries, registry GameRegistry, dbPool 
 // HandleEvent processes an event and broadcasts appropriate updates.
 func (s *Subscriber) HandleEvent(ctx context.Context, event events.Event) {
 	switch event.Type {
-	case events.EventPlayerJoined, events.EventPlayerLeft:
+	case events.EventPlayerJoined, events.EventPlayerLeft, events.EventHostTransferred:
 		s.broadcastPlayerList(ctx, event.LobbyCode)
 		// Player changes can affect game-content state (e.g. minimum players/start button).
 		// Trigger a full content refresh in addition to the player-list OOB swap.

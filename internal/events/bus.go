@@ -75,6 +75,7 @@ const (
 	EventPlayerJoined      = "player.joined"
 	EventPlayerLeft        = "player.left"
 	EventPlayerPresence    = "player.presence"
+	EventHostTransferred   = "host.transferred"
 	EventGameStarted       = "game.started"
 	EventQuestionSubmitted = "question.submitted"
 	EventAnswerSubmitted   = "answer.submitted"
@@ -99,6 +100,12 @@ type PlayerPresencePayload struct {
 	PlayerID     string
 	Connected    bool
 	GraceExpired bool
+}
+
+// HostTransferredPayload is the payload for EventHostTransferred.
+type HostTransferredPayload struct {
+	FromPlayerID string
+	ToPlayerID   string
 }
 
 // GameStartedPayload is the payload for EventGameStarted.

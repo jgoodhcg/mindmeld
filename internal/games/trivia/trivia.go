@@ -12,6 +12,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/internal/games"
+	"github.com/jgoodhcg/mindmeld/internal/lobbyview"
 	"github.com/jgoodhcg/mindmeld/internal/ws"
 	triviatmpl "github.com/jgoodhcg/mindmeld/templates/trivia"
 )
@@ -59,7 +60,14 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 	var totalAnswers int
 	var totalExpectedAnswers int
 	var submissionExpectedCount int
+	var hostTransferOptions []lobbyview.HostTransferOption
 	now := time.Now()
+
+	if isHost {
+		hostTransferOptions = lobbyview.BuildHostTransferOptions(players, player.ID.String(), func(playerID string) bool {
+			return g.hub.Presence(lobby.Code, playerID).IsConnected()
+		})
+	}
 
 	if lobby.Phase == "playing" {
 		var err error
@@ -135,7 +143,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 		}
 	}
 
-	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, submissionExpectedCount, isHost, scoreboard, roundScoreboard, distribution, totalAnswers, totalExpectedAnswers)
+	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, submissionExpectedCount, isHost, hostTransferOptions, scoreboard, roundScoreboard, distribution, totalAnswers, totalExpectedAnswers)
 }
 
 func (g *TriviaGame) countActivePlayers(lobbyCode string, players []db.GetLobbyPlayersRow, now time.Time, excludedPlayerID string) int {

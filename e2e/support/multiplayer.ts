@@ -142,6 +142,14 @@ export async function clickAndWaitForIdle(page: Page, locator: string): Promise<
   await Promise.all([page.waitForLoadState('networkidle'), page.click(locator)]);
 }
 
+export async function transferHost(page: Page, playerName: string): Promise<void> {
+  await page.selectOption('form[action$="/host-transfer"] select[name="target_player_id"]', {
+    label: playerName,
+  });
+  page.once('dialog', (dialog) => dialog.accept());
+  await clickAndWaitForIdle(page, 'form[action$="/host-transfer"] button:has-text("TRANSFER HOST")');
+}
+
 export function disconnectGracePeriodMs(): number {
   const raw = process.env.DISCONNECT_GRACE_PERIOD;
   if (!raw) {

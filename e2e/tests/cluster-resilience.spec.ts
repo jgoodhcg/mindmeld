@@ -15,6 +15,7 @@ import {
   reconnectPlayer,
   requirePage,
   safeCloseSessions,
+  transferHost,
   type PlayerSession,
 } from '../support/multiplayer.js';
 
@@ -231,6 +232,52 @@ test.describe('Cluster Resilience', () => {
       const reconnectedHost = await reconnectPlayer(host, code);
       await expectHostPlayer(reconnectedHost, player2.name);
       await expect(hostBadge(reconnectedHost, host.name)).not.toBeVisible();
+    } finally {
+      await safeCloseSessions(sessions);
+    }
+  });
+
+  test('allows the host to hand off control before the session starts', async ({ browser }) => {
+    test.setTimeout(90_000);
+
+    const sessions = await Promise.all(
+      ['Host', 'Player2', 'Player3'].map((name) => createPlayerSession(browser, name)),
+    );
+
+    const [host, player2, player3] = sessions;
+
+    try {
+      const code = await createLobby(host, '/cluster', `Cluster Manual Transfer ${Date.now()}`);
+
+      await joinLobby(player2, code);
+      await joinLobby(player3, code);
+
+      const hostPage = requirePage(host);
+      const player2Page = requirePage(player2);
+      const player3Page = requirePage(player3);
+
+      await expect(
+        hostPage.locator('form[action$="/host-transfer"] select[name="target_player_id"]'),
+      ).toBeVisible({ timeout: 10_000 });
+
+      await transferHost(hostPage, player2.name);
+
+      await expectHostPlayer(hostPage, player2.name);
+      await expectHostPlayer(player2Page, player2.name);
+      await expectHostPlayer(player3Page, player2.name);
+
+      await expect(
+        hostPage.locator('form[action$="/cluster/start"] button:has-text("START CLUSTER")'),
+      ).not.toBeVisible();
+      await expect(
+        player2Page.locator('form[action$="/cluster/start"] button:has-text("START CLUSTER")'),
+      ).toBeVisible({ timeout: 10_000 });
+
+      await clickAndWaitForIdle(
+        player2Page,
+        'form[action$="/cluster/start"] button:has-text("START CLUSTER")',
+      );
+      await waitForRound([hostPage, player2Page, player3Page], 1);
     } finally {
       await safeCloseSessions(sessions);
     }

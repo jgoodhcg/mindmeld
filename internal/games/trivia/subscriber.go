@@ -46,53 +46,8 @@ func (g *TriviaGame) HandleEvent(ctx context.Context, event events.Event, hub *w
 }
 
 func (g *TriviaGame) broadcastGameStarted(ctx context.Context, lobbyCode string, payload events.GameStartedPayload, hub *ws.Hub, queries *db.Queries) {
-	lobby, err := queries.GetLobbyByCode(ctx, lobbyCode)
-	if err != nil {
-		log.Printf("[trivia-subscriber] Failed to get lobby %s: %v", lobbyCode, err)
-		return
-	}
-
-	round, err := queries.GetActiveRound(ctx, lobby.ID)
-	if err != nil {
-		log.Printf("[trivia-subscriber] Failed to get active round for lobby %s: %v", lobbyCode, err)
-		return
-	}
-
-	players, err := queries.GetLobbyPlayers(ctx, lobby.ID)
-	if err != nil {
-		log.Printf("[trivia-subscriber] Failed to get players for lobby %s: %v", lobbyCode, err)
-		return
-	}
-
-	var buf bytes.Buffer
-	var emptyQuestion db.TriviaQuestion
-	var emptyScoreboard []db.GetLobbyScoreboardRow
-	var emptyRoundScoreboard []db.GetRoundScoreboardRow
-	var emptyDistribution []events.AnswerStat
-	err = triviatmpl.GameContent(
-		lobby,
-		players,
-		round,
-		false,
-		emptyQuestion,
-		false,
-		false,
-		false,
-		0,
-		g.countActivePlayers(lobbyCode, players, time.Now(), ""),
-		false,
-		emptyScoreboard,
-		emptyRoundScoreboard,
-		emptyDistribution,
-		0,
-		0,
-	).Render(ctx, &buf)
-	if err != nil {
-		log.Printf("[trivia-subscriber] Failed to render game content: %v", err)
-		return
-	}
-
-	hub.Broadcast(ctx, lobbyCode, buf.Bytes())
+	log.Printf("[trivia-subscriber] Game started for lobby %s, round %d", lobbyCode, payload.RoundNumber)
+	ws.BroadcastUpdateTrigger(ctx, lobbyCode, hub)
 }
 
 func (g *TriviaGame) broadcastQuestionSubmitted(ctx context.Context, lobbyCode string, payload events.QuestionSubmittedPayload, hub *ws.Hub) {
