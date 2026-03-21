@@ -22,7 +22,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ## Current Focus
 
 - **[Work Party Prep](./work-party-prep.md)** - Getting the platform polished and ready for a company social event.
-- **Immediate next execution:** Final game-day rehearsal pass (6–8 players) and friction cleanup.
+- **Immediate next execution:** Trivia result-integrity/reconnect clarity pass, then a 6-8 player rehearsal and friction cleanup.
 
 ---
 

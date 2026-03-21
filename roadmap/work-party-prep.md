@@ -5,128 +5,112 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-17
+updated: 2026-03-21
 effort: L
 depends-on: []
 ---
 
 # Work Party Prep (Launch Readiness)
 
-**Goal:** Make Trivia and Cluster genuinely fun to play at a work social event. Polish over new mechanics.
+## Intent
 
-## Phase 1: Stabilize (Done)
-**Objective:** Eliminate visual glitches and create a smooth, app-like feel.
+Make Trivia and Cluster reliably fun at a work social event. Favor fast starts, legible state, safe-by-default content, and memorable reveal moments over new mechanics.
 
-- [x] **Refactor WebSocket Refreshes**:
-    - Changed `broadcastRoundAdvanced` and `broadcastQuestionRevealed` to HTMX trigger events.
-    - Updated frontend `game_content` container to listen and `hx-get` refresh.
+## Current Focus
 
-- [x] **Answer Status Polish**:
-    - Smooth "Who has answered" updates via `hx-swap-oob="true"`.
+Final game-day readiness pass after the major polish work already shipped.
 
-- [x] **Disconnect handling baseline**:
-    - WebSocket reconnects now trigger an automatic lobby/game resync.
-    - Player list shows disconnected/reconnecting participants.
-    - Trivia and Cluster stop waiting forever once a disconnected player exceeds the reconnect grace window.
-    - Host role transfers automatically after the grace window if the current host never returns.
+Immediate execution order:
 
-## Phase 2: Trivia Question Friction
-**Objective:** Remove "writer's block" so games start fast and questions are good.
+1. Trivia result integrity + reconnect clarity
+2. AI assist handling for first-person / personal facts
+3. Audience wording pass across Trivia and Cluster
+4. Question pack collision decision
+5. 6-8 player rehearsal and friction cleanup
 
-- [x] **Content Rating System** ([archived/content-rating.md](./archived/content-rating.md)):
-    - Host selects audience (Adults / Work / Kids) at lobby creation.
-    - Host can change audience while lobby is still waiting.
-    - Lobby + content filtering implemented (`min_rating <= lobby.content_rating`) for Cluster and authored Trivia questions.
+## Completion Snapshot
 
-- [x] **Curated Question Packs**:
-    - Pre-built themed decks (work essentials, product/tech, pop culture, quick brain boost, world snapshot).
-    - Pack-first modal in question submission flow (players can still write their own).
-    - Pack/template visibility filtered by lobby content rating.
-    - Submitted pack questions are already marked used per lobby so they do not reappear after selection is finalized.
-    - Solves friction immediately — no API cost, no latency, works offline.
+Shipped and validated so far:
 
-- [ ] **Question pack collision control**:
-    - Decide whether duplicate pack picks within the same round are acceptable or should be actively discouraged before submission.
-    - Current gap: two players can still choose the same pack question concurrently before either one submits.
-    - Evaluate lightweight mitigation options:
-      - Randomize pack ordering per player.
-      - Show a rotating subset instead of the full pack.
-      - Reserve / temporarily hide a template once a player selects it.
-      - Assign non-overlapping suggestions per round or per player.
-    - Prefer solutions that reduce collisions without making the flow feel restrictive or confusing.
+- [x] Stabilized HTMX/WebSocket refresh flow so Trivia and Cluster update without full-screen flicker.
+- [x] Added smooth answer-status updates and reconnect-driven resync behavior.
+- [x] Added disconnect grace handling plus automatic host fallback after grace expiry.
+- [x] Shipped shared audience/content rating controls for Trivia and Cluster.
+- [x] Shipped curated Trivia question packs filtered by audience.
+- [x] Shipped AI trivia drafting with local fallback, mocked e2e coverage, busy state, and stronger prompt handling.
+- [x] Expanded Cluster prompt-axis pool, improved prompt quality, and broadened axis variety.
+- [x] Added Cluster reveal choreography plus post-reveal outlier/debrief insights.
+- [x] Added unanswered-result bars, clickable home branding, intentional host handoff, baseline analytics, game instructions, and accessibility baseline fixes.
 
-- [x] **AI Question Assist** (optional layer on top of packs):
-    - "Generate Question" button on the submit form.
-    - AI generates 1 question + answers, constrained by lobby content rating.
-    - Player can edit before submitting. AI enhances, doesn't replace.
-    - OpenRouter-enabled when explicitly configured; local fallback generator keeps flow working without network/API key.
-    - Deterministic mocked e2e coverage added for AI assist so normal validation does not spend money or depend on live provider behavior.
-    - Default OpenRouter model updated to `google/gemini-3.1-pro-preview`.
-    - Prompt contract upgraded to handle generic topics, stated facts, and personal-question shells in one path.
+## Specification
 
-- [ ] **AI assist quality + UX follow-up**:
-    - [x] Add an e2e path that exercises LLM generation safely and deterministically (no accidental billable live call during normal validation).
-    - [x] Add a visible busy state while AI draft generation is running.
-    - [x] Fix keyboard flow so tabbing from the AI topic input reaches the generate button reliably.
-    - [x] Visually pair "Question pack" and "AI draft" so players can immediately see one is curated/manual and the other is AI-assisted.
-    - [x] Add clearer prompt-writing guidance and examples for the AI draft input.
-    - [x] Improve prompt handling for personal/familiarity prompts so named subjects are preserved (`Justin` stays `Justin`) and the system can generate question shells with placeholders instead of inventing fake facts.
-    - Upgrade distractor generation so personal questions yield convincing alternatives when the user already knows the correct answer.
-    - Allow iterative AI refinement on a drafted trivia question instead of forcing a full regenerate from scratch each time.
-    - Save authored or AI-assisted trivia questions into a personal question bank so players can reuse and adapt them in future games.
-    - Local env loading now uses shell-compatible `.env.local` semantics in `make` targets and startup, avoiding stale or malformed inherited provider credentials during local runs.
-    - Current live-provider blocker after auth is OpenRouter timeout with Gemini.
+### Slice 1: Trivia result integrity + reconnect clarity
 
-## Phase 3: Cluster Content Overhaul
-**Objective:** Make Cluster rounds provoke opinions and split the room.
+- [ ] Stop keying Trivia answers and results by answer text alone.
+- [ ] Use stable option identity for answer storage, correctness, and revealed result aggregation.
+- [ ] Make the reconnect grace window legible to hosts and players so "waiting on reconnect" is clearly distinct from a stalled game.
+- [ ] Re-check Trivia reconnect/resync behavior so returning players do not appear to rewind room state.
 
-**Current priority:** Final game-day rehearsal follow-ups (6-8 player dry run and friction cleanup).
+### Slice 2: AI assist quality follow-up
 
-- [x] **Expand prompt-axis pool** (quantity):
-    - Target: 30+ prompt-axis combinations (migration seeds 60 combinations).
-    - Enough for multiple full sessions without repeats.
+- [x] Mocked e2e path exists for AI generation without a live billable call.
+- [x] Busy/loading state is visible while generation is running.
+- [x] Keyboard flow reaches the generate button correctly.
+- [x] AI draft and question-pack affordances are visually grouped.
+- [x] Prompt guidance/examples are clearer.
+- [x] Named-subject and familiarity prompts preserve subject identity instead of inventing facts.
+- [ ] Improve first-person fact handling so input like `my favorite fruit is blueberry` becomes a question using the player's name or a placeholder such as `[MY_NAME]`.
+- [ ] Upgrade distractor generation so personal questions still produce plausible wrong answers.
+- [ ] Allow iterative AI refinement of a draft instead of forcing full regeneration.
+- [ ] Save authored or AI-assisted questions into a reusable personal bank.
+- [ ] Resolve or explicitly defer the current live-provider blocker: OpenRouter timeout after auth with Gemini.
 
-- [x] **Improve prompt quality** (spiciness):
-    - Prompts should provoke genuine disagreement, not consensus.
-    - Rubric: Would people argue about this after the reveal?
-    - Tag each combination with content rating.
+### Slice 3: Audience wording pass
 
-- [x] **Add axis variety**:
-    - More axis sets beyond the current 2.
-    - Axes should create meaningful splits (not just agree/disagree).
+- [ ] Replace shared `Polite mode` / `Prompt filter` copy with clearer audience-safety language in Trivia and Cluster.
+- [ ] Keep one shared control if possible, since the same rating affects Cluster prompts plus Trivia packs and AI-generated Trivia.
+- [ ] Verify the revised wording reads cleanly in create-lobby, waiting-lobby, and in-game surfaces.
 
-## Phase 4: Cluster Reveal Juice
-**Objective:** Make the centroid reveal a dramatic, memorable moment.
+### Slice 4: Question pack collision control
 
-- [x] **Reveal choreography**:
-    - Animate points appearing on the plane.
-    - Centroid drops in with emphasis.
-    - Winner highlight with visual flourish.
+- [ ] Decide whether duplicate pack picks in the same round are acceptable or should be actively discouraged.
+- [ ] If mitigation is needed, prefer a lightweight approach that reduces collisions without making pack selection feel restrictive.
+- [ ] Candidate options:
+  - Randomize pack ordering per player.
+  - Show a rotating subset instead of the full pack.
+  - Temporarily reserve or hide a template once selected.
+  - Assign non-overlapping suggestions per round or player.
 
-- [x] **Post-reveal insights**:
-    - Show who was the outlier.
-    - Optional discussion prompt ("Why did the group land here?").
+### Slice 5: Rehearsal pass and friction cleanup
 
-## Phase 5: Small Polish
-**Objective:** Quality-of-life improvements that add up.
+- [ ] Run a final 6-8 player rehearsal across Trivia and Cluster.
+- [ ] Capture every observed friction point, then ship only the fixes that materially improve game-day flow.
+- [ ] Prefer clarity, recovery, and pacing fixes over new feature ideas.
 
-- [x] **Trivia: show "unanswered" bar** in the revealed results distribution.
-- [x] **Audience control styling pass**: radio options and lobby audience controls aligned with existing UI visual language.
-- [x] **Home navigation affordance**: make the top-level `Mindmeld` branding clickable so players can return to the platform home page from lobby / join flows.
-- [ ] **Intentional host handoff**:
-    - Add a shared lobby-level control so the current host can explicitly pass host to another connected player.
-    - Scope the first version to the waiting lobby and between-round moments, not mid-question interaction.
-    - Keep automatic fallback on disconnect as the safety net; manual handoff is for intentional facilitation changes, not failure recovery.
-    - Validate both games with e2e coverage for auto-fallback and, when shipped, manual transfer.
-- [ ] **Audience wording pass**:
-    - Replace shared `Polite mode` / `Prompt filter` copy with language that reads more clearly in both Trivia and Cluster.
-    - Proposed direction: position the toggle as an audience-safety setting, e.g. `Polite, professional, and safe for all audiences`.
-    - Keep one shared control if possible, since the same content rating already affects both Cluster prompts and Trivia packs / AI-generated trivia.
-- [x] **Baseline analytics wiring**: Plausible script loaded in shared layout for site-wide pageview capture.
-- [x] **Game instructions** ([game-instructions.md](./game-instructions.md)): pre-game rules screen.
-- [x] **Accessibility baseline pass**: added skip link/main landmark, AI assist live status messaging, and keyboard/screen-reader-friendly question-pack dialog behavior.
+### Follow-on (only if readiness work is complete)
 
-## Phase 6: Flavor Expansion (Planned)
-**Objective:** Add conversation-first "juice" moments without drifting from the north star.
+- [ ] Execute the highest-value items from [juice-playbook.md](./juice-playbook.md) in small, testable slices without compromising game-day stability.
 
-- [ ] Execute highest-value items from [juice-playbook.md](./juice-playbook.md) in small, testable slices.
+## Validation
+
+- [ ] Run `make fmt` and `make lint` after each shipped slice.
+- [ ] Run `go build -o bin/server ./cmd/server` after code changes.
+- [ ] Run `make e2e-test` before closing a UI-affecting slice. The dev server must already be running; the user will start it.
+- [ ] For Trivia submit/AI/audience-copy work, run `make e2e-flow ARGS="templates"` and review generated PNGs in `e2e/screenshots/`.
+- [ ] For live Trivia flow/reconnect work, run `make e2e-flow ARGS="trivia CODE"` when a test lobby is available and review the screenshots.
+- [ ] For Cluster-facing wording or rehearsal follow-ups, run `make e2e-flow ARGS="coordinates CODE"` when a test lobby is available and review the screenshots.
+
+## Scope
+
+- In scope: launch-readiness polish, clarity, recovery, pacing, content quality, and safe-by-default wording.
+- Out of scope: new game modes, large database/content authoring systems, or risky pre-event architecture work.
+- Out of scope: any fix that requires migrations, infra changes, or live-provider dependency unless the event-readiness benefit is clear and immediate.
+
+## Context
+
+- Canonical roadmap overview: [index.md](./index.md)
+- Trivia polish backlog: [trivia.md](./trivia.md)
+- Cluster MVP status: [cluster-mvp.md](./cluster-mvp.md)
+- Player guidance shipped here: [game-instructions.md](./game-instructions.md)
+- Optional flavor follow-ons: [juice-playbook.md](./juice-playbook.md)
+- Prior audience/content-rating work: [archived/content-rating.md](./archived/content-rating.md)
