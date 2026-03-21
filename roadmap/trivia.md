@@ -5,7 +5,7 @@ description: "Core trivia game MVP with real-time play and polish tasks."
 tags: [area/game, type/feature, tech/websocket]
 priority: medium
 created: 2025-12-14
-updated: 2026-03-17
+updated: 2026-03-21
 effort: L
 depends-on: []
 ---
@@ -40,10 +40,10 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 ## TODO (Host & Players)
 
 - [x] **Host transfer on disconnect**: If host leaves mid-game, automatically transfer host to the earliest still-connected player after the reconnect grace window
-- [ ] **Manual host transfer**: Allow host to transfer host role to another player via UI
-  - Implement as a shared lobby capability so Trivia and Cluster use the same handoff rules.
-  - First release should allow transfer while waiting and between rounds; avoid mid-question transfer until the control model is clearer.
-  - Limit choices to currently connected players and confirm the handoff before applying it.
+- [x] **Manual host transfer**: Allow host to transfer host role to another player via UI
+  - Shared lobby capability used by both Trivia and Cluster.
+  - First release supports waiting lobbies plus between-round / revealed states.
+  - Choices are limited to currently connected players and require explicit confirmation.
 
 ---
 
@@ -75,10 +75,23 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 - [x] **Host-only start button**: Only display the "Start Game" button to the host player
 - [x] **Fix white background on scroll**: Body/html background color shows white when scrolling past content
 - [ ] **Show answer status while waiting**: Display which players have answered in the players section (for both question author and players who have already answered)
+- [x] **Fix duplicate answer identity**: Stop keying submitted answers and result bars by answer text alone
+  - Stable option identity (slot / answer ID) now drives answer submission, correctness checks, and results aggregation.
+  - Result bars expose per-slot identity so duplicated answer text no longer causes mirrored vote counts.
+  - Added e2e coverage with intentionally duplicated option text so this does not regress.
 - [ ] ~~**Fix answer flicker**: UI flickers when other players submit answers (likely WebSocket update causing full re-render)~~ (Being refactored in [Work Party Prep](./work-party-prep.md))
 - [x] **Handle ties on scoreboard**: Display a tie instead of arbitrarily choosing a winner when scores are equal
 - [ ] **Better tie visualization**: Visually distinct handling for tied round winners (multiple crowns) and tied game winners
 - [ ] **Author live results**: Allow the question author to see the live answer distribution graph while others are answering, instead of the static "Your Question" screen.
+- [ ] **Disconnect grace UX clarity**: Make the reconnect window legible to host and players
+  - During the grace window, show that a disconnected player is still temporarily blocking progress and can still rejoin.
+  - Add explicit host-facing copy for the waiting state, ideally with player name and countdown / grace status.
+  - Verify reconnect behavior does not appear to "rewind" the question flow when a player returns during grace.
+
+- [ ] **Personal fact placeholder handling in AI assist**: Improve prompt interpretation for first-person fact inputs
+  - If a player types a fact like `my favorite fruit is blueberry`, generate a question that either preserves the player's name or uses a safe placeholder like `[MY_NAME]`.
+  - Avoid turning first-person facts into awkward generic trivia phrasing or inventing a third-person subject.
+  - Cover both named-subject prompts and unnamed first-person prompts in mocked AI assist tests.
 
 ## TODO (Game Flow)
 

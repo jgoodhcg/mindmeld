@@ -30,15 +30,9 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 			{{ shuffled := ShuffleAnswers(question) }}
 			for _, ans := range shuffled {
 				{{
-					count := 0
-					for _, stat := range distribution {
-						if stat.Answer == ans.Value {
-							count = stat.Count
-							break
-						}
-					}
+					count := CountDistributionForAnswer(question, distribution, ans)
 					percent := CalculatePercentage(count, resultsTotal)
-					isCorrect := ans.Value == question.CorrectAnswer
+					isCorrect := ans.IsCorrect
 
 					// Color logic
 					barColor := "bg-cyan" // Default for "answering" phase
@@ -53,7 +47,7 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 						}
 					}
 				}}
-				<div class="relative">
+				<div class="relative" data-answer-key={ ans.Key }>
 					<div class="flex items-center justify-between text-sm mb-1 px-1">
 						<span class="font-mono font-bold text-text-muted">{ ans.Label }. { ans.Value }</span>
 						<span class="font-mono text-text">{ fmt.Sprintf("%d%%", percent) }</span>

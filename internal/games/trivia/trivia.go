@@ -118,21 +118,8 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 								if a.PlayerID == player.ID {
 									hasAnswered = true
 								}
-								found := false
-								for i, stat := range distribution {
-									if stat.Answer == a.SelectedAnswer {
-										distribution[i].Count++
-										found = true
-										break
-									}
-								}
-								if !found {
-									distribution = append(distribution, events.AnswerStat{
-										Answer: a.SelectedAnswer,
-										Count:  1,
-									})
-								}
 							}
+							distribution = buildAnswerDistributionFromAnswers(currentQuestion, answers)
 						}
 					}
 				}

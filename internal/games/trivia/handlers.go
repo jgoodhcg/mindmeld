@@ -11,6 +11,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 	"github.com/jgoodhcg/mindmeld/internal/events"
 	"github.com/jgoodhcg/mindmeld/internal/questions"
+	"github.com/jgoodhcg/mindmeld/internal/triviaanswer"
 	triviatmpl "github.com/jgoodhcg/mindmeld/templates/trivia"
 )
 
@@ -480,15 +481,21 @@ func (g *TriviaGame) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	normalizedAnswer := triviaanswer.NormalizeSelection(targetQuestion, selectedAnswer)
+	if !triviaanswer.IsRecognizedSelection(targetQuestion, normalizedAnswer) {
+		http.Error(w, "Invalid answer", http.StatusBadRequest)
+		return
+	}
+
 	// 4. Check Answer
-	isCorrect := (selectedAnswer == targetQuestion.CorrectAnswer)
+	isCorrect := triviaanswer.IsCorrectSelection(targetQuestion, normalizedAnswer)
 	player := auth.GetPlayer(r.Context())
 
 	// 5. Submit Answer
 	_, err = g.queries.SubmitAnswer(r.Context(), db.SubmitAnswerParams{
 		QuestionID:     questionID,
 		PlayerID:       player.ID,
-		SelectedAnswer: selectedAnswer,
+		SelectedAnswer: normalizedAnswer,
 		IsCorrect:      isCorrect,
 	})
 	if err != nil {
@@ -500,16 +507,8 @@ func (g *TriviaGame) handleSubmitAnswer(w http.ResponseWriter, r *http.Request) 
 	questionComplete := false
 
 	// Prepare distribution stats
-	distribution := []events.AnswerStat{}
 	rawStats, err := g.queries.GetAnswerStats(r.Context(), questionID)
-	if err == nil {
-		for _, s := range rawStats {
-			distribution = append(distribution, events.AnswerStat{
-				Answer: s.SelectedAnswer,
-				Count:  int(s.Count),
-			})
-		}
-	}
+	distribution := buildAnswerDistributionFromStats(targetQuestion, rawStats)
 
 	if err == nil {
 		targetPerQuestion := int64(g.countActivePlayers(code, lobbyPlayers, time.Now(), targetQuestion.Author.String()))

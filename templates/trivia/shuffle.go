@@ -5,24 +5,23 @@ import (
 	"math/rand"
 
 	"github.com/jgoodhcg/mindmeld/internal/db"
+	"github.com/jgoodhcg/mindmeld/internal/events"
+	"github.com/jgoodhcg/mindmeld/internal/triviaanswer"
 )
 
 // ShuffledAnswer represents an answer option with its display label
 type ShuffledAnswer struct {
-	Label string // A, B, C, D
-	Value string // The answer text
+	Key       string // Stable answer identity
+	Label     string // A, B, C, D
+	Value     string // The answer text
+	IsCorrect bool
 }
 
 // ShuffleAnswers returns the question's answers in a randomized order.
 // The shuffle is seeded by the question ID for consistency - the same
 // question always shows answers in the same shuffled order.
 func ShuffleAnswers(q db.TriviaQuestion) []ShuffledAnswer {
-	answers := []string{
-		q.CorrectAnswer,
-		q.WrongAnswer1,
-		q.WrongAnswer2,
-		q.WrongAnswer3,
-	}
+	answers := append([]triviaanswer.Option(nil), triviaanswer.Options(q)...)
 
 	// Seed with question ID for deterministic shuffle
 	seed := int64(binary.BigEndian.Uint64(q.ID.Bytes[:8]))
@@ -38,10 +37,22 @@ func ShuffleAnswers(q db.TriviaQuestion) []ShuffledAnswer {
 	result := make([]ShuffledAnswer, 4)
 	for i, ans := range answers {
 		result[i] = ShuffledAnswer{
-			Label: labels[i],
-			Value: ans,
+			Key:       ans.Key,
+			Label:     labels[i],
+			Value:     ans.Value,
+			IsCorrect: ans.IsCorrect,
 		}
 	}
 
 	return result
+}
+
+func CountDistributionForAnswer(question db.TriviaQuestion, distribution []events.AnswerStat, answer ShuffledAnswer) int {
+	count := 0
+	for _, stat := range distribution {
+		if triviaanswer.NormalizeSelection(question, stat.Answer) == answer.Key {
+			count += stat.Count
+		}
+	}
+	return count
 }

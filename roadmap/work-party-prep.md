@@ -46,8 +46,8 @@ Shipped and validated so far:
 
 ### Slice 1: Trivia result integrity + reconnect clarity
 
-- [ ] Stop keying Trivia answers and results by answer text alone.
-- [ ] Use stable option identity for answer storage, correctness, and revealed result aggregation.
+- [x] Stop keying Trivia answers and results by answer text alone.
+- [x] Use stable option identity for answer storage, correctness, and revealed result aggregation.
 - [ ] Make the reconnect grace window legible to hosts and players so "waiting on reconnect" is clearly distinct from a stalled game.
 - [ ] Re-check Trivia reconnect/resync behavior so returning players do not appear to rewind room state.
 

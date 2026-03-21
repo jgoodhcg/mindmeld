@@ -204,10 +204,7 @@ func (g *TriviaGame) handleGraceExpired(ctx context.Context, lobbyCode string) b
 	if err != nil {
 		return false
 	}
-	distribution := make([]events.AnswerStat, 0, len(rawStats))
-	for _, stat := range rawStats {
-		distribution = append(distribution, events.AnswerStat{Answer: stat.SelectedAnswer, Count: int(stat.Count)})
-	}
+	distribution := buildAnswerDistributionFromStats(currentQuestion, rawStats)
 
 	if err = g.queries.UpdateRoundQuestionState(ctx, db.UpdateRoundQuestionStateParams{
 		ID:                round.ID,
