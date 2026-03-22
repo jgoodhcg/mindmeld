@@ -280,26 +280,51 @@ templ GameContent(
 							@MarkerLegend()
 							@ScoreExplanation()
 							<div class="space-y-2">
-								<div class="grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono">
-									<div class="col-span-5">Player</div>
-									<div class="col-span-2 text-right">Round pts</div>
-									<div class="col-span-2 text-right">Avg/round</div>
-									<div class="col-span-3 text-right">Total pts</div>
+								<div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+									<p class="font-mono text-xs uppercase tracking-widest text-text-muted">Reveal standings</p>
+									<p class="text-xs text-text-muted">Dist from you: 0.00 = same point, 1.41 = opposite corners.</p>
 								</div>
-								for _, s := range standings {
-									{{
-										rowClass := "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-base border-border"
-										if s.IsLeader {
-											rowClass = "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-amber/10 border-amber/50"
+								<div class="overflow-x-auto">
+									<div class="min-w-[640px] space-y-2">
+										<div class="grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono">
+											<div class="col-span-3">Player</div>
+											<div class="col-span-2 text-right">Round pts</div>
+											<div class="col-span-2 text-right" data-cluster-distance-header="true">Dist from you</div>
+											<div class="col-span-2 text-right">Avg/round</div>
+											<div class="col-span-3 text-right">Total pts</div>
+										</div>
+										for _, s := range standings {
+											{{
+												rowClass := "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-base border-border"
+												if s.IsLeader {
+													rowClass = "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-amber/10 border-amber/50"
+												}
+											}}
+											<div class={ rowClass }>
+												<div class="col-span-3 truncate text-text">
+													<span>{ s.Nickname }</span>
+													if s.IsCurrentPlayer {
+														<span class="ml-2 inline-flex rounded border border-cyan/30 bg-cyan/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-cyan">You</span>
+													}
+												</div>
+												<div class="col-span-2 text-right font-mono text-cyan">{ fmt.Sprintf("%d", s.RoundPoints) }</div>
+												<div class="col-span-2 text-right font-mono text-cyan" data-cluster-distance-cell="true">
+													if s.HasDistanceFromYou {
+														if s.IsCurrentPlayer {
+															You
+														} else {
+															{ formatDistance(s.DistanceFromYou) }
+														}
+													} else {
+														-
+													}
+												</div>
+												<div class="col-span-2 text-right font-mono text-cyan">{ formatAveragePoints(s.AvgPointsPerRound) }</div>
+												<div class="col-span-3 text-right font-mono text-text">{ fmt.Sprintf("%d", s.TotalPoints) }</div>
+											</div>
 										}
-									}}
-									<div class={ rowClass }>
-										<div class="col-span-5 text-text truncate">{ s.Nickname }</div>
-										<div class="col-span-2 text-right font-mono text-cyan">{ fmt.Sprintf("%d", s.RoundPoints) }</div>
-										<div class="col-span-2 text-right font-mono text-cyan">{ formatAveragePoints(s.AvgPointsPerRound) }</div>
-										<div class="col-span-3 text-right font-mono text-text">{ fmt.Sprintf("%d", s.TotalPoints) }</div>
 									</div>
-								}
+								</div>
 							</div>
 							if isHost {
 								<form action={ templ.SafeURL("/lobbies/" + lobby.Code + "/cluster/next") } method="POST">

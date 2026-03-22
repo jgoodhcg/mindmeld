@@ -3,7 +3,7 @@ title: "Cluster Delivery Log"
 status: active
 description: "Running implementation notes for Cluster: what worked, what missed, prompt count, and estimated token/cost usage."
 created: 2026-02-10
-updated: 2026-02-10
+updated: 2026-03-22
 tags: [area/game, type/log]
 priority: medium
 ---
@@ -30,6 +30,49 @@ Assumptions used for rough USD estimates:
 `estimated_cost_usd ~= (input_tokens * 0.000005) + (output_tokens * 0.000015)`
 
 ## Running Entries
+
+### 2026-03-22 - Two-player Cluster support + viewer distance readout
+
+Scope delivered:
+- lowered Cluster's minimum start gate from 3 active players to 2
+- kept centroid scoring unchanged so two-player rounds still reveal the midpoint target
+- added viewer-relative `Dist from you` values in reveal standings so small groups have an immediate comparison metric
+- updated automated coverage from 3-player round flow to 2-player flow with distance assertions
+
+What went right:
+- the gameplay change stayed localized to the start gate, reveal scoring helper, and standings template
+- no alternate demo-only mode was needed; the real game loop now works for small-group demos and real pair play
+- pairwise distance adds useful post-reveal discussion fuel even when centroid scoring ties in 2-player rounds
+
+Follow-up notes:
+- two-player rounds currently tie on centroid points by design because both players are equally far from the midpoint
+- the new distance column is intended as additional reveal texture, not a replacement scoring rule
+
+### 2026-03-22 - Production Cluster library import
+
+Scope delivered:
+- validated canonical source from `content/cluster/source`
+- imported `cluster-library-v1` into production
+- confirmed production schema was already current through migration `007`
+- deactivated older `cluster-seed-v2` prompt/axis/pair rows to avoid mixing libraries in live selection
+
+Production content state after import:
+- 103 prompts
+- 17 axis sets
+- 515 prompt-axis pairs
+- availability by audience:
+  - Mild (10): 90 pairs
+  - Polite (20): 440 pairs
+  - Adults (30): 515 pairs
+
+What went right:
+- importer dry-run cleanly reported production-safe create counts with no managed existing rows
+- no migration work was needed because production schema was already caught up
+- deactivating the older seed content kept runtime selection deterministic and avoided silently mixing old/new pools
+
+Follow-up notes:
+- roadmap/docs were behind the actual tooling state; production import confirmed the file-first content pipeline is now operational, not speculative
+- review tooling still exists as a local workflow, but production content operations currently rely on CLI import rather than an in-app admin surface
 
 ### 2026-02-10 - Cluster MVP implementation + stabilization
 

@@ -40,7 +40,7 @@ func (g *ClusterGame) handleStartGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if g.countActivePlayers(code, players, time.Now()) < minPlayersToStart {
-		http.Error(w, "Cluster needs at least 3 players to start", http.StatusBadRequest)
+		http.Error(w, "Cluster needs at least 2 players to start", http.StatusBadRequest)
 		return
 	}
 

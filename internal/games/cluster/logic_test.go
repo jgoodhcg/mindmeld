@@ -39,6 +39,16 @@ func TestCalculateRoundPoints(t *testing.T) {
 	}
 }
 
+func TestCalculateDistance(t *testing.T) {
+	if got := CalculateDistance(0.5, 0.5, 0.5, 0.5); got != 0 {
+		t.Fatalf("expected matching points distance 0, got %v", got)
+	}
+
+	if got := CalculateDistance(1.0, 1.0, 0.0, 0.0); got != maxDistance {
+		t.Fatalf("expected opposite corners distance %v, got %v", maxDistance, got)
+	}
+}
+
 func TestSelectNextUnusedPairNoRepeat(t *testing.T) {
 	ordered := []string{"pair-a", "pair-b", "pair-c"}
 	used := map[string]bool{"pair-a": true}

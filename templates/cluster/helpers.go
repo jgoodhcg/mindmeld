@@ -57,6 +57,10 @@ func formatAveragePoints(points float64) string {
 	return fmt.Sprintf("%.1f", points)
 }
 
+func formatDistance(distance float64) string {
+	return fmt.Sprintf("%.2f", distance)
+}
+
 func centerStyle(x, y float64) string {
 	clampedX := clampUnit(x)
 	clampedY := clampUnit(y)

@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-21
+updated: 2026-03-22
 effort: L
 depends-on: []
 ---
@@ -39,7 +39,9 @@ Shipped and validated so far:
 - [x] Shipped curated Trivia question packs filtered by audience.
 - [x] Shipped AI trivia drafting with local fallback, mocked e2e coverage, busy state, and stronger prompt handling.
 - [x] Expanded Cluster prompt-axis pool, improved prompt quality, and broadened axis variety.
+- [x] Imported the expanded Cluster source library to production (`cluster-library-v1`: 103 prompts, 17 axes, 515 pairs) and deactivated the older `cluster-seed-v2` content.
 - [x] Added Cluster reveal choreography plus post-reveal outlier/debrief insights.
+- [x] Enabled 2-player Cluster rounds and added a reveal-time `Dist from you` comparison so quick demos and small-group play still feel informative.
 - [x] Added unanswered-result bars, clickable home branding, intentional host handoff, baseline analytics, game instructions, and accessibility baseline fixes.
 
 ## Specification
@@ -59,7 +61,7 @@ Shipped and validated so far:
 - [x] AI draft and question-pack affordances are visually grouped.
 - [x] Prompt guidance/examples are clearer.
 - [x] Named-subject and familiarity prompts preserve subject identity instead of inventing facts.
-- [ ] Improve first-person fact handling so input like `my favorite fruit is blueberry` becomes a question using the player's name or a placeholder such as `[MY_NAME]`.
+- [x] Improve first-person fact handling so input like `my favorite fruit is blueberry` becomes a question using the player's name or a placeholder such as `[MY_NAME]`.
 - [ ] Upgrade distractor generation so personal questions still produce plausible wrong answers.
 - [ ] Allow iterative AI refinement of a draft instead of forcing full regeneration.
 - [ ] Save authored or AI-assisted questions into a reusable personal bank.

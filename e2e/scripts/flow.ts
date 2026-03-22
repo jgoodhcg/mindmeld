@@ -136,7 +136,7 @@ async function coordinatesFlow(page: Page, lobbyCode: string) {
     code = match ? match[1] : lobbyCode;
     console.log(`  Created lobby code: ${code}`);
 
-    // Add two extra players so Cluster can start (minimum 3 players).
+    // Add one extra player so Cluster can start (minimum 2 players).
     const browser = page.context().browser();
     if (browser) {
       const joinAs = async (nickname: string) => {
@@ -155,7 +155,6 @@ async function coordinatesFlow(page: Page, lobbyCode: string) {
       };
 
       await joinAs('FlowPlayer2');
-      await joinAs('FlowPlayer3');
       await page.waitForTimeout(1000);
     }
   } else {
@@ -178,7 +177,7 @@ async function coordinatesFlow(page: Page, lobbyCode: string) {
 
   const startBtn = page.locator('form[action$="/cluster/start"] button:has-text("START CLUSTER")').first();
   if (await startBtn.isVisible().catch(() => false)) {
-    await page.waitForSelector('#player-list li:nth-child(3)', { timeout: 10000 }).catch(() => {});
+    await page.waitForSelector('#player-list li:nth-child(2)', { timeout: 10000 }).catch(() => {});
     await Promise.all([
       page.waitForLoadState('networkidle'),
       startBtn.click(),
@@ -207,7 +206,6 @@ async function coordinatesFlow(page: Page, lobbyCode: string) {
   if (extraPlayers.length > 0) {
     const extraPoints = [
       { x: 0.82, y: 0.22 },
-      { x: 0.61, y: 0.73 },
     ];
 
     for (let i = 0; i < extraPlayers.length; i++) {
