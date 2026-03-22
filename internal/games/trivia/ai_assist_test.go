@@ -142,6 +142,40 @@ func TestBuildQuestionAssistPromptsForPersonalShell(t *testing.T) {
 	}
 }
 
+func TestBuildQuestionAssistPromptsForFirstPersonFact(t *testing.T) {
+	systemPrompt, userPrompt := buildQuestionAssistPrompts(contentrating.Work, "my favorite fruit is blueberry")
+
+	if !strings.Contains(systemPrompt, "rewrite it using [MY_NAME] as the subject placeholder") {
+		t.Fatalf("expected [MY_NAME] guidance in system prompt, got %q", systemPrompt)
+	}
+	if userPrompt != "Now generate a question from this input:\nFirst-person stated fact about [MY_NAME]: my favorite fruit is blueberry" {
+		t.Fatalf("unexpected user prompt %q", userPrompt)
+	}
+}
+
+func TestGenerateLocalQuestionFromFirstPersonFact(t *testing.T) {
+	q := generateLocalQuestion(contentrating.Work, "my favorite fruit is blueberry")
+
+	if q.Source != "local-fallback" {
+		t.Fatalf("expected local fallback source, got %q", q.Source)
+	}
+	if q.QuestionText != "What is [MY_NAME]'s favorite fruit?" {
+		t.Fatalf("unexpected question text %q", q.QuestionText)
+	}
+	if q.CorrectAnswer != "blueberry" {
+		t.Fatalf("unexpected correct answer %q", q.CorrectAnswer)
+	}
+	answers := []string{q.CorrectAnswer, q.WrongAnswer1, q.WrongAnswer2, q.WrongAnswer3}
+	seen := make(map[string]bool, len(answers))
+	for _, answer := range answers {
+		key := strings.ToLower(answer)
+		if seen[key] {
+			t.Fatalf("expected unique answers, got %+v", answers)
+		}
+		seen[key] = true
+	}
+}
+
 func TestCleanTopicAllowsLongerPromptInputs(t *testing.T) {
 	input := "Make a personal multiple-choice question from this fact: Jess' go-to karaoke song is Mr. Brightside and keep Jess in the question text."
 	cleaned := cleanTopic(input)

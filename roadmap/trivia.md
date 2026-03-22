@@ -5,7 +5,7 @@ description: "Core trivia game MVP with real-time play and polish tasks."
 tags: [area/game, type/feature, tech/websocket]
 priority: medium
 created: 2025-12-14
-updated: 2026-03-21
+updated: 2026-03-22
 effort: L
 depends-on: []
 ---
@@ -89,7 +89,7 @@ Implement a minimal game loop: create lobby → join with name → submit questi
   - [x] Verify reconnect behavior does not appear to "rewind" the question flow when a player returns during grace.
 
 - [ ] **Personal fact placeholder handling in AI assist**: Improve prompt interpretation for first-person fact inputs
-  - If a player types a fact like `my favorite fruit is blueberry`, generate a question that either preserves the player's name or uses a safe placeholder like `[MY_NAME]`.
+  - [x] If a player types a fact like `my favorite fruit is blueberry`, generate a question that either preserves the player's name or uses a safe placeholder like `[MY_NAME]`.
   - Avoid turning first-person facts into awkward generic trivia phrasing or inventing a third-person subject.
   - Cover both named-subject prompts and unnamed first-person prompts in mocked AI assist tests.
 

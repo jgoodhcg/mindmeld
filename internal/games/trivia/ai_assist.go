@@ -31,7 +31,16 @@ const (
 var (
 	openAIChatCompletionsURL     = "https://api.openai.com/v1/chat/completions"
 	openRouterChatCompletionsURL = "https://openrouter.ai/api/v1/chat/completions"
+	firstPersonFactPattern       = regexp.MustCompile(`(?i)^my\s+(.+?)\s+(is|are)\s+(.+)$`)
+	namedFactPattern             = regexp.MustCompile(`(?i)^([a-z][a-z .'-]*?)[’']s\s+(.+?)\s+(is|are)\s+(.+)$`)
 )
+
+type statedFact struct {
+	Subject   string
+	Attribute string
+	Verb      string
+	Value     string
+}
 
 type generatedQuestion struct {
 	QuestionText  string
@@ -314,6 +323,7 @@ func buildQuestionAssistPrompts(lobbyRating int16, topic string) (string, string
 		"Interpret the input in one of three modes.",
 		"Mode 1: generic topic or category. Generate a normal trivia question about that topic with one correct answer and three plausible wrong answers.",
 		"Mode 2: stated fact. Rewrite the fact into a natural player-facing question, preserve the fact exactly as the correct answer, keep any named person or subject in the question text, and generate three plausible wrong answers in the same category.",
+		"If the input is an unnamed first-person fact, rewrite it using [MY_NAME] as the subject placeholder instead of generic third-person phrasing.",
 		"Mode 3: personal question shell. If the input asks for a personal question but does not provide the fact, generate a clean question shell, do not invent any personal fact, and set correct_answer to exactly [fill in correct answer].",
 		"Never drift into adjacent trivia when the input is clearly about a specific person or stated fact.",
 		"Never fabricate personal facts.",
@@ -329,11 +339,20 @@ func buildQuestionAssistPrompts(lobbyRating int16, topic string) (string, string
 		return systemPrompt, "Now generate a question from this input:\ngeneral trivia"
 	}
 
+	if fact, ok := parseStatedFact(cleanedTopic); ok && fact.Subject == "[MY_NAME]" {
+		return systemPrompt, fmt.Sprintf("Now generate a question from this input:\nFirst-person stated fact about [MY_NAME]: %s", cleanedTopic)
+	}
+
 	return systemPrompt, fmt.Sprintf("Now generate a question from this input:\n%s", cleanedTopic)
 }
 
 func generateLocalQuestion(lobbyRating int16, topic string) generatedQuestion {
 	topic = cleanTopic(topic)
+	if fact, ok := parseStatedFact(topic); ok {
+		q := generateQuestionFromStatedFact(fact)
+		q.Source = "local-fallback"
+		return q
+	}
 	candidates := localTopicCandidates(topic, lobbyRating)
 	if len(candidates) == 0 {
 		candidates = localTopicCandidates("", lobbyRating)
@@ -427,5 +446,127 @@ func audiencePolicy(rating int16) string {
 		return "Adults: still avoid hateful/harassing or unsafe content."
 	default:
 		return "Polite, work-safe content."
+	}
+}
+
+func parseStatedFact(topic string) (statedFact, bool) {
+	cleaned := strings.TrimSpace(strings.TrimRight(topic, ".!?"))
+	if matches := firstPersonFactPattern.FindStringSubmatch(cleaned); len(matches) == 4 {
+		return statedFact{
+			Subject:   "[MY_NAME]",
+			Attribute: strings.TrimSpace(matches[1]),
+			Verb:      strings.ToLower(strings.TrimSpace(matches[2])),
+			Value:     strings.TrimSpace(matches[3]),
+		}, true
+	}
+
+	if matches := namedFactPattern.FindStringSubmatch(cleaned); len(matches) == 5 {
+		return statedFact{
+			Subject:   strings.TrimSpace(matches[1]),
+			Attribute: strings.TrimSpace(matches[2]),
+			Verb:      strings.ToLower(strings.TrimSpace(matches[3])),
+			Value:     strings.TrimSpace(matches[4]),
+		}, true
+	}
+
+	return statedFact{}, false
+}
+
+func generateQuestionFromStatedFact(fact statedFact) generatedQuestion {
+	wrongs := distractorsForFact(fact.Attribute, fact.Value)
+	return generatedQuestion{
+		QuestionText:  trimToLen(buildFactQuestionText(fact), 180),
+		CorrectAnswer: trimToLen(fact.Value, 80),
+		WrongAnswer1:  trimToLen(wrongs[0], 80),
+		WrongAnswer2:  trimToLen(wrongs[1], 80),
+		WrongAnswer3:  trimToLen(wrongs[2], 80),
+	}
+}
+
+func buildFactQuestionText(fact statedFact) string {
+	subject := possessiveSubject(fact.Subject)
+	if fact.Verb == "are" {
+		return fmt.Sprintf("What are %s %s?", subject, fact.Attribute)
+	}
+	return fmt.Sprintf("What is %s %s?", subject, fact.Attribute)
+}
+
+func possessiveSubject(subject string) string {
+	if strings.HasSuffix(subject, "s") || strings.HasSuffix(subject, "S") {
+		return subject + "'"
+	}
+	return subject + "'s"
+}
+
+func distractorsForFact(attribute string, correct string) []string {
+	pool := distractorPoolForFact(attribute, correct)
+	wrongs := make([]string, 0, 3)
+	seen := map[string]bool{
+		strings.ToLower(strings.TrimSpace(correct)): true,
+	}
+
+	for _, candidate := range pool {
+		key := strings.ToLower(strings.TrimSpace(candidate))
+		if key == "" || seen[key] {
+			continue
+		}
+		seen[key] = true
+		wrongs = append(wrongs, candidate)
+		if len(wrongs) == 3 {
+			return wrongs
+		}
+	}
+
+	fallbacks := []string{"Coffee", "Pizza", "Blue", "Dog", "Chicago", "Summer"}
+	for _, candidate := range fallbacks {
+		key := strings.ToLower(candidate)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		wrongs = append(wrongs, candidate)
+		if len(wrongs) == 3 {
+			return wrongs
+		}
+	}
+
+	for len(wrongs) < 3 {
+		candidate := fmt.Sprintf("Alternative %d", len(wrongs)+1)
+		key := strings.ToLower(candidate)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		wrongs = append(wrongs, candidate)
+	}
+
+	return wrongs
+}
+
+func distractorPoolForFact(attribute string, correct string) []string {
+	normalized := strings.ToLower(strings.TrimSpace(attribute + " " + correct))
+	switch {
+	case strings.Contains(normalized, "fruit"):
+		return []string{"Apple", "Banana", "Strawberry", "Mango", "Orange"}
+	case strings.Contains(normalized, "color"):
+		return []string{"Blue", "Green", "Red", "Purple", "Yellow"}
+	case strings.Contains(normalized, "drink"), strings.Contains(normalized, "beverage"), strings.Contains(normalized, "coffee"), strings.Contains(normalized, "tea"), strings.Contains(normalized, "soda"):
+		return []string{"Coffee", "Tea", "Lemonade", "Sparkling water", "Orange juice"}
+	case strings.Contains(normalized, "food"), strings.Contains(normalized, "snack"), strings.Contains(normalized, "meal"), strings.Contains(normalized, "dish"):
+		return []string{"Pizza", "Tacos", "Pasta", "Sushi", "Ramen"}
+	case strings.Contains(normalized, "animal"), strings.Contains(normalized, "pet"):
+		return []string{"Dog", "Cat", "Rabbit", "Turtle", "Parrot"}
+	case strings.Contains(normalized, "season"):
+		return []string{"Spring", "Summer", "Fall", "Winter"}
+	case strings.Contains(normalized, "city"), strings.Contains(normalized, "town"), strings.Contains(normalized, "hometown"):
+		return []string{"Chicago", "Seattle", "Detroit", "Austin", "Boston"}
+	case strings.Contains(normalized, "movie"), strings.Contains(normalized, "film"):
+		return []string{"Jaws", "Alien", "Casablanca", "The Matrix", "Moonrise Kingdom"}
+	case strings.Contains(normalized, "song"), strings.Contains(normalized, "karaoke"):
+		return []string{"Mr. Brightside", "Dancing Queen", "Hey Jude", "Africa", "Bohemian Rhapsody"}
+	case strings.Contains(normalized, "pronoun"):
+		return []string{"he/him", "she/her", "xe/xem", "any pronouns", "no preference"}
+	default:
+		return nil
 	}
 }
