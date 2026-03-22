@@ -101,6 +101,7 @@ test.describe('Cluster Multiplayer', () => {
       await expect(player2Page.locator('#cluster-x')).toHaveValue('0.85');
       await expect(player2Page.locator('#cluster-y')).toHaveValue('0.65');
       await expect(player2Page.locator('#cluster-coordinate-readout')).toHaveText('Selected point: (0.70, 0.30)');
+      await expect(player2Page.locator('#cluster-selected-marker')).toHaveAttribute('style', /85(?:\.00)?%/);
       await submitSelectedCoordinate(player2Page);
 
       for (const page of [hostPage, player2Page]) {

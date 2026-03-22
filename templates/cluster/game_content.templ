@@ -173,73 +173,89 @@ templ GameContent(
 							</form>
 							<script>
 							(function() {
-								const plane = document.getElementById('cluster-plane-input');
-								if (!plane || plane.dataset.bound === 'true') {
-									return;
-								}
-
-								const marker = document.getElementById('cluster-selected-marker');
-								const xInput = document.getElementById('cluster-x');
-								const yInput = document.getElementById('cluster-y');
-								const readout = document.getElementById('cluster-coordinate-readout');
-								const form = document.getElementById('cluster-submit-form');
-
-								if (!marker || !xInput || !yInput || !readout || !form) {
-									return;
-								}
-
-								plane.dataset.bound = 'true';
-								const storageKey = form.dataset.selectionKey || '';
-
-								const clamp = (v) => Math.max(0, Math.min(1, v));
-								const round2 = (v) => Math.round(v * 100) / 100;
-								const toDisplay = (v) => ((clamp(v) - 0.5) * 2);
-								const formatDisplay = (v) => {
-									const rounded = round2(v).toFixed(2);
-									return rounded === '-0.00' ? '0.00' : rounded;
-								};
-
-								function setPoint(x, y, shouldPersist) {
-									const cx = clamp(x);
-									const cy = clamp(y);
-									xInput.value = cx.toFixed(2);
-									yInput.value = cy.toFixed(2);
-									marker.style.left = `calc(${(cx * 100).toFixed(2)}% - 8px)`;
-									marker.style.top = `calc(${((1 - cy) * 100).toFixed(2)}% - 8px)`;
-									readout.textContent = `Selected point: (${formatDisplay(toDisplay(cx))}, ${formatDisplay(toDisplay(cy))})`;
-									if (shouldPersist && storageKey) {
-										window.sessionStorage.setItem(storageKey, JSON.stringify({ x: cx, y: cy }));
-									}
-								}
-
-								function updateFromPointer(event) {
-									const rect = plane.getBoundingClientRect();
-									if (!rect.width || !rect.height) {
+								const setupClusterSelection = (root) => {
+									const scope = root && root.querySelector ? root : document;
+									const plane = scope.querySelector('#cluster-plane-input');
+									if (!plane || plane.dataset.bound === 'true') {
 										return;
 									}
 
-									const relativeX = (event.clientX - rect.left) / rect.width;
-									const relativeY = 1 - ((event.clientY - rect.top) / rect.height);
-									setPoint(relativeX, relativeY, true);
-								}
+									const marker = scope.querySelector('#cluster-selected-marker');
+									const xInput = scope.querySelector('#cluster-x');
+									const yInput = scope.querySelector('#cluster-y');
+									const readout = scope.querySelector('#cluster-coordinate-readout');
+									const form = scope.querySelector('#cluster-submit-form');
 
-								const initialX = Number.parseFloat(xInput.value);
-								const initialY = Number.parseFloat(yInput.value);
-								setPoint(Number.isFinite(initialX) ? initialX : 0.5, Number.isFinite(initialY) ? initialY : 0.5, false);
-
-								if (storageKey) {
-									const stored = window.sessionStorage.getItem(storageKey);
-									if (stored) {
-										try {
-											const parsed = JSON.parse(stored);
-											if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
-												setPoint(parsed.x, parsed.y, false);
-											}
-										} catch (_) {}
+									if (!marker || !xInput || !yInput || !readout || !form) {
+										return;
 									}
-								}
 
-								plane.addEventListener('pointerdown', updateFromPointer);
+									plane.dataset.bound = 'true';
+									const storageKey = form.dataset.selectionKey || '';
+
+									const clamp = (v) => Math.max(0, Math.min(1, v));
+									const round2 = (v) => Math.round(v * 100) / 100;
+									const toDisplay = (v) => ((clamp(v) - 0.5) * 2);
+									const formatDisplay = (v) => {
+										const rounded = round2(v).toFixed(2);
+										return rounded === '-0.00' ? '0.00' : rounded;
+									};
+
+									const setPoint = (x, y, shouldPersist) => {
+										const cx = clamp(x);
+										const cy = clamp(y);
+										xInput.value = cx.toFixed(2);
+										yInput.value = cy.toFixed(2);
+										marker.style.left = `calc(${(cx * 100).toFixed(2)}% - 8px)`;
+										marker.style.top = `calc(${((1 - cy) * 100).toFixed(2)}% - 8px)`;
+										readout.textContent = `Selected point: (${formatDisplay(toDisplay(cx))}, ${formatDisplay(toDisplay(cy))})`;
+										if (shouldPersist && storageKey) {
+											window.sessionStorage.setItem(storageKey, JSON.stringify({ x: cx, y: cy }));
+										}
+									};
+
+									const updateFromPointer = (event) => {
+										const rect = plane.getBoundingClientRect();
+										if (!rect.width || !rect.height) {
+											return;
+										}
+
+										const relativeX = (event.clientX - rect.left) / rect.width;
+										const relativeY = 1 - ((event.clientY - rect.top) / rect.height);
+										setPoint(relativeX, relativeY, true);
+									};
+
+									const initialX = Number.parseFloat(xInput.value);
+									const initialY = Number.parseFloat(yInput.value);
+									setPoint(Number.isFinite(initialX) ? initialX : 0.5, Number.isFinite(initialY) ? initialY : 0.5, false);
+
+									if (storageKey) {
+										const stored = window.sessionStorage.getItem(storageKey);
+										if (stored) {
+											try {
+												const parsed = JSON.parse(stored);
+												if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
+													setPoint(parsed.x, parsed.y, false);
+												}
+											} catch (_) {}
+										}
+									}
+
+									plane.addEventListener('pointerdown', updateFromPointer);
+								};
+
+								window.__mindmeldClusterSetupSelection = setupClusterSelection;
+								setupClusterSelection(document);
+
+								if (!window.__mindmeldClusterSelectionSwapHookBound) {
+									window.__mindmeldClusterSelectionSwapHookBound = true;
+									document.body.addEventListener('htmx:afterSwap', function(event) {
+										if (!window.__mindmeldClusterSetupSelection) {
+											return;
+										}
+										window.__mindmeldClusterSetupSelection(event.target);
+									});
+								}
 							})();
 						</script>
 						}

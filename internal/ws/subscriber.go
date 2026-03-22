@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -58,7 +59,9 @@ func (s *Subscriber) HandleEvent(ctx context.Context, event events.Event) {
 		}
 		s.broadcastPlayerList(ctx, event.LobbyCode)
 		s.delegateToGame(ctx, event)
-		BroadcastUpdateTrigger(ctx, event.LobbyCode, s.hub)
+		if !ok || s.shouldRefreshGameContentForPresence(ctx, event.LobbyCode, payload) {
+			BroadcastUpdateTrigger(ctx, event.LobbyCode, s.hub)
+		}
 	default:
 		if !s.delegateToGame(ctx, event) {
 			log.Printf("[ws-subscriber] Unhandled event type: %s", event.Type)
@@ -80,6 +83,26 @@ func (s *Subscriber) delegateToGame(ctx context.Context, event events.Event) boo
 	}
 
 	return handler.HandleEvent(ctx, event, s.hub, s.queries)
+}
+
+func (s *Subscriber) shouldRefreshGameContentForPresence(ctx context.Context, lobbyCode string, payload events.PlayerPresencePayload) bool {
+	if payload.GraceExpired {
+		return true
+	}
+
+	lobby, err := s.queries.GetLobbyByCode(ctx, lobbyCode)
+	if err != nil {
+		log.Printf("[ws-subscriber] Failed to load lobby %s for presence refresh check: %v", lobbyCode, err)
+		return true
+	}
+
+	// During active Cluster rounds, transient reconnect churn from another player's form POST
+	// should not reset in-progress coordinate selection for everyone else.
+	if lobby.GameType == "cluster" && strings.EqualFold(lobby.Phase, "playing") {
+		return false
+	}
+
+	return true
 }
 
 // BroadcastUpdateTrigger sends an OOB swap that triggers the client to fetch updated game content.
