@@ -386,7 +386,7 @@ func (g *ClusterGame) getNextPromptAxisSet(ctx context.Context, q db.DBTX, lobby
 				WHERE cr.lobby_id = $1
 				  AND cr.prompt_axis_set_id = cpas.id
 		  )
-		ORDER BY cpas.created_at, cpas.id
+		ORDER BY RANDOM()
 		LIMIT 1
 	`
 
