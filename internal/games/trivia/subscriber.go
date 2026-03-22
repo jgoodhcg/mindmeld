@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"log"
+	"slices"
 	"time"
 
 	"github.com/jgoodhcg/mindmeld/internal/db"
@@ -123,6 +124,28 @@ func (g *TriviaGame) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 		answeredMap[a.PlayerID.String()] = true
 	}
 
+	players, err := queries.GetLobbyPlayers(ctx, lobby.ID)
+	if err != nil {
+		return
+	}
+	now := time.Now()
+	reconnectingAnswerBlockers := make([]string, 0)
+	for _, lobbyPlayer := range players {
+		playerID := lobbyPlayer.PlayerID.String()
+		if playerID == currentQuestion.Author.String() {
+			continue
+		}
+		if answeredMap[playerID] {
+			continue
+		}
+		presence := g.hub.Presence(lobbyCode, playerID)
+		if presence.IsDisconnected() && !presence.GraceExpiredAt(now) {
+			reconnectingAnswerBlockers = append(reconnectingAnswerBlockers, lobbyPlayer.Nickname)
+		}
+	}
+	slices.Sort(reconnectingAnswerBlockers)
+	reconnectGraceSeconds := int(g.hub.Presence(lobbyCode, currentQuestion.Author.String()).GracePeriod.Seconds())
+
 	hub.BroadcastPersonalized(ctx, lobbyCode, func(playerID string) []byte {
 		hasAnswered := answeredMap[playerID]
 		isAuthor := currentQuestion.Author.String() == playerID
@@ -137,6 +160,8 @@ func (g *TriviaGame) broadcastAnswerSubmitted(ctx context.Context, lobbyCode str
 				payload.TotalExpected,
 				false,
 				false,
+				reconnectGraceSeconds,
+				reconnectingAnswerBlockers,
 			).Render(ctx, &buf)
 
 			if err != nil {

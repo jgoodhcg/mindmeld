@@ -6,7 +6,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/events"
 )
 
-templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, totalExpectedAnswers int, isRevealed bool, isHost bool) {
+templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution []events.AnswerStat, totalAnswers int, totalExpectedAnswers int, isRevealed bool, isHost bool, reconnectGraceSeconds int, reconnectingAnswerBlockers []string) {
 	<div id="game-content" class="bg-elevated border border-border rounded p-5 sm:p-6">
 		<div class="text-center mb-6">
 			<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4">Results</h2>
@@ -87,7 +87,11 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 			} else if !isRevealed {
 				<div class="text-center animate-pulse">
 					<p class="text-cyan font-mono text-lg font-bold">LIVE RESULTS</p>
-					<p class="text-text-muted text-sm">Waiting for other players...</p>
+					if len(reconnectingAnswerBlockers) > 0 {
+						<p class="text-text-muted text-sm">Waiting on reconnect before revealing results...</p>
+					} else {
+						<p class="text-text-muted text-sm">Waiting for other players...</p>
+					}
 				</div>
 			} else {
 				<div class="text-center">
@@ -95,5 +99,6 @@ templ QuestionResults(lobbyCode string, question db.TriviaQuestion, distribution
 				</div>
 			}
 		</div>
+		@ReconnectNotice(reconnectingAnswerBlockers, reconnectGraceSeconds, isHost && !isRevealed)
 	</div>
 }

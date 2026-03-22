@@ -3,6 +3,7 @@ package trivia
 import (
 	"context"
 	"log"
+	"slices"
 	"time"
 
 	"github.com/a-h/templ"
@@ -61,6 +62,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 	var totalExpectedAnswers int
 	var submissionExpectedCount int
 	var hostTransferOptions []lobbyview.HostTransferOption
+	var reconnectingAnswerBlockers []string
 	now := time.Now()
 
 	if isHost {
@@ -114,12 +116,29 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 						answers, err := g.queries.GetAnswersForQuestion(ctx, currentQuestion.ID)
 						if err == nil {
 							totalAnswers = len(answers)
+							answeredPlayerIDs := make(map[string]struct{}, len(answers))
 							for _, a := range answers {
 								if a.PlayerID == player.ID {
 									hasAnswered = true
 								}
+								answeredPlayerIDs[a.PlayerID.String()] = struct{}{}
 							}
 							distribution = buildAnswerDistributionFromAnswers(currentQuestion, answers)
+
+							for _, lobbyPlayer := range players {
+								playerID := lobbyPlayer.PlayerID.String()
+								if playerID == currentQuestion.Author.String() {
+									continue
+								}
+								if _, alreadyAnswered := answeredPlayerIDs[playerID]; alreadyAnswered {
+									continue
+								}
+								presence := g.hub.Presence(lobby.Code, playerID)
+								if presence.IsDisconnected() && !presence.GraceExpiredAt(now) {
+									reconnectingAnswerBlockers = append(reconnectingAnswerBlockers, lobbyPlayer.Nickname)
+								}
+							}
+							slices.Sort(reconnectingAnswerBlockers)
 						}
 					}
 				}
@@ -130,7 +149,7 @@ func (g *TriviaGame) RenderContent(ctx context.Context, lobby db.Lobby, players 
 		}
 	}
 
-	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, submissionExpectedCount, isHost, hostTransferOptions, scoreboard, roundScoreboard, distribution, totalAnswers, totalExpectedAnswers)
+	return triviatmpl.GameContent(lobby, players, activeRound, hasSubmitted, currentQuestion, questionActive, isAuthor, hasAnswered, submittedCount, submissionExpectedCount, isHost, hostTransferOptions, scoreboard, roundScoreboard, distribution, totalAnswers, totalExpectedAnswers, int(g.hub.Presence(lobby.Code, player.ID.String()).GracePeriod.Seconds()), reconnectingAnswerBlockers)
 }
 
 func (g *TriviaGame) countActivePlayers(lobbyCode string, players []db.GetLobbyPlayersRow, now time.Time, excludedPlayerID string) int {

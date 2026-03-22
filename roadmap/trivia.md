@@ -83,10 +83,10 @@ Implement a minimal game loop: create lobby → join with name → submit questi
 - [x] **Handle ties on scoreboard**: Display a tie instead of arbitrarily choosing a winner when scores are equal
 - [ ] **Better tie visualization**: Visually distinct handling for tied round winners (multiple crowns) and tied game winners
 - [ ] **Author live results**: Allow the question author to see the live answer distribution graph while others are answering, instead of the static "Your Question" screen.
-- [ ] **Disconnect grace UX clarity**: Make the reconnect window legible to host and players
-  - During the grace window, show that a disconnected player is still temporarily blocking progress and can still rejoin.
-  - Add explicit host-facing copy for the waiting state, ideally with player name and countdown / grace status.
-  - Verify reconnect behavior does not appear to "rewind" the question flow when a player returns during grace.
+- [x] **Disconnect grace UX clarity**: Make the reconnect window legible to host and players
+  - [x] During the grace window, show that a disconnected player is still temporarily blocking progress and can still rejoin.
+  - [x] Add explicit host/player-facing copy for the waiting state, including the blocking player name and grace-window messaging.
+  - [x] Verify reconnect behavior does not appear to "rewind" the question flow when a player returns during grace.
 
 - [ ] **Personal fact placeholder handling in AI assist**: Improve prompt interpretation for first-person fact inputs
   - If a player types a fact like `my favorite fruit is blueberry`, generate a question that either preserves the player's name or uses a safe placeholder like `[MY_NAME]`.

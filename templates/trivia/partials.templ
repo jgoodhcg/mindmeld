@@ -1,6 +1,9 @@
 package trivia
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // SubmitStatus renders the status counter and start button for the host.
 // Used for WebSocket OOB swap when question.submitted event occurs.
@@ -65,5 +68,21 @@ templ AnswerStatus(answeredCount int, totalExpected int, isUpdate bool) {
 				hx-swap-oob="true"
 			}
 		></div>
+	}
+}
+
+templ ReconnectNotice(playerNames []string, graceSeconds int, isHost bool) {
+	if len(playerNames) > 0 {
+		{{
+			names := strings.Join(playerNames, ", ")
+			message := "Waiting on reconnect from " + names + ". The round will continue automatically if they return or the " + fmt.Sprintf("%d", graceSeconds) + "s grace window expires."
+			if isHost {
+				message = "Waiting on reconnect from " + names + " before revealing results. The round will continue automatically if they return or the " + fmt.Sprintf("%d", graceSeconds) + "s grace window expires."
+			}
+		}}
+		<div class="mt-4 rounded border border-amber/40 bg-amber/10 px-4 py-3 text-left">
+			<p class="font-mono text-xs uppercase tracking-widest text-amber mb-1">Reconnect Window Active</p>
+			<p class="text-sm text-text-muted">{ message }</p>
+		</div>
 	}
 }

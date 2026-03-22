@@ -5,7 +5,7 @@ import (
 	"github.com/jgoodhcg/mindmeld/internal/db"
 )
 
-templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool, answeredCount int, totalExpected int) {
+templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool, answeredCount int, totalExpected int, isHost bool, reconnectGraceSeconds int, reconnectingAnswerBlockers []string) {
 	<div class="bg-elevated border border-border rounded p-5 sm:p-6">
 		<div class="text-center mb-6">
 			<h2 class="font-mono text-sm tracking-widest uppercase text-text-muted mb-4">Select Answer</h2>
@@ -35,5 +35,6 @@ templ AnswerQuestion(lobby db.Lobby, question db.TriviaQuestion, isAuthor bool, 
 			</form>
 			@AnswerStatus(answeredCount, totalExpected, false)
 		}
+		@ReconnectNotice(reconnectingAnswerBlockers, reconnectGraceSeconds, isHost)
 	</div>
 }
