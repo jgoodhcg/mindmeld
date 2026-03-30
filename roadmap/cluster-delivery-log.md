@@ -3,7 +3,7 @@ title: "Cluster Delivery Log"
 status: active
 description: "Running implementation notes for Cluster: what worked, what missed, prompt count, and estimated token/cost usage."
 created: 2026-02-10
-updated: 2026-03-22
+updated: 2026-03-30
 tags: [area/game, type/log]
 priority: medium
 ---
@@ -30,6 +30,40 @@ Assumptions used for rough USD estimates:
 `estimated_cost_usd ~= (input_tokens * 0.000005) + (output_tokens * 0.000015)`
 
 ## Running Entries
+
+### 2026-03-30 - Cluster playtest feedback capture
+
+What was observed:
+- players understood the basic premise and immediately started thinking about the prompt in terms of where it belongs on the coordinate plane
+- one core rules question surfaced quickly during reveal: "am I answering this myself, or trying to guess where someone else put it?"
+- the debrief prompt/readout was readable enough to support post-reveal discussion
+- the session ended early because the tester had to leave for another meeting, so pacing and late-session stamina still need a longer rehearsal
+
+What this suggests:
+- the core interaction is legible, but the objective framing still needs to be sharper at round start and reveal
+- prompt quality/review is now a clear gating task; content confidence matters before adding more mechanics
+- centroid-only reveal may not be enough long-term; comparative or similarity-based insights could add depth after event-readiness work is done
+
+Follow-up notes:
+- prioritize a prompt-library review pass and wording clarity ahead of new mode work
+- park "make it more interesting beyond centroid" ideas in the post-MVP roadmap rather than the event-readiness slice
+- run another longer Cluster rehearsal to validate pacing, discussion energy, and end-of-game flow
+
+### 2026-03-22 - Cluster selection stability + prompt variety
+
+Scope delivered:
+- randomized unused prompt-axis selection instead of walking the pool in deterministic created-at order
+- prevented transient presence refreshes during active Cluster rounds from wiping another player's in-progress coordinate selection
+- added e2e coverage that asserts the selected marker survives live updates while another player submits
+
+What went right:
+- the selection-randomization change stayed small and preserved the existing no-repeat-per-lobby rule
+- the live-update fix stayed targeted to presence-triggered content refreshes, rather than disabling real-time behavior entirely
+- validating the selected marker in e2e closed the gap between the user-visible bug and automated coverage
+
+Follow-up notes:
+- randomized selection improves replay variety, but it raises the quality bar on the entire prompt pool because weak prompts are now more likely to surface earlier
+- future Cluster UI work should keep protecting local in-progress selection from unrelated websocket churn
 
 ### 2026-03-22 - Two-player Cluster support + viewer distance readout
 

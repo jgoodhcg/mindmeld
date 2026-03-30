@@ -5,7 +5,7 @@ description: "Post-MVP roadmap for content tooling, AI augmentation, and reveal/
 tags: [area/game, type/roadmap]
 priority: medium
 created: 2026-02-10
-updated: 2026-02-10
+updated: 2026-03-30
 effort: L
 depends-on: [cluster-mvp.md]
 ---
@@ -25,6 +25,19 @@ Use this test for every enhancement:
 - Does this avoid turning the experience into passive screen-watching?
 
 If attention cost is high and discussion lift is low, defer it.
+
+## Recent Playtest Signals
+
+From a 2026-03-30 Cluster playtest:
+
+- Players understood the premise and naturally mapped the prompt onto the plane.
+- A rules ambiguity still surfaced: are players answering for themselves, or trying to predict each other?
+- The current debrief prompt was readable enough to support conversation.
+- There is interest in making the game feel richer than pure centroid scoring, but prompt quality still looks like the first bottleneck.
+
+Implication:
+- First, improve prompt quality and round framing.
+- Then evaluate deeper reveal layers that add conversation fuel without turning the game into analytics homework.
 
 ## Phase Plan (Do Not Implement Yet)
 
@@ -57,6 +70,9 @@ If attention cost is high and discussion lift is low, defer it.
   - AI-generated optional discussion starter about centroid placement
   - AI-generated optional cluster labels
   - session-level trend analysis summaries
+  - nearest-neighbor / "who thinks most like you on this axis?" callouts
+  - cross-prompt similarity summaries ("you were consistently high-confidence / low-spice across rounds")
+  - relative-to-other-games or player-profile comparisons, only if they clearly increase conversation more than screen attention
 
 ### Phase 5: Labeled Points & Cross-Session Visibility
 
@@ -150,7 +166,7 @@ For each mode, assess:
 ## Candidate Features Moved from Prior Combined Roadmap
 
 - Benchmark mode (AI or historical anchor points).
-- 1-2 player support variants.
+- Solo-only variants, if single-player practice or content QA ever becomes useful.
 - Team mode and longitudinal trend analysis.
 
 ## Evaluation Matrix Template (Per Feature)

@@ -22,7 +22,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 ## Current Focus
 
 - **[Work Party Prep](./work-party-prep.md)** - Getting the platform polished and ready for a company social event.
-- **Immediate next execution:** Trivia result-integrity/reconnect clarity pass, then a 6-8 player rehearsal and friction cleanup.
+- **Immediate next execution:** Audience wording pass, Cluster prompt review/prune, question-pack collision decision, then a 6-8 player rehearsal and friction cleanup.
 
 ---
 
@@ -69,7 +69,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 | 2 | **Content Rating System** | Done | Foundation shipped: host audience control + filtering tiers in gameplay content selection |
 | 3 | **Curated Trivia Packs** | Done | Pack-based, work-safe-first templates shipped for faster starts |
 | 4 | **AI Question Assist** | Done | Generate button shipped with audience-safe constraints + local fallback |
-| 5 | **Cluster Prompt Overhaul** | Done | New migration seeds 60 combinations and retires weak starter prompts |
+| 5 | **Cluster Prompt Overhaul** | Done | Expanded Cluster content shipped and imported: 103 prompts, 17 axes, 515 prompt-axis pairs |
 | 6 | **Cluster Reveal Juice** | Done | Staggered reveal motion + centroid drop + outlier/debrief insights shipped |
 | 7 | **Game instructions screen** | Done | Role-based pre-game + in-game help shipped for both games |
 | 8 | **Accessibility pass** | Backlog | Contrast, keyboard use, screen reader flow. Note: Safari tab order is not intuitive/consistent with other browsers |

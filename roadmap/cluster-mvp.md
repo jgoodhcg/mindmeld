@@ -5,7 +5,7 @@ description: "Playable real-time Cluster game with shipped scope, validation bas
 tags: [area/game, type/feature]
 priority: high
 created: 2026-01-11
-updated: 2026-03-22
+updated: 2026-03-30
 effort: M
 depends-on: []
 ---
@@ -24,7 +24,7 @@ Implemented and validated:
 - [x] Database schema and migrations for prompts, axis sets, prompt-axis pairs, rounds, and submissions.
 - [x] Seed content with normalized prompt/axis provenance fields.
 - [x] Minimum 2-player start gate and host-controlled round flow.
-- [x] Prompt/axis no-repeat selection per lobby session.
+- [x] Prompt/axis no-repeat selection per lobby session with randomized ordering among unused pairs.
 - [x] Centroid-distance scoring (0-100), winner detection, and cumulative standings.
 - [x] Session exhaustion handling when prompt-axis pool is consumed.
 - [x] Interactive click/tap coordinate plane submission (no raw numeric UX).
@@ -37,7 +37,7 @@ Implemented and validated:
 - [x] Deterministic game listing order on platform page.
 - [x] Automated test coverage:
   - unit tests for centroid and scoring logic
-  - cluster multiplayer e2e for 2-player lobby flow with distance readout
+  - cluster multiplayer e2e for 2-player lobby flow with distance readout and preserved local selection during live updates
   - e2e visual flow screenshots for cluster states/reveal
 
 ## MVP Completion Note

@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-22
+updated: 2026-03-30
 effort: L
 depends-on: []
 ---
@@ -22,11 +22,10 @@ Final game-day readiness pass after the major polish work already shipped.
 
 Immediate execution order:
 
-1. Trivia result integrity + reconnect clarity
-2. AI assist handling for first-person / personal facts
-3. Audience wording pass across Trivia and Cluster
-4. Question pack collision decision
-5. 6-8 player rehearsal and friction cleanup
+1. Audience wording pass across Trivia and Cluster
+2. Cluster prompt review/prune + round-goal clarity pass
+3. Question pack collision decision
+4. 6-8 player rehearsal and friction cleanup
 
 ## Completion Snapshot
 
@@ -42,6 +41,7 @@ Shipped and validated so far:
 - [x] Imported the expanded Cluster source library to production (`cluster-library-v1`: 103 prompts, 17 axes, 515 pairs) and deactivated the older `cluster-seed-v2` content.
 - [x] Added Cluster reveal choreography plus post-reveal outlier/debrief insights.
 - [x] Enabled 2-player Cluster rounds and added a reveal-time `Dist from you` comparison so quick demos and small-group play still feel informative.
+- [x] Randomized Cluster prompt-axis selection and prevented live updates from wiping in-progress coordinate picks during active rounds.
 - [x] Added unanswered-result bars, clickable home branding, intentional host handoff, baseline analytics, game instructions, and accessibility baseline fixes.
 
 ## Specification
@@ -88,6 +88,18 @@ Shipped and validated so far:
 - [ ] Run a final 6-8 player rehearsal across Trivia and Cluster.
 - [ ] Capture every observed friction point, then ship only the fixes that materially improve game-day flow.
 - [ ] Prefer clarity, recovery, and pacing fixes over new feature ideas.
+- [ ] Complete a Cluster prompt-library review/prune pass before the final rehearsal.
+- [ ] Tighten Cluster round-start/reveal wording so players are clearly answering for themselves, not predicting each other.
+- Latest Cluster playtest notes from 2026-03-30:
+  - premise + coordinate-plane interaction landed quickly
+  - one important rules question remains: is the player placing their own answer or trying to predict someone else's placement?
+  - debrief copy/readout was readable
+  - prompt review is now clearly a readiness task, not a nice-to-have
+  - session ended early for a meeting, so pacing/endurance still need a longer rehearsal
+- Readiness follow-up for Cluster:
+  - tighten round-start/reveal wording so the goal is unambiguous
+  - review and prune weak prompts before adding new mechanics
+  - defer "beyond centroid" expansion ideas until after launch-readiness polish is complete
 
 ### Follow-on (only if readiness work is complete)
 
