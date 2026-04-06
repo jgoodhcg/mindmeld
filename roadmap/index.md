@@ -83,6 +83,7 @@ If a feature makes the game stickier but less social, it's wrong for Mindmeld.
 - Hive Mind (cooperative convergence)
 - Polarity (spectrum game)
 - Pecking Order (ranking/sorting)
+- Buzzer (speed trivia / game show buzz-in)
 - See [ideas.md](./ideas.md) for the full backlog
 
 ## Key Links

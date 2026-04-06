@@ -5,7 +5,7 @@ description: "Raw game concepts awaiting promotion to work units."
 tags: [area/product, type/idea]
 priority: low
 created: 2026-01-11
-updated: 2026-02-07
+updated: 2026-04-06
 effort: XS
 depends-on: []
 ---
@@ -34,7 +34,13 @@ A holding pen for game concepts. These are not fully specced work units yet.
 *   **Loop:** Prompt ("Most likely to survive zombie apocalypse") -> Everyone ranks the other players -> Reveal consensus vs. biggest disagreements.
 *   **Vibe:** Roasting friends (requires established groups).
 
-### 4. Metadata (Phone as Player)
+### 4. Buzzer (Speed Trivia)
+*   **Concept:** Game show-style buzz-in race.
+*   **Loop:** Host (or rotating designator) asks a question -> Players buzz in -> First to buzz gets the floor to answer -> Sounds/visuals indicate who buzzed first.
+*   **Vibe:** High-energy, competitive, "Jeopardy" feel.
+*   **Open:** Could be a Trivia game mode or standalone game.
+
+### 5. Metadata (Phone as Player)
 *   **Concept:** Using the device's actual state as content.
 *   **Loop:** Prompt ("Battery %", "Unread Emails") -> Users enter true stats -> Group guesses who owns the extreme values.
 *   **Vibe:** Low-stakes roasting based on habits.
