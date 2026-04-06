@@ -29,7 +29,7 @@ func TestScoreRoundReturnsWinnersAndOutliers(t *testing.T) {
 		},
 	}
 
-	dots, _, distances, winners, outliers := scoreRound(submissions, 0.5, 0.5, uuidByte(1).String())
+	dots, _, _, distances, winners, outliers := scoreRound(submissions, 0.5, 0.5, uuidByte(1).String())
 	if len(dots) != 3 {
 		t.Fatalf("expected 3 dots, got %d", len(dots))
 	}
@@ -69,7 +69,7 @@ func TestScoreRoundTwoPlayersExposeViewerDistancesWithoutOutliers(t *testing.T) 
 		},
 	}
 
-	_, roundPoints, distances, winners, outliers := scoreRound(submissions, 0.475, 0.425, hostID.String())
+	_, roundPoints, _, distances, winners, outliers := scoreRound(submissions, 0.475, 0.425, hostID.String())
 
 	if roundPoints[hostID.String()] != roundPoints[guestID.String()] {
 		t.Fatalf("expected two-player centroid scoring tie, got %d vs %d", roundPoints[hostID.String()], roundPoints[guestID.String()])

@@ -16,18 +16,18 @@ type DotView struct {
 	Y               float64
 	Points          int
 	AnimationDelay  int
-	IsWinner        bool
+	IsOutlier       bool
 	IsCurrentPlayer bool
 }
 
 // StandingView is one row in standings.
 type StandingView struct {
 	Nickname           string
-	RoundPoints        int
-	TotalPoints        int
-	AvgPointsPerRound  float64
+	DistanceFromCenter float64
+	HasCenterDistance  bool
 	DistanceFromYou    float64
 	HasDistanceFromYou bool
 	IsCurrentPlayer    bool
-	IsLeader           bool
+	TotalPoints        int
+	AvgPointsPerRound  float64
 }

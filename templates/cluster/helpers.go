@@ -27,18 +27,42 @@ func plotStyleAnimated(x, y float64, radiusPx int, delayMs int) string {
 }
 
 func dotClass(dot DotView) string {
-	// Default all other players to gray; highlight current player in cyan.
-	className := "absolute h-4 w-4 rounded-full border border-base bg-text-muted"
+	className := "absolute z-10 h-4 w-4 rounded-full border border-base bg-text"
 	if dot.IsCurrentPlayer {
-		className = "absolute h-4 w-4 rounded-full border border-base bg-cyan"
+		className += " ring-2 ring-cyan ring-offset-2 ring-offset-base"
 	}
-
-	// Winner outline matches amber scoreboard highlight.
-	if dot.IsWinner {
-		className += " ring-2 ring-amber ring-offset-1 ring-offset-base"
-	}
-
 	return className
+}
+
+func dotLabelClass(dot DotView) string {
+	className := "absolute z-0 whitespace-nowrap rounded bg-base/75 px-1.5 py-0.5 text-[10px] leading-none text-text-muted"
+	if dot.IsOutlier {
+		className += " border border-amber/40 text-amber"
+	}
+	return className
+}
+
+func dotLabelStyle(dot DotView) string {
+	left := clampUnit(dot.X) * 100
+	top := (1 - clampUnit(dot.Y)) * 100
+
+	xTransform := "-50%"
+	textAlign := "center"
+	switch {
+	case dot.X <= 0.18:
+		xTransform = "0"
+		textAlign = "left"
+	case dot.X >= 0.82:
+		xTransform = "-100%"
+		textAlign = "right"
+	}
+
+	labelTop := fmt.Sprintf("calc(%.2f%% - 14px)", top)
+	if dot.Y >= 0.82 {
+		labelTop = fmt.Sprintf("calc(%.2f%% + 12px)", top)
+	}
+
+	return fmt.Sprintf("left: %.2f%%; top: %s; transform: translateX(%s); text-align: %s;", left, labelTop, xTransform, textAlign)
 }
 
 func displayCoord(v float64) string {
@@ -69,26 +93,19 @@ func centerStyle(x, y float64) string {
 	return fmt.Sprintf("left: %.2f%%; top: %.2f%%;", left, top)
 }
 
-func winnerSummary(winners []string) string {
-	switch len(winners) {
-	case 0:
-		return ""
-	case 1:
-		return winners[0] + " wins this round"
-	default:
-		return strings.Join(winners, ", ") + " tie this round"
-	}
-}
-
 func outlierSummary(outliers []string) string {
 	switch len(outliers) {
 	case 0:
 		return ""
 	case 1:
-		return outliers[0] + " was furthest from the centroid"
+		return outliers[0] + " landed furthest from the group center"
 	default:
-		return strings.Join(outliers, ", ") + " were furthest from the centroid"
+		return strings.Join(outliers, ", ") + " landed furthest from the group center"
 	}
+}
+
+func spreadRingStyle(x, y float64) string {
+	return centerStyle(x, y) + "width: 25%; height: 25%; transform: translate(-50%, -50%);"
 }
 
 func clampUnit(v float64) float64 {

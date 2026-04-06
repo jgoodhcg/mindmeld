@@ -52,22 +52,22 @@ func (g *ClusterGame) Info() games.GameInfo {
 // RenderContent builds Cluster content from lobby state.
 func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players []db.GetLobbyPlayersRow, player db.Player, isHost bool) templ.Component {
 	var (
-		hasRound            bool
-		roundNumber         int32
-		prompt              clustertmpl.PromptAxisView
-		hasSubmitted        bool
-		submittedCount      int
-		expectedCount       int
-		revealed            bool
-		dots                []clustertmpl.DotView
-		centroidX           float64
-		centroidY           float64
-		roundDistances      map[string]float64
-		standings           []clustertmpl.StandingView
-		winners             []string
-		outliers            []string
-		discussionHint      string
-		hostTransferOptions []lobbyview.HostTransferOption
+		hasRound             bool
+		roundNumber          int32
+		prompt               clustertmpl.PromptAxisView
+		hasSubmitted         bool
+		submittedCount       int
+		expectedCount        int
+		revealed             bool
+		dots                 []clustertmpl.DotView
+		centroidX            float64
+		centroidY            float64
+		roundCenterDistances map[string]float64
+		roundDistances       map[string]float64
+		standings            []clustertmpl.StandingView
+		winners              []string
+		outliers             []string
+		hostTransferOptions  []lobbyview.HostTransferOption
 	)
 	now := time.Now()
 	expectedCount = g.countActivePlayers(lobby.Code, players, now)
@@ -117,15 +117,14 @@ func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players
 			if revealed {
 				centroidX = activeRound.CentroidX.Float64
 				centroidY = activeRound.CentroidY.Float64
-				dots, roundPoints, roundDistances, winners, outliers = scoreRound(submissions, centroidX, centroidY, player.ID.String())
-				discussionHint = discussionPrompt(prompt.PromptText, activeRound.RoundNumber)
+				dots, roundPoints, roundCenterDistances, roundDistances, winners, outliers = scoreRound(submissions, centroidX, centroidY, player.ID.String())
 			}
 		}
 	} else if !errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("[cluster] failed to get latest round for lobby %s: %v", lobby.Code, err)
 	}
 
-	standings, standingsErr := g.getStandings(ctx, lobby.ID, players, roundPoints, roundDistances, player.ID.String())
+	standings, standingsErr := g.getStandings(ctx, lobby.ID, players, roundPoints, roundCenterDistances, roundDistances, player.ID.String())
 	if standingsErr != nil {
 		log.Printf("[cluster] failed to build standings for lobby %s: %v", lobby.Code, standingsErr)
 	}
@@ -151,7 +150,6 @@ func (g *ClusterGame) RenderContent(ctx context.Context, lobby db.Lobby, players
 		standings,
 		winners,
 		outliers,
-		discussionHint,
 		remainingPairs,
 		exhausted,
 	)
@@ -436,7 +434,7 @@ func (g *ClusterGame) getScoredSubmissionsForLobby(ctx context.Context, q db.DBT
 	return items, nil
 }
 
-func (g *ClusterGame) getStandings(ctx context.Context, lobbyID pgtype.UUID, players []db.GetLobbyPlayersRow, roundPoints map[string]int, roundDistances map[string]float64, currentPlayerID string) ([]clustertmpl.StandingView, error) {
+func (g *ClusterGame) getStandings(ctx context.Context, lobbyID pgtype.UUID, players []db.GetLobbyPlayersRow, roundPoints map[string]int, roundCenterDistances map[string]float64, roundDistances map[string]float64, currentPlayerID string) ([]clustertmpl.StandingView, error) {
 	totals := make(map[string]int, len(players))
 	roundsPlayed := make(map[string]int, len(players))
 	names := make(map[string]string, len(players))
@@ -468,16 +466,18 @@ func (g *ClusterGame) getStandings(ctx context.Context, lobbyID pgtype.UUID, pla
 		if roundsPlayed[key] > 0 {
 			avg = float64(totals[key]) / float64(roundsPlayed[key])
 		}
+		centerDistance, hasCenterDistance := roundCenterDistances[key]
 		distanceFromYou, hasDistanceFromYou := roundDistances[key]
 
 		standings = append(standings, clustertmpl.StandingView{
 			Nickname:           nickname,
-			RoundPoints:        roundPoints[key],
-			TotalPoints:        totals[key],
-			AvgPointsPerRound:  avg,
+			DistanceFromCenter: centerDistance,
+			HasCenterDistance:  hasCenterDistance,
 			DistanceFromYou:    distanceFromYou,
 			HasDistanceFromYou: hasDistanceFromYou,
 			IsCurrentPlayer:    key == currentPlayerID,
+			TotalPoints:        totals[key],
+			AvgPointsPerRound:  avg,
 		})
 	}
 
@@ -488,24 +488,18 @@ func (g *ClusterGame) getStandings(ctx context.Context, lobbyID pgtype.UUID, pla
 		return standings[i].TotalPoints > standings[j].TotalPoints
 	})
 
-	if len(standings) > 0 {
-		top := standings[0].TotalPoints
-		for i := range standings {
-			standings[i].IsLeader = standings[i].TotalPoints == top
-		}
-	}
-
 	return standings, nil
 }
 
-func scoreRound(submissions []submissionRecord, centroidX float64, centroidY float64, currentPlayerID string) ([]clustertmpl.DotView, map[string]int, map[string]float64, []string, []string) {
+func scoreRound(submissions []submissionRecord, centroidX float64, centroidY float64, currentPlayerID string) ([]clustertmpl.DotView, map[string]int, map[string]float64, map[string]float64, []string, []string) {
 	if len(submissions) == 0 {
-		return nil, map[string]int{}, map[string]float64{}, nil, nil
+		return nil, map[string]int{}, map[string]float64{}, map[string]float64{}, nil, nil
 	}
 
 	maxPoints := -1
 	minPoints := 101
 	roundPoints := make(map[string]int, len(submissions))
+	roundCenterDistances := make(map[string]float64, len(submissions))
 	roundDistances := make(map[string]float64, len(submissions))
 	dots := make([]clustertmpl.DotView, 0, len(submissions))
 	var currentSubmission *submissionRecord
@@ -519,8 +513,10 @@ func scoreRound(submissions []submissionRecord, centroidX float64, centroidY flo
 
 	for i, sub := range submissions {
 		points := CalculateRoundPoints(sub.X, sub.Y, centroidX, centroidY)
+		centerDistance := CalculateDistance(sub.X, sub.Y, centroidX, centroidY)
 		playerKey := sub.PlayerID.String()
 		roundPoints[playerKey] = points
+		roundCenterDistances[playerKey] = centerDistance
 		if currentSubmission != nil {
 			roundDistances[playerKey] = CalculateDistance(sub.X, sub.Y, currentSubmission.X, currentSubmission.Y)
 		}
@@ -544,12 +540,12 @@ func scoreRound(submissions []submissionRecord, centroidX float64, centroidY flo
 	winners := make([]string, 0)
 	outliers := make([]string, 0)
 	for i := range dots {
-		if dots[i].Points == maxPoints {
-			dots[i].IsWinner = true
-			winners = append(winners, dots[i].Nickname)
-		}
 		if dots[i].Points == minPoints {
+			dots[i].IsOutlier = true
 			outliers = append(outliers, dots[i].Nickname)
+		}
+		if dots[i].Points == maxPoints {
+			winners = append(winners, dots[i].Nickname)
 		}
 	}
 
@@ -558,25 +554,5 @@ func scoreRound(submissions []submissionRecord, centroidX float64, centroidY flo
 	if minPoints == maxPoints {
 		outliers = nil
 	}
-	return dots, roundPoints, roundDistances, winners, outliers
-}
-
-func discussionPrompt(promptText string, roundNumber int32) string {
-	prompts := []string{
-		`Which axis mattered most in your placement, and why?`,
-		`What assumption did you make about where the group would land?`,
-		`If you moved your point now, what changed in your thinking?`,
-		`What did you optimize for first: the X-axis or the Y-axis?`,
-	}
-
-	if len(prompts) == 0 {
-		return ""
-	}
-
-	index := int(roundNumber-1) % len(prompts)
-	if index < 0 {
-		index = 0
-	}
-
-	return `For "` + promptText + `": ` + prompts[index]
+	return dots, roundPoints, roundCenterDistances, roundDistances, winners, outliers
 }

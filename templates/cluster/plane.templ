@@ -37,33 +37,24 @@ templ PlaneFrame(prompt PromptAxisView, elementID string, interactive bool) {
 templ MarkerLegend() {
 	<div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs font-mono text-text-muted">
 		<div class="flex items-center gap-2 bg-base border border-border rounded px-3 py-2">
-			<span class="inline-block h-3 w-3 rounded-full bg-text-muted"></span>
-			<span>Other players</span>
+			<span class="inline-block h-3 w-3 rounded-full border border-base bg-text"></span>
+			<span>Player point</span>
 		</div>
 		<div class="flex items-center gap-2 bg-base border border-border rounded px-3 py-2">
-			<span class="inline-block h-3 w-3 rounded-full bg-cyan"></span>
+			<span class="inline-block h-3 w-3 rounded-full border border-base bg-text ring-2 ring-cyan ring-offset-1 ring-offset-base"></span>
 			<span>Your point</span>
 		</div>
-		<div class="flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2">
-			<span class="inline-block h-3 w-3 rounded-full bg-text-muted ring-2 ring-amber"></span>
-			<span>Round winner</span>
+		<div class="flex items-center gap-2 bg-base border border-border rounded px-3 py-2">
+			<span class="rounded bg-base/90 px-1.5 py-0.5 text-[10px] leading-none text-amber border border-amber/40">OUTLIER</span>
+			<span>Outlier label</span>
 		</div>
 		<div class="flex items-center gap-2 bg-base border border-amber/50 rounded px-3 py-2">
-			<span class="relative inline-block h-3 w-3">
-				<span class="absolute inset-0 rounded-full border border-amber"></span>
-				<span class="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-amber"></span>
-				<span class="absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-amber"></span>
+			<span class="relative inline-block h-4 w-4">
+				<span class="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-amber/80"></span>
+				<span class="absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-amber/80"></span>
 			</span>
-			<span>Centroid target</span>
+			<span>Group centroid</span>
 		</div>
-	</div>
-}
-
-templ ScoreExplanation() {
-	<div class="bg-base border border-border rounded px-4 py-3 text-sm text-text-muted">
-		<p class="font-mono text-xs tracking-wide uppercase text-text mb-1">Scoring</p>
-		<p>Round points measure distance to centroid: <span class="text-success font-mono">100</span> = exact centroid, <span class="text-danger font-mono">0</span> = farthest possible point.</p>
-		<p class="mt-1">`Round` = this reveal. `Total` = cumulative across rounds.</p>
 	</div>
 }
 

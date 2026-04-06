@@ -27,7 +27,6 @@ templ GameContent(
 	standings []StandingView,
 	winners []string,
 	outliers []string,
-	discussionHint string,
 	remainingPairs int,
 	exhausted bool,
 ) {
@@ -47,11 +46,11 @@ templ GameContent(
 			@keyframes cluster-target-pulse {
 				0%, 100% {
 					transform: scale(1);
-					opacity: 1;
+					opacity: 0.95;
 				}
 				70% {
-					transform: scale(1.16);
-					opacity: 0.55;
+					transform: scale(1.08);
+					opacity: 0.65;
 				}
 			}
 
@@ -63,6 +62,17 @@ templ GameContent(
 				to {
 					opacity: 1;
 					transform: translateY(0) scale(1);
+				}
+			}
+
+			@keyframes cluster-centroid-ring {
+				from {
+					transform: translate(-50%, -50%) scale(0.7);
+					opacity: 0.75;
+				}
+				to {
+					transform: translate(-50%, -50%) scale(1.18);
+					opacity: 0;
 				}
 			}
 		</style>
@@ -114,13 +124,7 @@ templ GameContent(
 							<div class="col-span-3 text-right">Total pts</div>
 						</div>
 						for i, s := range standings {
-							{{
-								rowClass := "grid grid-cols-12 gap-2 items-center p-3 rounded border bg-base border-border"
-								if s.IsLeader {
-									rowClass = "grid grid-cols-12 gap-2 items-center p-3 rounded border bg-amber/10 border-amber/50"
-								}
-							}}
-							<div class={ rowClass }>
+							<div class="grid grid-cols-12 gap-2 items-center p-3 rounded border bg-base border-border">
 								<div class="col-span-2 font-mono text-text-muted">{ fmt.Sprintf("%02d", i+1) }</div>
 								<div class="col-span-5 text-text truncate">{ s.Nickname }</div>
 								<div class="col-span-2 text-right font-mono text-cyan">{ formatAveragePoints(s.AvgPointsPerRound) }</div>
@@ -147,12 +151,6 @@ templ GameContent(
 						<div class="bg-base border border-border rounded p-4 sm:p-5 max-w-2xl mx-auto">
 							<p class="text-text text-lg sm:text-xl leading-relaxed">{ prompt.PromptText }</p>
 						</div>
-						if !revealed {
-							<div class="max-w-2xl mx-auto rounded border border-cyan/30 bg-cyan/10 px-4 py-3 text-sm text-text-muted">
-								<p><span class="font-mono text-[11px] uppercase tracking-widest text-cyan">Round Goal</span></p>
-								<p class="mt-2">Answer for yourself. Pick the point that best matches your own take on the prompt; the centroid is calculated only after everyone submits.</p>
-							</div>
-						}
 					</div>
 					if !revealed {
 						if hasSubmitted {
@@ -259,7 +257,7 @@ templ GameContent(
 										if (!window.__mindmeldClusterSetupSelection) {
 											return;
 										}
-										window.__mindmeldClusterSetupSelection(event.target);
+								window.__mindmeldClusterSetupSelection(event.target);
 									});
 								}
 							})();
@@ -275,62 +273,55 @@ templ GameContent(
 						<div class="space-y-5">
 							@PlaneFrame(prompt, "cluster-plane-reveal", false) {
 								for _, dot := range dots {
+									<div class={ dotLabelClass(dot) } style={ dotLabelStyle(dot) }>
+										{ dot.Nickname }
+										if dot.IsOutlier {
+											<span class="ml-1 font-mono uppercase tracking-widest">Outlier</span>
+										}
+									</div>
 									<div class={ dotClass(dot) } style={ plotStyleAnimated(dot.X, dot.Y, 8, dot.AnimationDelay) } title={ dot.Nickname + " (" + fmt.Sprintf("%d", dot.Points) + " pts)" }></div>
 								}
-								<div class="absolute h-6 w-6 rounded-full border-2 border-amber bg-amber/10" style={ plotStyle(centroidX, centroidY, 12, false) + " animation: cluster-centroid-drop 380ms ease-out both, cluster-target-pulse 1.3s 420ms infinite;" } title="Centroid target"></div>
-								<div class="absolute h-2 w-2 rounded-full bg-amber" style={ plotStyle(centroidX, centroidY, 4, false) }></div>
-								<div class="absolute h-0.5 w-8 bg-amber/85" style={ centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%);" }></div>
-								<div class="absolute h-8 w-0.5 bg-amber/85" style={ centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%);" }></div>
-								<div class="absolute h-0.5 w-7 bg-amber/50" style={ centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%) rotate(45deg);" }></div>
-								<div class="absolute h-0.5 w-7 bg-amber/50" style={ centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%) rotate(-45deg);" }></div>
+								<div class="absolute" style={ centerStyle(centroidX, centroidY) + " transform: translate(-50%, -50%);" } aria-hidden="true">
+									<div class="absolute h-24 w-24 rounded-full border border-amber/30" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+									<div class="absolute h-px w-7 bg-amber/80" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+									<div class="absolute h-7 w-px bg-amber/80" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+								</div>
 							}
 							<div class="text-center">
-								<p class="font-mono text-amber text-sm tracking-wide">CENTROID REVEALED</p>
-								if len(winners) > 0 {
-									<p class="text-text mt-1">{ winnerSummary(winners) }</p>
-								}
+								<p class="font-mono text-amber text-sm tracking-wide">GROUP CENTER REVEALED</p>
 								if len(outliers) > 0 {
 									<p class="text-text-muted text-sm mt-1">{ outlierSummary(outliers) }</p>
 								}
 							</div>
-							if discussionHint != "" {
-								<div class="rounded border border-cyan/30 bg-cyan/10 p-3">
-									<p class="font-mono text-[11px] uppercase tracking-widest text-cyan">Debrief Prompt</p>
-									<p class="text-text-muted mt-1">{ discussionHint }</p>
-								</div>
-							}
 							@MarkerLegend()
-							@ScoreExplanation()
 							<div class="space-y-2">
 								<div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-									<p class="font-mono text-xs uppercase tracking-widest text-text-muted">Reveal standings</p>
+									<p class="font-mono text-xs uppercase tracking-widest text-text-muted">Round comparison</p>
 									<p class="text-xs text-text-muted">Dist from you: 0.00 = same point, 1.41 = opposite corners.</p>
 								</div>
 								<div class="overflow-x-auto">
-									<div class="min-w-[640px] space-y-2">
+									<div class="min-w-[520px] space-y-2">
 										<div class="grid grid-cols-12 gap-2 px-3 text-xs uppercase tracking-widest text-text-muted font-mono">
-											<div class="col-span-3">Player</div>
-											<div class="col-span-2 text-right">Round pts</div>
-											<div class="col-span-2 text-right" data-cluster-distance-header="true">Dist from you</div>
-											<div class="col-span-2 text-right">Avg/round</div>
-											<div class="col-span-3 text-right">Total pts</div>
+											<div class="col-span-5">Player</div>
+											<div class="col-span-3 text-right">Center dist</div>
+											<div class="col-span-4 text-right" data-cluster-distance-header="true">Dist from you</div>
 										</div>
 										for _, s := range standings {
-											{{
-												rowClass := "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-base border-border"
-												if s.IsLeader {
-													rowClass = "grid grid-cols-12 gap-2 items-center rounded border p-3 bg-amber/10 border-amber/50"
-												}
-											}}
-											<div class={ rowClass }>
-												<div class="col-span-3 truncate text-text">
+											<div class="grid grid-cols-12 gap-2 items-center rounded border p-3 bg-base border-border">
+												<div class="col-span-5 truncate text-text">
 													<span>{ s.Nickname }</span>
 													if s.IsCurrentPlayer {
 														<span class="ml-2 inline-flex rounded border border-cyan/30 bg-cyan/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-cyan">You</span>
 													}
 												</div>
-												<div class="col-span-2 text-right font-mono text-cyan">{ fmt.Sprintf("%d", s.RoundPoints) }</div>
-												<div class="col-span-2 text-right font-mono text-cyan" data-cluster-distance-cell="true">
+												<div class="col-span-3 text-right font-mono text-cyan">
+													if s.HasCenterDistance {
+														{ formatDistance(s.DistanceFromCenter) }
+													} else {
+														-
+													}
+												</div>
+												<div class="col-span-4 text-right font-mono text-cyan" data-cluster-distance-cell="true">
 													if s.HasDistanceFromYou {
 														if s.IsCurrentPlayer {
 															You
@@ -341,8 +332,6 @@ templ GameContent(
 														-
 													}
 												</div>
-												<div class="col-span-2 text-right font-mono text-cyan">{ formatAveragePoints(s.AvgPointsPerRound) }</div>
-												<div class="col-span-3 text-right font-mono text-text">{ fmt.Sprintf("%d", s.TotalPoints) }</div>
 											</div>
 										}
 									</div>
