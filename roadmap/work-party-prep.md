@@ -5,7 +5,7 @@ description: "Polish both games for a work social event: reduce friction, expand
 tags: [area/product, type/polish]
 priority: high
 created: 2026-01-23
-updated: 2026-03-30
+updated: 2026-04-06
 effort: L
 depends-on: []
 ---
@@ -23,7 +23,7 @@ Final game-day readiness pass after the major polish work already shipped.
 Immediate execution order:
 
 1. Audience wording pass across Trivia and Cluster
-2. Cluster prompt review/prune + round-goal clarity pass
+2. Cluster prompt review/prune
 3. Question pack collision decision
 4. 6-8 player rehearsal and friction cleanup
 
@@ -43,6 +43,8 @@ Shipped and validated so far:
 - [x] Enabled 2-player Cluster rounds and added a reveal-time `Dist from you` comparison so quick demos and small-group play still feel informative.
 - [x] Randomized Cluster prompt-axis selection and prevented live updates from wiping in-progress coordinate picks during active rounds.
 - [x] Added unanswered-result bars, clickable home branding, intentional host handoff, baseline analytics, game instructions, and accessibility baseline fixes.
+- [x] Clarified Cluster so players answer for themselves instead of trying to predict the room.
+- [x] Reframed Cluster reveal around comparison rather than round winners, with group-center emphasis, subtle labels, and shape-first marker semantics.
 
 ## Specification
 
@@ -89,7 +91,10 @@ Shipped and validated so far:
 - [ ] Capture every observed friction point, then ship only the fixes that materially improve game-day flow.
 - [ ] Prefer clarity, recovery, and pacing fixes over new feature ideas.
 - [ ] Complete a Cluster prompt-library review/prune pass before the final rehearsal.
-- [ ] Tighten Cluster round-start/reveal wording so players are clearly answering for themselves, not predicting each other.
+- [x] Tighten Cluster round-start/reveal wording so players are clearly answering for themselves, not predicting each other.
+- [x] Remove default Cluster winner framing and treat centroid as group context instead of a target to beat.
+- [ ] Validate whether outlier labeling should stay on by default in 2-player rounds after rehearsal feedback.
+- [ ] Decide whether Cluster needs one lightweight extra reveal beat after curation, such as nearest-neighbor copy or an optional AI round summary with deterministic fallback.
 - Latest Cluster playtest notes from 2026-03-30:
   - premise + coordinate-plane interaction landed quickly
   - one important rules question remains: is the player placing their own answer or trying to predict someone else's placement?
@@ -97,8 +102,9 @@ Shipped and validated so far:
   - prompt review is now clearly a readiness task, not a nice-to-have
   - session ended early for a meeting, so pacing/endurance still need a longer rehearsal
 - Readiness follow-up for Cluster:
-  - tighten round-start/reveal wording so the goal is unambiguous
   - review and prune weak prompts before adding new mechanics
+  - validate the new comparison-first reveal in a longer rehearsal, especially at 2 players and 6-8 players
+  - keep any extra reveal additions lightweight and conversation-first
   - defer "beyond centroid" expansion ideas until after launch-readiness polish is complete
 
 ### Follow-on (only if readiness work is complete)

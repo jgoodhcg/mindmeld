@@ -5,7 +5,7 @@ description: "Post-MVP roadmap for content tooling, AI augmentation, and reveal/
 tags: [area/game, type/roadmap]
 priority: medium
 created: 2026-02-10
-updated: 2026-03-30
+updated: 2026-04-06
 effort: L
 depends-on: [cluster-mvp.md]
 ---
@@ -28,15 +28,16 @@ If attention cost is high and discussion lift is low, defer it.
 
 ## Recent Playtest Signals
 
-From a 2026-03-30 Cluster playtest:
+From the 2026-03-30 playtest plus the 2026-04-06 reveal pass:
 
 - Players understood the premise and naturally mapped the prompt onto the plane.
-- A rules ambiguity still surfaced: are players answering for themselves, or trying to predict each other?
-- The current debrief prompt was readable enough to support conversation.
-- There is interest in making the game feel richer than pure centroid scoring, but prompt quality still looks like the first bottleneck.
+- The original rules ambiguity has now been addressed by shifting default Cluster to self-answer + compare, not predict-to-win.
+- The reveal works better when centroid is treated as group context rather than the round's "target."
+- There is still interest in making the game feel richer than pure center-distance readouts, but prompt quality remains the first bottleneck.
+- Two-player rounds still need extra scrutiny because pair play benefits less from centroid-only interpretation.
 
 Implication:
-- First, improve prompt quality and round framing.
+- First, improve prompt quality and validate the comparison-first reveal in longer sessions.
 - Then evaluate deeper reveal layers that add conversation fuel without turning the game into analytics homework.
 
 ## Phase Plan (Do Not Implement Yet)
@@ -107,9 +108,9 @@ Alternate scoring/target modes that change the objective while keeping the same 
 ### Core Modes
 
 **Centroid (current default)**
-- Goal: Place closest to the group's centroid.
-- Scoring: Inverse distance to centroid (0-100 pts).
-- Discussion: "Why did the group center here?"
+- Goal: Place your own answer on the plane, then compare it to the group's center.
+- Reveal: Show group center, center distance, peer distance, and notable outliers without default winner framing.
+- Discussion: "Why did the room land here?" / "Who saw this differently, and why?"
 
 **Follow**
 - Goal: Place closest to a designated target player each round.

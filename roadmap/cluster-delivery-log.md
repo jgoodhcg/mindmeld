@@ -3,7 +3,7 @@ title: "Cluster Delivery Log"
 status: active
 description: "Running implementation notes for Cluster: what worked, what missed, prompt count, and estimated token/cost usage."
 created: 2026-02-10
-updated: 2026-03-30
+updated: 2026-04-06
 tags: [area/game, type/log]
 priority: medium
 ---
@@ -30,6 +30,25 @@ Assumptions used for rough USD estimates:
 `estimated_cost_usd ~= (input_tokens * 0.000005) + (output_tokens * 0.000015)`
 
 ## Running Entries
+
+### 2026-04-06 - Cluster framing clarification + comparison-first reveal
+
+Scope delivered:
+- rewrote Cluster instructions and in-game copy so players answer for themselves rather than trying to predict the room
+- removed default winner framing from reveal and repositioned centroid as the room's group center
+- simplified reveal marker semantics for better non-color readability: filled player dots, outlined current-player dot, crosshair center marker, subtle labels, and explicit outlier labels
+- replaced score-heavy reveal emphasis with center-distance and viewer-distance comparison readouts
+- removed the temporary debrief/readout panels after manual review showed they added more UI than value
+
+What went right:
+- the product decision to treat Cluster as self-answer + compare made several UI decisions easier, especially wording and reveal emphasis
+- the reveal became easier to scan once winner highlighting and extra copy blocks were removed
+- the new marker semantics move the game in a more accessibility-friendly direction because meaning no longer depends on color alone
+
+What still needs follow-up:
+- prompt-axis curation is still the biggest quality lever
+- two-player rounds need dedicated rehearsal feedback; outlier treatment may still be too aggressive in pair play
+- an optional AI round summary may still be worth testing later, but only as flavor on top of structured reveal facts with deterministic fallback
 
 ### 2026-03-30 - Cluster playtest feedback capture
 
